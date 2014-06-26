@@ -6,7 +6,7 @@ using namespace std::chrono;
 class nowadays_t
 {
 private:
-    template<class T>
+    template<typename T>
     class retriver
     {
     public:
