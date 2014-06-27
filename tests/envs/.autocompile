@@ -1,0 +1,5 @@
+
+main exeinfo_test.cpp
+out exeinfo_test
+cc_flag -std=c++11
+
