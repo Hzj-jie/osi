@@ -1,12 +1,13 @@
 
 #include <string>
 #include "os.hpp"
-using namespace std;
+#include "../template/singleton.hpp"
 
 #ifdef OS_WINDOWS
 #include <windows.h>
 namespace
 {
+    using namespace std;
     string getexepath()
     {
         char result[MAX_PATH];
@@ -19,6 +20,7 @@ namespace
 #include <unistd.h>
 namespace
 {
+    using namespace std;
     string getexepath()
     {
         char result[PATH_MAX];
@@ -28,19 +30,20 @@ namespace
 }
 #endif
 
-class exeinfo_t
+const static class exeinfo_t
 {
 private:
-    string _path;
-public:
+    std::string _path;
+
     exeinfo_t()
     {
         _path = getexepath();
     }
-
-    const string& path() const
+public:
+    const std::string& path() const
     {
         return _path;
     }
-} exeinfo;
+CONST_SINGLETON(exeinfo_t);
+}& exeinfo = exeinfo_t::instance();
 

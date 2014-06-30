@@ -28,20 +28,26 @@ exeinfo_test: exeinfo_test.cpp \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/stdarg.h \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/exception \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/atomic_lockfree_defines.h \
+ /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/exception_ptr.h \
+ /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/exception_defines.h \
+ /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/nested_exception.h \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/char_traits.h \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/stl_algobase.h \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/functexcept.h \
- /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/exception_defines.h \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/cpp_type_traits.h \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/ext/type_traits.h \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/ext/numeric_traits.h \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/stl_pair.h \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/move.h \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/concept_check.h \
+ /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/type_traits \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/stl_iterator_base_types.h \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/stl_iterator_base_funcs.h \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/debug/debug.h \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/stl_iterator.h \
+ /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/cstdint \
+ /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/stdint.h \
+ /usr/include/stdint.h /usr/include/bits/wordsize.h \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/localefwd.h \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/x86_64-pc-cygwin/bits/c++locale.h \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/clocale \
@@ -54,9 +60,7 @@ exeinfo_test: exeinfo_test.cpp \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/x86_64-pc-cygwin/bits/gthr-default.h \
  /usr/include/pthread.h /usr/include/sys/types.h \
  /usr/include/machine/types.h /usr/include/cygwin/types.h \
- /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/stdint.h \
- /usr/include/stdint.h /usr/include/bits/wordsize.h /usr/include/endian.h \
- /usr/include/bits/endian.h /usr/include/byteswap.h \
+ /usr/include/endian.h /usr/include/bits/endian.h /usr/include/byteswap.h \
  /usr/include/sys/sysmacros.h /usr/include/signal.h \
  /usr/include/sys/signal.h /usr/include/cygwin/signal.h \
  /usr/include/sched.h /usr/include/sys/sched.h /usr/include/time.h \
@@ -74,6 +78,9 @@ exeinfo_test: exeinfo_test.cpp \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/backward/binders.h \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/range_access.h \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/basic_string.h \
+ /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/initializer_list \
+ /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/functional_hash.h \
+ /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/hash_bytes.h \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/basic_string.tcc \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/locale_classes.tcc \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/streambuf \
@@ -90,7 +97,8 @@ exeinfo_test: exeinfo_test.cpp \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/ostream.tcc \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/istream \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/c++/bits/istream.tcc \
- ../../envs/exeinfo.hpp /usr/local/include/boost/predef.h \
+ ../../../envs/exeinfo.hpp ../../../envs/os.hpp \
+ /usr/local/include/boost/predef.h \
  /usr/local/include/boost/predef/language.h \
  /usr/local/include/boost/predef/language/stdc.h \
  /usr/local/include/boost/predef/version_number.h \
@@ -196,93 +204,14 @@ exeinfo_test: exeinfo_test.cpp \
  /usr/local/include/boost/predef/other/endian.h \
  /usr/local/include/boost/predef/platform.h \
  /usr/local/include/boost/predef/platform/mingw.h \
- /usr/include/w32api/windows.h /usr/include/w32api/_mingw.h \
- /usr/include/w32api/_mingw_mac.h /usr/include/w32api/_mingw_secapi.h \
- /usr/include/w32api/_cygwin.h /usr/include/w32api/vadefs.h \
- /usr/include/w32api/sdks/_mingw_directx.h \
- /usr/include/w32api/sdks/_mingw_ddk.h /usr/include/w32api/sdkddkver.h \
- /usr/include/w32api/excpt.h /usr/include/w32api/crtdefs.h \
- /usr/include/w32api/windef.h /usr/include/w32api/minwindef.h \
- /usr/include/w32api/winapifamily.h /usr/include/w32api/specstrings.h \
- /usr/include/w32api/sal.h /usr/include/w32api/winnt.h \
- /usr/include/w32api/_mingw_unicode.h /usr/include/w32api/apiset.h \
- /usr/include/w32api/psdk_inc/intrin-impl.h /usr/include/w32api/basetsd.h \
- /usr/include/w32api/guiddef.h /usr/include/string.h \
- /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include-fixed/sys/cdefs.h \
- /usr/include/sys/string.h \
- /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/x86intrin.h \
- /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/ia32intrin.h \
- /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/mmintrin.h \
- /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/xmmintrin.h \
- /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/mm_malloc.h \
- /usr/include/stdlib.h /usr/include/machine/stdlib.h \
- /usr/include/alloca.h /usr/include/cygwin/stdlib.h \
- /usr/include/cygwin/wait.h /usr/include/errno.h /usr/include/sys/errno.h \
- /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/emmintrin.h \
- /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/immintrin.h \
- /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/fxsrintrin.h \
- /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include/adxintrin.h \
- /usr/include/w32api/pshpack4.h /usr/include/w32api/poppack.h \
- /usr/include/w32api/pshpack4.h /usr/include/w32api/pshpack2.h \
- /usr/include/w32api/poppack.h /usr/include/w32api/pshpack2.h \
- /usr/include/w32api/pshpack8.h /usr/include/w32api/pshpack8.h \
- /usr/include/w32api/ktmtypes.h /usr/include/w32api/winbase.h \
- /usr/include/w32api/apisetcconv.h /usr/include/w32api/minwinbase.h \
- /usr/include/w32api/bemapiset.h /usr/include/w32api/debugapi.h \
- /usr/include/w32api/errhandlingapi.h /usr/include/w32api/fibersapi.h \
- /usr/include/w32api/fileapi.h /usr/include/w32api/handleapi.h \
- /usr/include/w32api/heapapi.h /usr/include/w32api/ioapiset.h \
- /usr/include/w32api/interlockedapi.h /usr/include/w32api/jobapi.h \
- /usr/include/w32api/libloaderapi.h /usr/include/w32api/memoryapi.h \
- /usr/include/w32api/namedpipeapi.h /usr/include/w32api/namespaceapi.h \
- /usr/include/w32api/processenv.h /usr/include/w32api/processthreadsapi.h \
- /usr/include/w32api/processtopologyapi.h \
- /usr/include/w32api/profileapi.h /usr/include/w32api/realtimeapiset.h \
- /usr/include/w32api/securityappcontainer.h \
- /usr/include/w32api/securitybaseapi.h /usr/include/w32api/synchapi.h \
- /usr/include/w32api/sysinfoapi.h /usr/include/w32api/systemtopologyapi.h \
- /usr/include/w32api/threadpoolapiset.h \
- /usr/include/w32api/threadpoollegacyapiset.h \
- /usr/include/w32api/utilapiset.h /usr/include/w32api/wow64apiset.h \
- /usr/include/w32api/winerror.h /usr/include/w32api/fltwinerror.h \
- /usr/include/w32api/timezoneapi.h /usr/include/w32api/wingdi.h \
- /usr/include/w32api/pshpack1.h /usr/include/w32api/winuser.h \
- /usr/include/w32api/tvout.h /usr/include/w32api/winnls.h \
- /usr/include/w32api/datetimeapi.h /usr/include/w32api/stringapiset.h \
- /usr/include/w32api/wincon.h /usr/include/w32api/winver.h \
- /usr/include/w32api/winreg.h /usr/include/w32api/reason.h \
- /usr/include/w32api/winnetwk.h /usr/include/w32api/wnnc.h \
- /usr/include/w32api/virtdisk.h /usr/include/w32api/cderr.h \
- /usr/include/w32api/dde.h /usr/include/w32api/ddeml.h \
- /usr/include/w32api/dlgs.h /usr/include/w32api/lzexpand.h \
- /usr/include/w32api/mmsystem.h /usr/include/w32api/nb30.h \
- /usr/include/w32api/rpc.h /usr/include/w32api/rpcdce.h \
- /usr/include/w32api/rpcdcep.h /usr/include/w32api/rpcnsi.h \
- /usr/include/w32api/rpcnterr.h /usr/include/w32api/rpcasync.h \
- /usr/include/w32api/shellapi.h /usr/include/w32api/winperf.h \
- /usr/include/w32api/wincrypt.h /usr/include/w32api/bcrypt.h \
- /usr/include/w32api/ncrypt.h /usr/include/w32api/winefs.h \
- /usr/include/w32api/winscard.h /usr/include/w32api/wtypes.h \
- /usr/include/w32api/rpcndr.h /usr/include/w32api/rpcnsip.h \
- /usr/include/w32api/rpcsal.h /usr/include/w32api/ole2.h \
- /usr/include/w32api/objbase.h /usr/include/w32api/combaseapi.h \
- /usr/include/w32api/wtypesbase.h /usr/include/w32api/unknwnbase.h \
- /usr/include/w32api/objidlbase.h /usr/include/w32api/cguid.h \
- /usr/include/w32api/objidl.h /usr/include/w32api/unknwn.h \
- /usr/include/w32api/urlmon.h /usr/include/w32api/oleidl.h \
- /usr/include/w32api/servprov.h /usr/include/w32api/msxml.h \
- /usr/include/w32api/oaidl.h /usr/include/w32api/propidl.h \
- /usr/include/w32api/oleauto.h /usr/include/w32api/winioctl.h \
- /usr/include/w32api/winsmcrd.h /usr/include/w32api/winspool.h \
- /usr/include/w32api/prsht.h /usr/include/w32api/commdlg.h \
- /usr/include/w32api/winsvc.h /usr/include/w32api/mcx.h \
- /usr/include/w32api/imm.h \
+ ../../../envs/../template/singleton.hpp \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include-fixed/limits.h \
  /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include-fixed/syslimits.h \
- /usr/include/limits.h /usr/include/features.h /usr/include/unistd.h \
- /usr/include/sys/unistd.h /usr/include/getopt.h
+ /usr/include/limits.h /usr/include/features.h \
+ /usr/lib/gcc/x86_64-pc-cygwin/4.8.3/include-fixed/sys/cdefs.h \
+ /usr/include/unistd.h /usr/include/sys/unistd.h /usr/include/getopt.h
 	g++ exeinfo_test.cpp -o exeinfo_test -std=c++11
 
 clean:
-	rm exeinfo_test
+	-rm exeinfo_test
 
