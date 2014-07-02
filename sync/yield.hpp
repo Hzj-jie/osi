@@ -1,31 +1,35 @@
 
+#include <stdint.h>
 #include <thread>
 #include "../envs/processor.hpp"
+#include "../envs/nowadays.hpp"
 using namespace std;
 
 namespace
 {
-    bool _yield(bool force = true)
+    static bool _yield(bool force = true)
     {
         if(force || should_yield())
         {
-            // TODO: not finished
+            int64_t n = nowadays.low_res.milliseconds();
+            this_thread::yield();
+            return (nowadays.low_res.milliseconds() - n > 1);
         }
         else return false;
     }
 }
 
-bool should_yield()
+static bool should_yield()
 {
     return processor.single();
 }
 
-bool force_yield()
+static bool force_yield()
 {
     return _yield(true);
 }
 
-bool not_force_yield()
+static bool not_force_yield()
 {
     return _yield(false);
 }
