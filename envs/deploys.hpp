@@ -4,7 +4,8 @@
 #include <boost/filesystem.hpp>
 #include "exeinfo.hpp"
 #include "../template/singleton.hpp"
-#include "../utils/sweeper.hpp"
+#include "../utils/auto_removed_folder.hpp"
+#include "../utils/uuid.hpp"
 
 const static class deploys_t
 {
@@ -66,6 +67,7 @@ private:
         append(log_folder);
         append(temp_folder);
 #undef append
+        _temp_folder = (path(_deploys_folder) / temp_folder_name() / uuid_str()).string();
         _service_data_folder = (path(_data_folder) / _service_name).string();
     }
 public:
@@ -82,15 +84,7 @@ public:
 #undef return_value
     const std::string& temp_folder()
     {
-        using namespace boost::filesystem;
-        static const sweeper s(
-                [this]()
-                {
-                    create_directory(_temp_folder);
-                },
-                [this]()
-                {
-                });
+        static const auto_removed_folder(_temp_folder);
         return _temp_folder;
     }
 CONST_SINGLETON(deploys_t);
