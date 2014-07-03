@@ -2,6 +2,6 @@
 #!/bin/sh
 
 make clean
-../../../autocompile/autocompile > Makefile
+autocompile > Makefile
 make
 
