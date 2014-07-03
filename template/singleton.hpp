@@ -33,8 +33,8 @@
 #endif
 #define _SINGLETON(DEC, T) \
     private: \
-        T(const T&); \
-        void operator=(const T&); \
+        T(const T&) = delete; \
+        void operator=(const T&) = delete; \
     public: \
         _SINGLETON_FUNC(DEC, T, instance,);
 
