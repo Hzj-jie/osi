@@ -6,6 +6,7 @@
 #include "../template/singleton.hpp"
 #include "../utils/auto_removed_folder.hpp"
 #include "../utils/uuid.hpp"
+#include "os.hpp"
 
 const static class deploys_t
 {
@@ -59,8 +60,11 @@ private:
         {
             _deploys_folder = p.root_path().string();
         }
+        append_directory_separator(_deploys_folder);
 
-#define append(x) _##x = (path(_deploys_folder) / x##_name()).string()
+#define append(x) { \
+    _##x = (path(_deploys_folder) / x##_name()).string(); \
+    append_directory_separator(_##x); }
         append(app_folder);
         append(counter_folder);
         append(data_folder);
@@ -68,7 +72,9 @@ private:
         append(temp_folder);
 #undef append
         _temp_folder = (path(_deploys_folder) / temp_folder_name() / uuid_str()).string();
+        append_directory_separator(_temp_folder);
         _service_data_folder = (path(_data_folder) / _service_name).string();
+        append_directory_separator(_service_data_folder);
     }
 public:
 #define return_value(x) \

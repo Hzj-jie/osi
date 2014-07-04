@@ -27,6 +27,7 @@
     CONST_STATIC_STRING redefined
 #endif
 #define CONST_STATIC_STRING(name, value) CONST_SINGLETON_FUNC(std::string, name, (#value))
+#define CONST_STATIC_STRING_EXP(name, value) CONST_SINGLETON_FUNC(std::string, name, (value))
 
 #ifdef _SINGLETON
     _SINGLETON redefined
