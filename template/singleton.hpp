@@ -1,4 +1,6 @@
 
+#pragma once
+
 #ifdef _SINGLETON_FUNC
     _SINGLETON_FUNC redefined
 #endif

@@ -14,6 +14,10 @@ int main()
         p(low_res);
         p(sys_res);
 #undef p
+        cout << nowadays.short_time()
+             << '\t'
+             << nowadays.short_time(character.minus_sign, character.minus_sign, character.minus_sign)
+             << endl;
         this_thread::sleep_for(seconds(1));
     }
 }
