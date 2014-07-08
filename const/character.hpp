@@ -13,6 +13,7 @@ public:
     DEFINE_CHARACTER(blank, " ");
     DEFINE_CHARACTER(minus_sign, "-");
     DEFINE_CHARACTER(colon, ":");
+    DEFINE_CHARACTER(underscore, "_");
 
 private:
     character_t() { }

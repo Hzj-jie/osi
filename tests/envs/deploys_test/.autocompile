@@ -1,0 +1,5 @@
+
+main deploys_test.cpp
+out deploys_test
+dlibs boost_system boost_filesystem
+

@@ -2,7 +2,8 @@
 #pragma once
 #include <boost/predef.h>
 #include <boost/filesystem.hpp>
-#include <../template/singleton.hpp>
+#include "../template/singleton.hpp"
+#include "../app_info/k_assert.hpp"
 
 #if BOOST_OS_CYGWIN || BOOST_OS_LINUX || BOOST_OS_UNIX
     #define OS_POSIX
@@ -24,7 +25,8 @@ CONST_STATIC_STRING_EXP(directory_separator, boost::filesystem::path("/").make_p
 
 static void append_directory_separator(std::string& p)
 {
-    if(!p.empty() && p.back() != directory_separator())
+    k_assert(directory_separator().size() == 1);
+    if(!p.empty() && p.back() != directory_separator()[0])
         p.append(directory_separator());
 }
 

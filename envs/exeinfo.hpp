@@ -2,6 +2,7 @@
 #include <string>
 #include "os.hpp"
 #include "../template/singleton.hpp"
+#include <boost/filesystem.hpp>
 
 #ifdef OS_WINDOWS
 #include <windows.h>
@@ -34,16 +35,33 @@ const static class exeinfo_t
 {
 private:
     std::string _path;
+    std::string _name;
+    std::string _directory;
 
     exeinfo_t()
     {
         _path = getexepath();
+        namespace bt = boost::filesystem;
+        bt::path p(_path);
+        if(!p.empty() && p.has_filename())
+        {
+            _name = p.filename().string();
+            _directory = p.parent_path().string();
+        }
+        else
+        {
+            _name = "UNKNOWN";
+            _directory = "UNKNOWN";
+        }
     }
 public:
-    const std::string& path() const
-    {
-        return _path;
-    }
+#define return_value(x) \
+    const std::string& x() const { \
+        return _##x; }
+    return_value(path);
+    return_value(name);
+    return_value(directory);
+#undef return_value
 CONST_SINGLETON(exeinfo_t);
 }& exeinfo = exeinfo_t::instance();
 

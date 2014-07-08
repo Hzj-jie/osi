@@ -1,0 +1,13 @@
+
+#include "../template/singleton.hpp"
+#include <string>
+
+const static class git_t
+{
+public:
+    CONST_STATIC_STRING(commit, COMMIT_VER);
+private:
+    git_t() { }
+CONST_SINGLETON(git_t);
+}& git = git_t::instance();
+
