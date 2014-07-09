@@ -1,5 +1,6 @@
 
 #pragma once
+#include "../envs/os.hpp"
 
 #ifdef _SINGLETON_FUNC
     _SINGLETON_FUNC redefined
@@ -30,6 +31,16 @@
 #endif
 #define CONST_STATIC_STRING(name, value) CONST_SINGLETON_FUNC(std::string, name, (#value))
 #define CONST_STATIC_STRING_EXP(name, value) CONST_SINGLETON_FUNC(std::string, name, (value))
+
+#ifdef CONST_STATIC_PATH_STRING
+    CONST_STATIC_PATH_STRING redefined
+#endif
+#if defined(BOOST_WINDOWS_API)
+    #define CONST_STATIC_PATH_STRING(name, value) CONST_SINGLETON_FUNC(boost::filesystem::path::string_type, name, (WIDE_STRING(value)))
+#elif defined(BOOST_POSIX_API)
+    #define CONST_STATIC_PATH_STRING(name, value) CONST_SINGLETON_FUNC(boost::filesystem::path::string_type, name, (#value))
+#endif
+#define CONST_STATIC_PATH_STRING_EXP(name, value) CONST_SINGLETON_FUNC(boost::filesystem::path::string_type, name, (value))
 
 #ifdef _SINGLETON
     _SINGLETON redefined

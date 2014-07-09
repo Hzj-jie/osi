@@ -4,18 +4,17 @@
 #include <iostream>
 #include <fstream>
 #include <initializer_list>
-using namespace std;
 
 class ierror_writer
 {
 public:
-    virtual void write(const string& s);
+    virtual void write(const std::string& s);
 };
 
 class console_error_writer : public ierror_writer
 {
 public:
-    virtual void write(const string& s)
+    virtual void write(const std::string& s)
     {
         cout << s;
     }
@@ -24,18 +23,18 @@ public:
 class file_error_writer : public ierror_writer
 {
 private:
-    ofstream writer;
+    std::ofstream writer;
 public:
-    virtual void write(const string& s)
+    virtual void write(const std::string& s)
     {
         if(writer) writer << s;
     }
 
-    file_error_writer(const string& file) :
+    file_error_writer(const std::string& file) :
         writer(filename) { }
 
     file_error_writer(file_error_writer&& other) :
-        writer(move(other.writer)) { }
+        writer(other.writer) { }
 
     ~file_error_writer()
     {
@@ -50,7 +49,7 @@ private:
     bool selected[error_type::last - error_type::first - 1];
 public:
     error_type_selected_error_writer(const ierror_writer& impl,
-                                     const initializer_list<error_type>& selected) :
+                                     const std::initializer_list<error_type>& selected) :
         impl(impl),
         selected({ false })
     {
@@ -62,7 +61,7 @@ public:
         }
     }
 
-    virtual void write(const string& s)
+    virtual void write(const std::string& s)
     {
         if(!s.empty())
         {

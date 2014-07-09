@@ -6,7 +6,6 @@
 #include "error_writer.hpp"
 #include "../template/singleton.hpp"
 #include "../envs/deploys.hpp"
-using namespace std;
 
 namespace
 {
