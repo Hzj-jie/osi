@@ -1,74 +1,88 @@
 
+#include <stdint.h>
+#include <utility>
 #include <memory>
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <initializer_list>
+#include "k_assert.hpp"
 
-class ierror_writer
+namespace error_handle
 {
-public:
-    virtual void write(const std::string& s);
-};
-
-class console_error_writer : public ierror_writer
-{
-public:
-    virtual void write(const std::string& s)
+    class ierror_writer
     {
-        cout << s;
-    }
-};
+    public:
+        virtual void write(const std::string& s) = 0;
+        virtual ~ierror_writer() { }
+    };
 
-class file_error_writer : public ierror_writer
-{
-private:
-    std::ofstream writer;
-public:
-    virtual void write(const std::string& s)
+    class console_error_writer : public ierror_writer
     {
-        if(writer) writer << s;
-    }
-
-    file_error_writer(const std::string& file) :
-        writer(filename) { }
-
-    file_error_writer(file_error_writer&& other) :
-        writer(other.writer) { }
-
-    ~file_error_writer()
-    {
-        writer.close();
-    }
-};
-
-class error_type_selected_error_writer : public ierror_writer
-{
-private:
-    ierror_writer impl;
-    bool selected[error_type::last - error_type::first - 1];
-public:
-    error_type_selected_error_writer(const ierror_writer& impl,
-                                     const std::initializer_list<error_type>& selected) :
-        impl(impl),
-        selected({ false })
-    {
-        for(auto it = selected.begin(); it != selected.end(); it++)
+    public:
+        virtual void write(const std::string& s)
         {
-            if(*it > error_type::first &&
-               *it < error_type::last)
-                selected[*it - 1] = true;
+            std::cout << s;
         }
-    }
+    };
 
-    virtual void write(const std::string& s)
+    class file_error_writer : public ierror_writer
     {
-        if(!s.empty())
+    private:
+        // std::ofstream is not moveable in g++ 4.8.2
+        std::ofstream* const writer;
+    public:
+        virtual void write(const std::string& s)
         {
-            using namespace error_handle;
-            if(selected[char_to_error_type(s[0])])
-                impl.write(s);
+            k_assert(writer != nullptr);
+            if(*writer) (*writer) << s;
         }
-    }
-};
+
+        file_error_writer(const std::string& file) :
+            writer(new std::ofstream(file)) { }
+
+        file_error_writer(file_error_writer&& other) :
+            writer(std::move(other.writer)) { }
+
+        virtual ~file_error_writer()
+        {
+            k_assert(writer != nullptr);
+            writer->close();
+            delete writer;
+        }
+    };
+
+    template <typename IMPL_T>
+    class error_type_selected_error_writer : public ierror_writer
+    {
+    private:
+        IMPL_T impl;
+        bool selected[uint32_t(error_type::last) - uint32_t(error_type::first) - 1];
+    public:
+#define ERROR_TYPE_SELECTED_ERROR_WRITER_CTOR \
+    impl(impl), \
+    selected{ false } { \
+        for(auto it = input_selected.begin(); it != input_selected.end(); it++) { \
+            if(uint32_t(*it) > uint32_t(error_type::first) && \
+               uint32_t(*it) < uint32_t(error_type::last)) \
+                selected[uint32_t(*it) - uint32_t(error_type::first) - 1] = true; } }
+        error_type_selected_error_writer(const IMPL_T& impl,
+                                         const std::initializer_list<error_type>& input_selected) :
+            ERROR_TYPE_SELECTED_ERROR_WRITER_CTOR;
+
+        error_type_selected_error_writer(IMPL_T&& impl,
+                                         const std::initializer_list<error_type>& input_selected) :
+            ERROR_TYPE_SELECTED_ERROR_WRITER_CTOR;
+#undef ERROR_TYPE_SELECTED_ERROR_WRITER_CTOR
+
+        virtual void write(const std::string& s)
+        {
+            if(!s.empty())
+            {
+                if(selected[uint32_t(char_to_error_type(s[0])) - uint32_t(error_type::first) - 1])
+                    impl.write(s);
+            }
+        }
+    };
+}
 

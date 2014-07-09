@@ -110,6 +110,15 @@ public:
         static const auto_removed_folder _auto_removed_temp_folder(_temp_folder);
         return _temp_folder;
     }
+
+    template <typename T>
+    path_string append_application_info_output_filename(const T& v) const
+    {
+        using namespace boost::filesystem;
+        path p(application_info_output_filename());
+        p += v;
+        return p.native();
+    }
 CONST_SINGLETON(deploys_t);
 }& deploys = deploys_t::instance();
 

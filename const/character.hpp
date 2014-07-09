@@ -10,6 +10,7 @@ public:
     const static char name = x; \
     CONST_STATIC_STRING_EXP(name##_s, std::string(1, x));
 
+    DEFINE_CHARACTER(null, '\0');
     DEFINE_CHARACTER(blank, ' ');
     DEFINE_CHARACTER(minus_sign, '-');
     DEFINE_CHARACTER(colon, ':');

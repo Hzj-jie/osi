@@ -25,7 +25,8 @@
     #endif
 #endif
 
-static void append_path(boost::filesystem::path::string_type& p, const std::string& v)
+template <typename T>
+static void append_path(boost::filesystem::path::string_type& p, T&& v)
 {
     using namespace boost::filesystem;
     path c(p);
@@ -33,9 +34,27 @@ static void append_path(boost::filesystem::path::string_type& p, const std::stri
     p = c.native();
 }
 
+template <typename T>
+static boost::filesystem::path::string_type append_path(const boost::filesystem::path::string_type& p,
+                                                        T&& v)
+{
+    using namespace boost::filesystem;
+    path c(p);
+    c /= v;
+    return c.native();
+}
+
 #if BOOST_COMP_MSVC
 #define WIDE_STRING(x) L#x
+#define INLINE __forceinline
 #else
 #define WIDE_STRING(x) L""#x
+#define INLINE inline
+#endif
+
+#if BOOST_COMP_GNUC
+#define ALWAYS_INLINE __attribute__((always_inline))
+#else
+#define ALWAYS_INLINE
 #endif
 

@@ -22,21 +22,24 @@ namespace error_handle
 
     static error_type char_to_error_type(char c)
     {
-        for(int i = error_type::first + 1; i < error_type::last; i++)
+        for(uint32_t i = uint32_t(error_type::first) + 1;
+            i < uint32_t(error_type::last);
+            i++)
         {
-            if(error_type_char[i - error_type::first] == c)
-                return i;
+            if(error_type_char[i] == c)
+                return error_type(i);
         }
         return error_type::other;
     }
 
-    static char error_type_to_char(error_type err_type)
+    static char error_type_to_char(error_type err_type, char err_type_char)
     {
         if(err_type > error_type::first &&
            err_type < error_type::last)
         {
-            return error_type_char[err_type - error_type::first];
+            return error_type_char[uint32_t(err_type)];
         }
-        else return 'o';
+        else return err_type_char;
     }
 }
+
