@@ -25,14 +25,12 @@
     #endif
 #endif
 
-CONST_STATIC_PATH_STRING_EXP(directory_separator, (boost::filesystem::path("/").make_preferred().native()));
-
-static void append_directory_separator(boost::filesystem::path::string_type& p)
+static void append_path(boost::filesystem::path::string_type& p, const std::string& v)
 {
-    k_assert(directory_separator().size() == 1);
     using namespace boost::filesystem;
-    const path::value_type& v = directory_separator()[0];
-    if(!p.empty() && p.back() != v) p.push_back(v);
+    path c(p);
+    c /= v;
+    p = c.native();
 }
 
 #if BOOST_COMP_MSVC

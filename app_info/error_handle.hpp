@@ -21,9 +21,10 @@ namespace
                                       error_type::exclamation,
                                       error_type::system,
                                       error_type::other }));
-            writers.push_back(file_error_writer(deploys.log_folder() +
-                                                deploys.applicatin_info_output_filename() +
-                                                ".log"));
+            writers.push_back(file_error_writer(
+                              append_path(deploys.log_folder(),
+                                          deploys.applicatin_info_output_filename() +
+                                          ".log"));
         }
 
         CONST_SINGLETON(default_writers);

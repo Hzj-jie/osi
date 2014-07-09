@@ -67,11 +67,8 @@ private:
                 _deploys_folder = p.root_path().native();
             }
         }
-        append_directory_separator(_deploys_folder);
 
-#define append(x) { \
-    _##x = (path(_deploys_folder) / x##_name()).native(); \
-    append_directory_separator(_##x); }
+#define append(x) { _##x = (path(_deploys_folder) / x##_name()).native(); }
         append(apps_folder);
         append(counter_folder);
         append(data_folder);
@@ -80,9 +77,7 @@ private:
 #undef append
         create_directory(_temp_folder);
         _temp_folder = (path(_deploys_folder) / temp_folder_name() / uuid_str()).native();
-        append_directory_separator(_temp_folder);
         _service_data_folder = (path(_data_folder) / _service_name).native();
-        append_directory_separator(_service_data_folder);
         {
             path p(exeinfo.name());
             p += character.underscore;
