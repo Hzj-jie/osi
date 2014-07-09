@@ -4,6 +4,7 @@
 #include <sstream>
 #include <vector>
 #include <boost/current_function.hpp>
+#include <boost/filesystem.hpp>
 #include "error_type.hpp"
 #include "error_writer.hpp"
 #include "../template/singleton.hpp"
@@ -50,6 +51,8 @@ namespace error_handle
     static void enable_default_file_error_writer()
     {
         using namespace error_handle;
+        using namespace boost::filesystem;
+        create_directory(deploys.log_folder());
         add_writer(new file_error_writer(
                           append_path(deploys.log_folder(),
                                       deploys.append_application_info_output_filename(".log"))));
