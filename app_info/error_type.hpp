@@ -41,5 +41,13 @@ namespace error_handle
         }
         else return err_type_char;
     }
+
+    static bool should_show_code_position(error_type err_type)
+    {
+        return err_type == error_type::critical ||
+               err_type == error_type::exclamation ||
+               err_type == error_type::warning ||
+               err_type == error_type::system;
+    }
 }
 

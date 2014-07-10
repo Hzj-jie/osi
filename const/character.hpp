@@ -16,6 +16,8 @@ public:
     DEFINE_CHARACTER(colon, ':');
     DEFINE_CHARACTER(underscore, '_');
     DEFINE_CHARACTER(at, '@');
+    DEFINE_CHARACTER(comma, ',');
+    DEFINE_CHARACTER(dot, '.');
 
 private:
     character_t() { }

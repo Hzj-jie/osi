@@ -1,34 +1,57 @@
 
 #include "error_handle.hpp"
-#include <string>
+#include "trace.hpp"
+#include "k_assert.hpp"
+#include "../utils/strutils.hpp"
 
 namespace
 {
     using namespace std;
-    static void assert_raise_error(const char* const msg,
-                                   const char* const file,
-                                   const int line,
-                                   const char* const func)
+    const static error_type assert_err_type = error_type::critical;
+
+#define ASSERT_ERROR_MSG(err_msg) strcat("ASSERT FAILED: ", err_msg)
+    template <typename T>
+    static void assert_raise_error(T&& err_msg)
     {
+        raise_error(assert_err_type, ASSERT_ERROR_MSG(err_msg));
     }
 
-    static void assert_raise_error(const string& msg,
-                                   const char* const file,
-                                   const int line,
-                                   const char* const func)
+    template <typename T>
+    static void assert_raise_error(T&& err_msg, const code_position& cp)
     {
+        raise_error(assert_err_type, ASSERT_ERROR_MSG(err_msg), cp);
+    }
+#undef ASSERT_ERROR_MSG
+
+    template <typename T>
+    static bool assert_failed(T&& err_msg)
+    {
+        assert_raise_error(err_msg);
+        return ::assert_failed();
     }
 
-    static void assert_raise_error(const ostringstream& msg,
-                                   const char* const file,
-                                   const int line,
-                                   const char* const func)
+    template <typename T>
+    static bool assert_failed(T&& err_msg, const code_position& cp)
     {
+        assert_raise_error(err_msg, cp);
+        return ::assert_failed();
     }
+}
 
-    static bool assert_failed(const char* const msg,
-                              const char* const file,
-                              const int line,
-                              const char* const func)
+#define ASSERT(x) { \
+    if(!(x)) { \
+        assert_failed(#x, CODE_POSITION()); } }
+
+#undef assert
+template <typename T>
+static bool assert(bool x, T&& err_msg)
+{
+    return x || assert_failed(err_msg);
+}
+
+template <typename T>
+static bool assert(bool x, T&& err_msg, const code_position& cp)
+{
+    return x || assert_failed(err_msg, cp);
 }
 

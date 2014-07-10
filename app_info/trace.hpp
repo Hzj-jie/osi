@@ -24,13 +24,18 @@ private:
     {
         if(valid(file, line, func))
         {
-            return strcat(character.at,
-                          character.blank,
+#define format_character(x) static_cast<const char>(character.x)
+            // the compiler cannot deduce the type, since character.at is a const intergeral
+            return strcat(format_character(at),
+                          format_character(blank),
+                          func,
+                          format_character(blank),
+                          format_character(at),
+                          format_character(blank),
                           file,
-                          character.colon,
-                          line,
-                          character.at,
-                          character.func);
+                          format_character(colon),
+                          line);
+#undef format_character
         }
         else return std::string();
     }
@@ -60,7 +65,8 @@ public:
     }
 };
 
-#define CODE_POSITION() code_position(__FILE__, __LINE__, BOOST_CURRENT_POSITION)
+#define CODE_POSITION() code_position(__FILE__, __LINE__, BOOST_CURRENT_FUNCTION)
+#define CODE_POS CODE_POSITION()
 
 static std::ostream& operator <<(std::ostream& os, const code_position& cp)
 {

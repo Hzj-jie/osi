@@ -10,6 +10,9 @@
 #include "../template/singleton.hpp"
 #include "../envs/deploys.hpp"
 #include "../envs/os.hpp"
+#include "trace.hpp"
+#include "../utils/strutils.hpp"
+#include "../const/character.hpp"
 
 namespace
 {
@@ -38,6 +41,37 @@ namespace
 
         CONST_SINGLETON(default_writers);
     }& default_writers_instance = default_writers::instance();
+
+    ostream& operator<<(ostream& os, const ostringstream& v)
+    {
+        os << v;
+        return os;
+    }
+
+    template <typename T>
+    static void raise_error(error_type err_type,
+                            char err_type_char,
+                            T&& err_msg,
+                            const code_position* cp)
+    {
+        using namespace std;
+        ostringstream os;
+        os << error_type_to_char(err_type, err_type_char)
+           << character.comma
+           << character.blank
+           << err_msg;
+        if(cp != nullptr && (*cp))
+        {
+            os << character.blank
+               << (*cp);
+        }
+        os << endl;
+        for(size_t i = 0; i < writers.size(); i++)
+        {
+            k_assert(writers[i] != nullptr);
+            writers[i] -> write(os.str());
+        }
+    }
 }
 
 namespace error_handle
@@ -59,125 +93,56 @@ namespace error_handle
     }
 }
 
-#define CODE_POSITION_PARAMETERS \
-            const char* const file, \
-            const int line, \
-            const char* const func
-#define CODE_POSITION_OPTIONAL_PARAMETERS \
-            const char* const file = nullptr, \
-            const int line = 0, \
-            const char* const func = nullptr
+template <typename T>
 static void raise_error(error_type err_type,
                         char err_type_char,
-                        const char* const err_msg,
-                        const char* const file = nullptr,
-                        const int line = 0,
-                        const char* const func = nullptr)
-{
-    using namespace std;
-    ostringstream os;
-    os << error_type_to_char(err_type, err_type_char)
-       << ", "
-       << err_msg;
-    if(file != nullptr &&
-       line > 0 &&
-       func != nullptr)
-    {
-        os << " @ "
-           << file
-           << ":"
-           << line
-           << "@"
-           << func;
-    }
-    os << endl;
-    for(size_t i = 0; i < writers.size(); i++)
-    {
-        k_assert(writers[i] != nullptr);
-        writers[i]->write(os.str());
-    }
-}
-
-static void raise_error(error_type err_type,
-                        char err_type_char,
-                        const string& err_msg,
-                        const char* const file = nullptr,
-                        const int line = 0,
-                        const char* const func = nullptr)
+                        T&& err_msg)
 {
     raise_error(err_type,
                 err_type_char,
-                err_msg.c_str(),
-                file,
-                line,
-                func);
+                err_msg,
+                nullptr);
 }
 
+template <typename T>
 static void raise_error(error_type err_type,
                         char err_type_char,
-                        const std::ostringstream& err_msg,
-                        const char* const file = nullptr,
-                        const int line = 0,
-                        const char* const func = nullptr)
+                        T&& err_msg,
+                        const code_position& cp)
 {
     raise_error(err_type,
                 err_type_char,
-                err_msg.str(),
-                file,
-                line,
-                func);
+                err_msg,
+                &cp);
 }
 
-static void raise_error(error_type err_type,
-                        const std::string& err_msg,
-                        const char* const file = nullptr,
-                        const int line = 0,
-                        const char* const func = nullptr)
+template <typename T>
+static void raise_error(error_type err_type, T&& err_msg)
 {
-    raise_error(err_type, character.null, err_msg, file, line, func);
+    raise_error(err_type, character.null, err_msg);
 }
 
-static void raise_error(error_type err_type,
-                        const char* const err_msg,
-                        const char* const file = nullptr,
-                        const int line = 0,
-                        const char* const func = nullptr)
+template <typename T>
+static void raise_error(error_type err_type, T&& err_msg, const code_position& cp)
 {
-    raise_error(err_type, character.null, err_msg, file, line, func);
+    raise_error(err_type, character.null, err_msg, cp);
 }
 
-static void raise_error(error_type err_type,
-                        const std::ostringstream& err_msg,
-                        const char* const file = nullptr,
-                        const int line = 0,
-                        const char* const func = nullptr)
+template <typename T>
+static void raise_error(T&& err_msg)
 {
-    raise_error(err_type, character.null, err_msg, file, line, func);
+    raise_error(error_type::information, err_msg);
 }
 
-static void raise_error(const std::string& err_msg,
-                        const char* const file = nullptr,
-                        const int line = 0,
-                        const char* const func = nullptr)
+template <typename T>
+static void raise_error(T&& err_msg, const code_position& cp)
 {
-    raise_error(error_type::information, err_msg, file, line, func);
+    raise_error(error_type::information, err_msg, cp);
 }
 
-static void raise_error(const char* const err_msg,
-                        const char* const file = nullptr,
-                        const int line = 0,
-                        const char* const func = nullptr)
-{
-    raise_error(error_type::information, err_msg, file, line, func);
-}
-
-static void raise_error(const std::ostringstream& err_msg,
-                        const char* const file = nullptr,
-                        const int line = 0,
-                        const char* const func = nullptr)
-{
-    raise_error(error_type::information, err_msg, file, line, func);
-}
-
-#define CODE_POSITION __FILE__, __LINE__, BOOST_CURRENT_FUNCTION
+#define RAISE_ERROR(err_type, err_msg) { \
+    if(error_handle::should_show_code_position(err_type)) \
+        raise_error(err_type, err_msg, CODE_POSITION()); \
+    else \
+        raise_error(err_type, err_msg); }
 

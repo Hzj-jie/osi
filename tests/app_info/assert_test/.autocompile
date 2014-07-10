@@ -1,0 +1,5 @@
+
+main assert_test.cpp
+out assert_test
+dlibs boost_filesystem boost_system
+
