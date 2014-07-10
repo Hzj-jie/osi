@@ -4,9 +4,9 @@
 #include <memory>
 #include <string>
 #include <iostream>
-#include <fstream>
 #include <initializer_list>
 #include "k_assert.hpp"
+#include <boost/filesystem/fstream.hpp>
 
 namespace error_handle
 {
@@ -30,16 +30,17 @@ namespace error_handle
     {
     private:
         // std::ofstream is not moveable in g++ 4.8.2
-        std::ofstream* const writer;
+        boost::filesystem::ofstream* const writer;
     public:
+        typedef boost::filesystem::path::string_type path_string;
         virtual void write(const std::string& s)
         {
             k_assert(writer != nullptr);
             if(*writer) (*writer) << s;
         }
 
-        file_error_writer(const std::string& file) :
-            writer(new std::ofstream(file)) { }
+        file_error_writer(const path_string& file) :
+            writer(new boost::filesystem::ofstream(file)) { }
 
         file_error_writer(file_error_writer&& other) :
             writer(std::move(other.writer)) { }

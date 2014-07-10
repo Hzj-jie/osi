@@ -15,6 +15,7 @@ public:
     DEFINE_CHARACTER(minus_sign, '-');
     DEFINE_CHARACTER(colon, ':');
     DEFINE_CHARACTER(underscore, '_');
+    DEFINE_CHARACTER(at, '@');
 
 private:
     character_t() { }

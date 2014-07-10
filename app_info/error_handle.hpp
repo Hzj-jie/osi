@@ -59,6 +59,14 @@ namespace error_handle
     }
 }
 
+#define CODE_POSITION_PARAMETERS \
+            const char* const file, \
+            const int line, \
+            const char* const func
+#define CODE_POSITION_OPTIONAL_PARAMETERS \
+            const char* const file = nullptr, \
+            const int line = 0, \
+            const char* const func = nullptr
 static void raise_error(error_type err_type,
                         char err_type_char,
                         const char* const err_msg,
@@ -171,5 +179,5 @@ static void raise_error(const std::ostringstream& err_msg,
     raise_error(error_type::information, err_msg, file, line, func);
 }
 
-#define ERROR_POS __FILE__, __LINE__, BOOST_CURRENT_FUNCTION
+#define CODE_POSITION __FILE__, __LINE__, BOOST_CURRENT_FUNCTION
 

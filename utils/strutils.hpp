@@ -114,3 +114,25 @@ static std::string to_str(const char& i)
     return o;
 }
 
+namespace
+{
+    using namespace std;
+    void append_to_stream(ostream& s) { }
+
+    template <typename T, typename... Args>
+    void append_to_stream(ostream& s, T&& f, Args&&... others)
+    {
+        s << f;
+        append_to_stream(s, others...);
+    }
+}
+
+template <typename... Args>
+std::string strcat(Args&&... args)
+{
+    using namespace std;
+    ostringstream os;
+    append_to_stream(os, args...);
+    return os.str();
+}
+
