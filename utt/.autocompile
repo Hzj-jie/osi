@@ -1,3 +1,4 @@
 
 out utt
+dlibs boost_filesystem boost_system
 

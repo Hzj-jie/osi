@@ -12,23 +12,19 @@ public:
     virtual ~icase() { }
 };
 
-#define REGISTER_CASE(x) \
+#define DEFINE_CASE(x) \
     public: \
         virtual const std::string& name() const { \
             static const std::string i(#x); \
-            return i;} \
-    private: \
-        const static class REGISTER_CASE_INSERTER_##x_t { \
-            private: \
-                REGISTER_CASE_INSERTER_##x_t() { \
-                    utt::cases.push_back(new x()); } \
-            CONST_SINGLETON(REGISTER_CASE_INSERTER_##x_t); \
-     _Pragma ( "GCC diagnostic push" ) \
-	 _Pragma ( "GCC diagnostic ignored \"-Wunused-variable\"" ) \
-            }& REGISTER_CASE_INSERTER_##x = REGISTER_CASE_INSERTER_##x_t::instance() ; \
-	 _Pragma ( "GCC diagnostic pop" )
+            return i;}
 
-#define DEFINE_CASE(x) REGISTER_CASE(x)
+#define REGISTER_CASE(x) \
+    const static class REGISTER_CASE_INSERTER_##x_t { \
+        private: \
+            REGISTER_CASE_INSERTER_##x_t() { \
+                utt::cases.push_back(new x()); } \
+        CONST_SINGLETON(REGISTER_CASE_INSERTER_##x_t); \
+        }& REGISTER_CASE_INSERTER_##x = REGISTER_CASE_INSERTER_##x_t::instance() ; \
 
 namespace utt
 {

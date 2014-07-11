@@ -24,6 +24,9 @@ private:
     path_string _log_folder;
     path_string _temp_folder;
     path_string _service_data_folder;
+    path_string _service_log_folder;
+    path_string _service_counter_folder;
+    path_string _service_temp_folder;
     path_string _application_info_output_filename;
 
     CONST_STATIC_PATH_STRING(deploys_folder_name, deploys);
@@ -56,9 +59,11 @@ private:
             if(!p.empty() &&
                !p.parent_path().empty() &&
                !p.parent_path().parent_path().empty() &&
-               !p.parent_path().parent_path().has_filename() &&
+               p.parent_path().parent_path().has_filename() &&
                p.parent_path().parent_path().filename() == apps_folder_name() &&
-               !p.parent_path().parent_path().parent_path().empty())
+               !p.parent_path().parent_path().parent_path().empty() &&
+               p.parent_path().parent_path().parent_path().has_filename() &&
+               p.parent_path().parent_path().parent_path().filename() == deploys_folder_name())
             {
                 _deploys_folder = p.parent_path().parent_path().parent_path().native();
             }
@@ -75,15 +80,17 @@ private:
         append(log_folder);
         append(temp_folder);
 #undef append
-        create_directory(_temp_folder);
-        _temp_folder = (path(_deploys_folder) / temp_folder_name() / uuid_str()).native();
-        _service_data_folder = (path(_data_folder) / _service_name).native();
+#define append(x) { _service_##x = (path(_##x) / _service_name).native(); }
+        append(temp_folder);
+        _service_temp_folder = (path(_service_temp_folder) / uuid_str()).native();
+        append(data_folder);
+        append(log_folder);
+        append(counter_folder);
+#undef append
         {
             path p(exeinfo.name());
             p += character.underscore;
-            p += service_name();
-            p += character.underscore;
-            p += git.commit();
+            p += git.short_commit();
             p += character.underscore;
             p += nowadays.short_time(character.underscore,
                                      character.minus_sign,
@@ -103,12 +110,20 @@ public:
     return_value(data_folder);
     return_value(log_folder);
     return_value(service_data_folder);
+    return_value(service_log_folder);
+    return_value(service_counter_folder);
     return_value(application_info_output_filename);
 #undef return_value
     const path_string& temp_folder() const
     {
-        static const auto_removed_folder _auto_removed_temp_folder(_temp_folder);
+        boost::filesystem::create_directory(_temp_folder);
         return _temp_folder;
+    }
+
+    const path_string& service_temp_folder() const
+    {
+        static const auto_removed_folder _auto_removed_temp_folder(_service_temp_folder);
+        return _service_temp_folder;
     }
 
     template <typename T>

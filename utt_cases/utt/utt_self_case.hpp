@@ -6,7 +6,7 @@
 #include "../../utt/icase.hpp"
 #include "../../utt/utt_assert.hpp"
 
-class utt_self_case : icase
+class utt_self_case : public icase
 {
 public:
     virtual bool run()
@@ -32,4 +32,6 @@ public:
     }
     DEFINE_CASE(utt_self_case);
 };
+
+REGISTER_CASE(utt_self_case);
 

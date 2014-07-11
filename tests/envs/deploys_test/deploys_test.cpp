@@ -17,8 +17,11 @@ int main()
     p(counter_folder);
     p(data_folder);
     p(log_folder);
-    p(service_data_folder);
     p(temp_folder);
+    p(service_data_folder);
+    p(service_log_folder);
+    p(service_counter_folder);
+    p(service_temp_folder);
     p(application_info_output_filename);
 #undef p
 }

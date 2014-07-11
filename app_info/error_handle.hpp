@@ -14,6 +14,7 @@
 #include "trace.hpp"
 #include "../utils/strutils.hpp"
 #include "../const/character.hpp"
+#include "../envs/nowadays.hpp"
 
 namespace
 {
@@ -41,10 +42,7 @@ namespace
         }
 
         CONST_SINGLETON(default_writers);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-variable"
     }& default_writers_instance = default_writers::instance();
-#pragma GCC diagnostic pop
 
     ostream& operator<<(ostream& os, const ostringstream& v)
     {
@@ -64,6 +62,7 @@ namespace
         os << error_type_to_char(err_type, err_type_char)
            << character.comma
            << character.blank
+           << nowadays.long_time()
            << err_msg;
         if(cp != nullptr && (*cp))
         {
@@ -92,9 +91,9 @@ namespace error_handle
     {
         using namespace error_handle;
         using namespace boost::filesystem;
-        create_directory(deploys.log_folder());
+        create_directories(deploys.service_log_folder());
         add_writer(new file_error_writer(
-                          append_path(deploys.log_folder(),
+                          append_path(deploys.service_log_folder(),
                                       deploys.append_application_info_output_filename(".log"))));
     }
 }

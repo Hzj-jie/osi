@@ -9,7 +9,7 @@ class auto_removed_folder : private sweeper
 public:
 #define AUTO_REMOVED_FOLDER_CTOR \
             sweeper([&]() { \
-                        boost::filesystem::create_directory(p); }, \
+                        boost::filesystem::create_directories(p); }, \
                     [=]() { \
                         boost::filesystem::remove_all(p); }) { }
     auto_removed_folder(boost::filesystem::path&& p) :
