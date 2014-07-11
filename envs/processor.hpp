@@ -12,7 +12,7 @@ public:
     processor_t()
     {
         _count = thread::hardware_concurrency();
-        _count = (_count == 0 ? 1 : _processor_count);
+        _count = (_count == 0 ? 1 : _count);
         _single = (_count == 1);
     }
 
