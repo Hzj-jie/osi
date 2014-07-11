@@ -5,6 +5,7 @@
 #include <vector>
 #include <boost/current_function.hpp>
 #include <boost/filesystem.hpp>
+#include <mutex>
 #include "error_type.hpp"
 #include "error_writer.hpp"
 #include "../template/singleton.hpp"
@@ -40,11 +41,14 @@ namespace
         }
 
         CONST_SINGLETON(default_writers);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
     }& default_writers_instance = default_writers::instance();
+#pragma GCC diagnostic pop
 
     ostream& operator<<(ostream& os, const ostringstream& v)
     {
-        os << v;
+        os << v.str();
         return os;
     }
 
@@ -55,6 +59,7 @@ namespace
                             const code_position* cp)
     {
         using namespace std;
+        static mutex mtx;
         ostringstream os;
         os << error_type_to_char(err_type, err_type_char)
            << character.comma
@@ -69,6 +74,7 @@ namespace
         for(size_t i = 0; i < writers.size(); i++)
         {
             k_assert(writers[i] != nullptr);
+            unique_lock<mutex> lck;
             writers[i] -> write(os.str());
         }
     }
