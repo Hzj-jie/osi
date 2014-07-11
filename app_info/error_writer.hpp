@@ -7,6 +7,7 @@
 #include <initializer_list>
 #include "k_assert.hpp"
 #include <boost/filesystem/fstream.hpp>
+#include <array>
 
 namespace error_handle
 {
@@ -58,11 +59,11 @@ namespace error_handle
     {
     private:
         IMPL_T impl;
-        bool selected[uint32_t(error_type::last) - uint32_t(error_type::first) - 1];
+        std::array<bool, uint32_t(error_type::last) - uint32_t(error_type::first) - 1> selected;
     public:
 #define ERROR_TYPE_SELECTED_ERROR_WRITER_CTOR \
-    impl(impl), \
-    selected{ false } { \
+    impl(impl) { \
+        selected.fill(false); \
         for(auto it = input_selected.begin(); it != input_selected.end(); it++) { \
             if(uint32_t(*it) > uint32_t(error_type::first) && \
                uint32_t(*it) < uint32_t(error_type::last)) \

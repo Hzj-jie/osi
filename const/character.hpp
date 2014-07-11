@@ -18,6 +18,7 @@ public:
     DEFINE_CHARACTER(at, '@');
     DEFINE_CHARACTER(comma, ',');
     DEFINE_CHARACTER(dot, '.');
+    DEFINE_CHARACTER(u, 'u');
 
 private:
     character_t() { }

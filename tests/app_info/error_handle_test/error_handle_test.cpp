@@ -1,4 +1,5 @@
 
+#include <stdlib.h>
 #include "../../../app_info/error_handle.hpp"
 #include "../../../utils/strutils.hpp"
 #include <stdint.h>
@@ -7,6 +8,7 @@ using namespace std;
 
 int main(int argc, const char* const* const argv)
 {
+    system("pause");
     if(argc > 1)
         error_handle::enable_default_file_error_writer();
     raise_error(error_type::warning,

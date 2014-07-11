@@ -5,6 +5,7 @@
 #include <boost/current_function.hpp>
 #include "../utils/strutils.hpp"
 #include "../const/character.hpp"
+#include "../utils/lazier.hpp"
 
 struct code_position
 {
@@ -40,37 +41,46 @@ private:
         else return std::string();
     }
 
+private:
+    mutable lazier<std::string> formated_str;
+
 public:
     const char* const file;
     const unsigned int line;
     const char* const func;
-    const std::string str;
 
     code_position(const char* const file = nullptr,
                   const unsigned int line = 0,
                   const char* const func = nullptr) :
+        formated_str([=]() { return format(file, line, func); }),
         file(file),
         line(line),
-        func(func),
-        str(format(file, line, func)) { }
+        func(func) { }
 
     operator bool() const
     {
         return valid(file, line, func);
     }
 
+    const std::string& str() const
+    {
+        return formated_str.value();
+    }
+
     operator std::string() const
     {
-        return str;
+        return str();
     }
 };
 
 #define CODE_POSITION() code_position(__FILE__, __LINE__, BOOST_CURRENT_FUNCTION)
 #define CODE_POS CODE_POSITION()
+#define EMPTY_CODE_POSITION() static_cast<const code_position*>(nullptr)
+#define EMPTY_CODE_POS EMPTY_CODE_POSITION()
 
 static std::ostream& operator <<(std::ostream& os, const code_position& cp)
 {
-    os << cp.str;
+    os << cp.str();
     return os;
 }
 

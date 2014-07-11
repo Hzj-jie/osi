@@ -1,5 +1,7 @@
 
 #include <atomic>
+#include "../app_info/trace.hpp"
+#include "../app_info/assert.hpp"
 
 class single_entry
 {
@@ -35,7 +37,7 @@ public:
 
     void release()
     {
-        // TODO: wait for assert
+        assert(in_use(), CODE_POSITION());
         mark_not_in_use();
     }
 
