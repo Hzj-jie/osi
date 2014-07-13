@@ -22,5 +22,5 @@ static bool assert_failed()
              << ":" \
              << __LINE__ \
              << endl; \
-        assert_failed(); } }
+        ::assert_failed(); } }
 

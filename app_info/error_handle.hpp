@@ -16,6 +16,12 @@
 #include "../const/character.hpp"
 #include "../envs/nowadays.hpp"
 
+ostream& operator<<(ostream& os, const ostringstream& v)
+{
+    os << v.str();
+    return os;
+}
+
 namespace
 {
     using namespace std;
@@ -44,12 +50,6 @@ namespace
         CONST_SINGLETON(default_writers);
     }& default_writers_instance = default_writers::instance();
 
-    ostream& operator<<(ostream& os, const ostringstream& v)
-    {
-        os << v.str();
-        return os;
-    }
-
     template <typename T>
     static void raise_error(error_type err_type,
                             char err_type_char,
@@ -63,6 +63,8 @@ namespace
            << character.comma
            << character.blank
            << nowadays.long_time()
+           << character.comma
+           << character.blank
            << err_msg;
         if(cp != nullptr && (*cp))
         {

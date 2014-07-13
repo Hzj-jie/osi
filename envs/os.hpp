@@ -26,12 +26,13 @@
 #endif
 
 template <typename T>
-static void append_path(boost::filesystem::path::string_type& p, T&& v)
+static boost::filesystem::path::string_type& append_path(boost::filesystem::path::string_type& p, T&& v)
 {
     using namespace boost::filesystem;
     path c(p);
     c /= v;
     p = c.native();
+    return p;
 }
 
 template <typename T>
