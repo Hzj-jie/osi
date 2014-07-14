@@ -34,14 +34,14 @@ namespace error_handle
         // std::ofstream is not moveable in g++ 4.8.2
         boost::filesystem::ofstream* const writer;
     public:
-        typedef boost::filesystem::path::string_type path_string;
         virtual void write(const std::string& s)
         {
             k_assert(writer != nullptr);
             if(*writer) (*writer) << s;
         }
 
-        file_error_writer(const path_string& file) :
+        template <typename T>
+        file_error_writer(T&& file) :
             writer(new boost::filesystem::ofstream(file)) { }
 
         file_error_writer(file_error_writer&& other) :

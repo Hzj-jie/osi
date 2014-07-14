@@ -16,5 +16,8 @@ public:
         AUTO_REMOVED_FOLDER_CTOR;
     auto_removed_folder(const boost::filesystem::path& p) :
         AUTO_REMOVED_FOLDER_CTOR;
+    template <typename T>
+    auto_removed_folder(T&& s) :
+        auto_removed_folder(boost::filesystem::path(s)) { }
 #undef AUTO_REMOVED_FOLDER_CTOR
 };

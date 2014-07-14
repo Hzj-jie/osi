@@ -3,7 +3,7 @@
 #include <string>
 #include <list>
 #include <mutex>
-#include "../app_info/k_assert.hpp"
+#include "../app_info/assert.hpp"
 #include <stdint.h>
 
 class icase
@@ -16,8 +16,7 @@ public:
 
     virtual bool execute()
     {
-        k_assert(false);
-        return false;
+        return assert(false);
     }
 
     virtual bool cleanup()

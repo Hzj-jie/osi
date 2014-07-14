@@ -25,8 +25,8 @@
     #endif
 #endif
 
-template <typename T>
-static boost::filesystem::path::string_type& append_path(boost::filesystem::path::string_type& p, T&& v)
+template <typename RT, typename T>
+static RT& append_path(RT& p, T&& v)
 {
     using namespace boost::filesystem;
     path c(p);
@@ -35,9 +35,8 @@ static boost::filesystem::path::string_type& append_path(boost::filesystem::path
     return p;
 }
 
-template <typename T>
-static boost::filesystem::path::string_type append_path(const boost::filesystem::path::string_type& p,
-                                                        T&& v)
+template <typename RT, typename T>
+static RT append_path(const RT& p, T&& v)
 {
     using namespace boost::filesystem;
     path c(p);

@@ -10,9 +10,12 @@
 #include "../utils/strutils.hpp"
 #include "../app_info/assert.hpp"
 #include "../envs/processor.hpp"
+#include "utt_error_handle.hpp"
 #include <atomic>
 using namespace utt;
 using namespace std;
+
+static atomic<uint32_t> runned_cases;
 
 static void run(int id)
 {
@@ -32,14 +35,15 @@ static void run(int id)
                 if(should_run)
                 {
                     int64_t start_ms = nowadays.high_res.milliseconds();
-                    raise_error(strcat(id, ": starts case ", c.name()));
-                    utt::assert.is_true(c.run(), CODE_POSITION());
-                    raise_error(strcat(id,
-                                       ": finished case ",
-                                       c.name(),
-                                       ", uses ",
-                                       nowadays.high_res.milliseconds() - start_ms,
-                                       " milliseconds"));
+                    ::raise_error(strcat(id, ": starts case ", c.name()));
+                    runned_cases++;
+                    utt_assert.is_true(c.run(), CODE_POSITION());
+                    ::raise_error(strcat(id,
+                                         ": finished case ",
+                                         c.name(),
+                                         ", uses ",
+                                         nowadays.high_res.milliseconds() - start_ms,
+                                         " milliseconds"));
                 }
                 using_processors.fetch_sub(c.preserved_processor_count());
                 if(should_run) finish_case(i);
@@ -52,7 +56,7 @@ static void run(int id)
         }
         else
         {
-            raise_error(strcat(id, ": no more cases to run, finished"));
+            ::raise_error(strcat(id, ": no more cases to run, finished"));
             break;
         }
     }
@@ -67,6 +71,10 @@ int main()
     run(config.thread_count - 1);
     for(uint32_t i = 0; i < config.thread_count - 1; i++)
         threads[i].join();
+    utt_raise_error(strcat("finish running all ",
+                           runned_cases,
+                           " cases, total failures ",
+                           utt_assert.failure_count()));
     return 0;
 }
 

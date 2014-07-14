@@ -3,27 +3,34 @@
 #include <string.h>
 #include <string>
 #include "../template/singleton.hpp"
-#include "../app_info/error_handle.hpp"
+#include "utt_error_handle.hpp"
 #include "../app_info/trace.hpp"
 #include "../const/character.hpp"
+#include <atomic>
+#include <stdint.h>
 
 namespace utt
 {
     const static class assert_t
     {
     private:
-        const static error_type utt_err_type = error_type::other;
-        const static char utt_err_type_char = character.t;
+        mutable atomic<uint32_t> _failure_count;
 #define UTT_ASSERT(v, cp) { \
             if(v) return true; \
             else { \
+                _failure_count++; \
                 std::string err_msg = "UTT ASSERT FAILED: "#v; \
                 if(cp == nullptr) \
-                    raise_error(utt_err_type, utt_err_type_char, err_msg); \
+                    utt_raise_error(err_msg); \
                 else \
-                    raise_error(utt_err_type, utt_err_type_char, err_msg, *cp); \
+                    utt_raise_error(err_msg, *cp); \
                 return false; } }
     public:
+        uint32_t failure_count() const
+        {
+            return _failure_count;
+        }
+
         template <typename T1, typename T2>
         bool equal(T1&& i, T2&& j) const
         {
@@ -209,4 +216,6 @@ namespace utt
         CONST_SINGLETON(assert_t);
     }& assert = assert_t::instance();
 }
+
+static const utt::assert_t& utt_assert = utt::assert;
 

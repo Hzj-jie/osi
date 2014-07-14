@@ -1,4 +1,5 @@
 
+#pragma once
 #include "../../utt/icase.hpp"
 #include "../../sync/single_entry.hpp"
 #include "../../utt/utt_assert.hpp"
