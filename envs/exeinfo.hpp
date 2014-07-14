@@ -1,4 +1,5 @@
 
+#pragma once
 #include <string>
 #include "os.hpp"
 #include "../template/singleton.hpp"

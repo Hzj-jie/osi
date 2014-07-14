@@ -5,7 +5,7 @@ using namespace std;
 
 int main()
 {
-#define p(x) cout << #x << '\t' << processor.x() << endl;
+#define p(x) cout << #x << '\t' << processor.x << endl;
     p(count);
     p(single);
 #undef p
