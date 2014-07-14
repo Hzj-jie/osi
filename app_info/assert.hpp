@@ -5,9 +5,10 @@
 #include "k_assert.hpp"
 #include "../utils/strutils.hpp"
 
+#include "assert_blocker.hpp"
+
 namespace
 {
-    using namespace std;
     const static error_type assert_err_type = error_type::critical;
 
 #define ASSERT_ERROR_MSG(err_msg) strcat("ASSERT FAILED: ", err_msg)
