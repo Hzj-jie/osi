@@ -1,22 +1,14 @@
 
+#pragma once
 #include <stdint.h>
 #include "processor.hpp"
 
 class loops_per_yield_t
 {
-private:
-    uint32_t _count;
 public:
-    loops_per_yield_t()
-    {
-        // TODO: update count based on the performance of the system
-        // i.e. move system_perf
-        _count = (processor.single() ? 1 : 500);
-    }
-
-    uint32_t count() const
-    {
-        return _count;
-    }
+    const uint32_t count;
+    // TODO: update count based on the performance of the system
+    loops_per_yield_t() :
+        count(processor.single ? 1 : 500) { }
 } loops_per_yield;
 

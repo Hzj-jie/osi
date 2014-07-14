@@ -13,7 +13,7 @@ namespace utt
     {
     private:
         const static error_type utt_err_type = error_type::other;
-        const static char utt_err_type_char = character.u;
+        const static char utt_err_type_char = character.t;
 #define UTT_ASSERT(v, cp) { \
             if(v) return true; \
             else { \

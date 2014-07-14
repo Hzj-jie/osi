@@ -27,28 +27,6 @@ namespace
     using namespace std;
     using namespace error_handle;
     static vector<ierror_writer*> writers { };
-    static const class default_writers
-    {
-    public:
-        ~default_writers()
-        {
-            for(size_t i = 0; i < writers.size(); i++)
-                delete writers[i];
-            writers.clear();
-        }
-    private:
-        default_writers()
-        {
-            writers.push_back(new error_type_selected_error_writer<console_error_writer>
-                             (console_error_writer(),
-                              { error_type::critical,
-                                error_type::exclamation,
-                                error_type::system,
-                                error_type::other }));
-        }
-
-        CONST_SINGLETON(default_writers);
-    }& default_writers_instance = default_writers::instance();
 
     template <typename T>
     static void raise_error(error_type err_type,
@@ -89,6 +67,27 @@ namespace error_handle
         writers.push_back(writer);
     }
 
+    static bool remove_writer(ierror_writer* writer)
+    {
+        for(size_t i = 0; i < writers.size(); i++)
+        {
+            if(writer == writers[i])
+            {
+                writers.erase(writers.begin() + i);
+                delete writer;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static void clear_writers()
+    {
+        for(size_t i = 0; i < writers.size(); i++)
+            delete writers[i];
+        writers.clear();
+    }
+
     static void enable_default_file_error_writer()
     {
         using namespace error_handle;
@@ -98,6 +97,30 @@ namespace error_handle
                           append_path(deploys.service_log_folder(),
                                       deploys.append_application_info_output_filename(".log"))));
     }
+}
+
+namespace
+{
+    static const class default_writers
+    {
+    public:
+        ~default_writers()
+        {
+            error_handle::clear_writers();
+        }
+    private:
+        default_writers()
+        {
+            writers.push_back(new error_type_selected_error_writer<console_error_writer>
+                             (console_error_writer(),
+                              { error_type::critical,
+                                error_type::exclamation,
+                                error_type::system,
+                                error_type::other }));
+        }
+
+        CONST_SINGLETON(default_writers);
+    }& default_writers_instance = default_writers::instance();
 }
 
 template <typename T>

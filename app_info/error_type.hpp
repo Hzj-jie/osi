@@ -1,4 +1,5 @@
 
+#pragma once
 #include <stdint.h>
 
 enum class error_type : uint32_t
@@ -35,7 +36,8 @@ namespace error_handle
     static char error_type_to_char(error_type err_type, char err_type_char)
     {
         if(err_type > error_type::first &&
-           err_type < error_type::last)
+           err_type < error_type::last &&
+           err_type != error_type::other)
         {
             return error_type_char[uint32_t(err_type)];
         }
@@ -47,7 +49,8 @@ namespace error_handle
         return err_type == error_type::critical ||
                err_type == error_type::exclamation ||
                err_type == error_type::warning ||
-               err_type == error_type::system;
+               err_type == error_type::system ||
+               err_type == error_type::other;
     }
 }
 
