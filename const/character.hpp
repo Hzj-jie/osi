@@ -19,7 +19,6 @@ public:
     DEFINE_CHARACTER(comma, ',');
     DEFINE_CHARACTER(dot, '.');
     DEFINE_CHARACTER(u, 'u');
-    DEFINE_CHARACTER(t, 't');
 
 private:
     character_t() { }

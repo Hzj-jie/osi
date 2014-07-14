@@ -9,14 +9,11 @@
 #include "../app_info/error_handle.hpp"
 #include "../utils/strutils.hpp"
 #include "../app_info/assert.hpp"
-#include "../envs/processor.hpp"
-#include <atomic>
 using namespace utt;
 using namespace std;
 
 static void run(int id)
 {
-    static atomic_int using_processors;
     while(1)
     {
         icase* i = nullptr;
@@ -26,29 +23,17 @@ static void run(int id)
             icase& c = (*i);
             if(config.selected(c))
             {
-                uint32_t current_using_processors = using_processors.fetch_add(c.preserved_processor_count());
-                bool should_run = (current_using_processors <= processor.count ||
-                                   current_using_processors == c.preserved_processor_count());
-                if(should_run)
-                {
-                    int64_t start_ms = nowadays.high_res.milliseconds();
-                    raise_error(strcat(id, ": starts case ", c.name()));
-                    utt::assert.is_true(c.run(), CODE_POSITION());
-                    raise_error(strcat(id,
-                                       ": finished case ",
-                                       c.name(),
-                                       ", uses ",
-                                       nowadays.high_res.milliseconds() - start_ms,
-                                       " milliseconds"));
-                }
-                using_processors.fetch_sub(c.preserved_processor_count());
-                if(should_run) finish_case(i);
-                else
-                {
-                    pending_case(i);
-                    this_thread::sleep_for(chrono::seconds(10));
-                }
+                int64_t start_ms = nowadays.high_res.milliseconds();
+                raise_error(strcat(id, ": starts case ", c.name()));
+                utt::assert.is_true(c.run(), CODE_POSITION());
+                raise_error(strcat(id,
+                                   ": finished case ",
+                                   c.name(),
+                                   ", uses ",
+                                   nowadays.high_res.milliseconds() - start_ms,
+                                   " milliseconds"));
             }
+            finish_case(i);
         }
         else
         {

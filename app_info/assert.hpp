@@ -1,5 +1,4 @@
 
-#pragma once
 #include "error_handle.hpp"
 #include "trace.hpp"
 #include "k_assert.hpp"
@@ -39,17 +38,11 @@ namespace
     }
 }
 
+#define ASSERT(x) { \
+    if(!(x)) { \
+        assert_failed(#x, CODE_POSITION()); } }
+
 #undef assert
-static bool assert(bool x)
-{
-    return x || assert_failed(x);
-}
-
-static bool assert(bool x, const code_position& cp)
-{
-    return x || assert_failed(x, cp);
-}
-
 template <typename T>
 static bool assert(bool x, T&& err_msg)
 {

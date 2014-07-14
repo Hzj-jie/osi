@@ -2,7 +2,6 @@
 #pragma once
 #include <iostream>
 #include <assert.h>
-#include <boost/current_function.hpp>
 
 static bool assert_failed()
 {

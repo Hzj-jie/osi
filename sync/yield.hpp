@@ -1,15 +1,9 @@
 
-#pragma once
 #include <stdint.h>
 #include <thread>
 #include "../envs/processor.hpp"
 #include "../envs/nowadays.hpp"
 using namespace std;
-
-static bool should_yield()
-{
-    return processor.single;
-}
 
 namespace
 {
@@ -23,6 +17,11 @@ namespace
         }
         else return false;
     }
+}
+
+static bool should_yield()
+{
+    return processor.single();
 }
 
 static bool force_yield()
