@@ -2,36 +2,43 @@
 #pragma once
 #include <stdint.h>
 #include <thread>
+#include <chrono>
 #include "../envs/processor.hpp"
 #include "../envs/nowadays.hpp"
-using namespace std;
 
-static bool should_yield()
-{
-    return processor.single;
-}
-
-namespace
-{
-    static bool _yield(bool force = true)
+namespace std {
+namespace this_thread {
+    static bool yield_weak()
     {
-        if(force || should_yield())
-        {
-            int64_t n = nowadays.low_res.milliseconds();
-            this_thread::yield();
-            return (nowadays.low_res.milliseconds() - n > 1);
-        }
-        else return false;
+        int64_t n = nowadays.low_res.milliseconds();
+        this_thread::yield();
+        return (nowadays.low_res.milliseconds() - n > 1);
     }
-}
 
-static bool force_yield()
-{
-    return _yield(true);
-}
+    static void yield_strong()
+    {
+        if(!yield_weak())
+            sleep_for(chrono::milliseconds(1));
+    }
 
-static bool not_force_yield()
-{
-    return _yield(false);
-}
+    inline static bool not_force_yield()
+    {
+        return yield_weak();
+    }
+
+    inline static bool weak_yield()
+    {
+        return yield_weak();
+    }
+
+    inline static void force_yield()
+    {
+        yield_strong();
+    }
+
+    inline static void strong_yield()
+    {
+        yield_strong();
+    }
+} }
 

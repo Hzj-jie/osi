@@ -19,7 +19,7 @@ private:
     {
         for(uint32_t i = 0; i < round_per_thread; i++)
         {
-            while(!se.mark_in_use()) force_yield();
+            while(!se.mark_in_use()) std::this_thread::force_yield();
             v++;
             se.release();
         }

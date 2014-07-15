@@ -1,14 +1,16 @@
 
 #pragma once
 #include <stdint.h>
-#include "processor.hpp"
+#include "../template/singleton.hpp"
 
-class loops_per_yield_t
+const static class loops_per_yield_t
 {
 public:
     const uint32_t count;
     // TODO: update count based on the performance of the system
+private:
     loops_per_yield_t() :
         count(processor.single ? 1 : 500) { }
-} loops_per_yield;
+    CONST_SINGLETON(loops_per_yield_t);
+}& loops_per_yield = loops_per_yield_t::instance();
 

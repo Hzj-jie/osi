@@ -7,4 +7,5 @@
 #include "../utt_cases/envs/nowadays_test.hpp"
 #include "../utt_cases/utils/auto_removed_folder_test.hpp"
 #include "../utt_cases/utils/uuid_test.hpp"
+#include "../utt_cases/sync/spin_wait_test.hpp"
 
