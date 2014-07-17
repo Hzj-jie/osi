@@ -4,7 +4,6 @@
 #include <boost/filesystem.hpp>
 #include <boost/system/api_config.hpp>
 // include BOOST_WINDOWS_API and BOOSE_POSIX_API
-#include "../template/singleton.hpp"
 #include "../app_info/k_assert.hpp"
 
 #include <iostream>
@@ -36,7 +35,7 @@ static RT& append_path(RT& p, T&& v)
 }
 
 template <typename RT, typename T>
-static RT append_path(const RT& p, T&& v)
+static boost::filesystem::path::string_type append_path(const RT& p, T&& v)
 {
     using namespace boost::filesystem;
     path c(p);

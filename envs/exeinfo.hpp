@@ -5,7 +5,7 @@
 #include "../template/singleton.hpp"
 #include <boost/filesystem.hpp>
 
-#ifdef OS_WINDOWS
+#if defined(OS_WINDOWS)
 #include <windows.h>
 namespace
 {
@@ -16,8 +16,7 @@ namespace
         return string(result, GetModuleFileName(nullptr, result, MAX_PATH));
     }
 }
-#endif
-#ifdef OS_POSIX
+#elif defined(OS_POSIX)
 #include <limits.h>
 #include <unistd.h>
 namespace
