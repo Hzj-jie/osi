@@ -57,12 +57,12 @@ public:
 
 namespace utt
 {
-    using namespace std;
-    static list<icase*> cases;
-    static mutex mtx;
+    static std::list<icase*> cases;
+    static std::mutex mtx;
     
     static bool fetch_next_case(icase*& r)
     {
+        using namespace std;
         r = nullptr;
         unique_lock<mutex> lck(mtx);
         if(cases.empty()) return false;
@@ -81,6 +81,7 @@ namespace utt
 
     static void pending_case(icase* c)
     {
+        using namespace std;
         k_assert(c != nullptr);
         unique_lock<mutex> lck(mtx);
         cases.push_back(c);

@@ -1,4 +1,5 @@
 
+#pragma once
 #include <functional>
 #include <thread>
 #include <stdint.h>
@@ -24,11 +25,24 @@ namespace this_thread {
         while(f())
         {
             i++;
-            if(i > loops_per_yield.count)
+#ifdef USE_YIELD_STRONG
+            if(i == loops_per_yield.count)
             {
                 if(yield_weak()) i = 0;
                 else i = loops_per_yield.count;
             }
+            else if(i > loops_per_yield.count)
+            {
+                yield_strong();
+                i = 0;
+            }
+#else
+            if(i >= loops_per_yield.count)
+            {
+                if(yield_weak()) i = 0;
+                else i = loops_per_yield.count;
+            }
+#endif
         }
     }
 

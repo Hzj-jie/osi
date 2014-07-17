@@ -16,7 +16,7 @@
 #include "../const/character.hpp"
 #include "../envs/nowadays.hpp"
 
-ostream& operator<<(ostream& os, const ostringstream& v)
+std::ostream& operator<<(std::ostream& os, const std::ostringstream& v)
 {
     os << v.str();
     return os;
@@ -24,9 +24,7 @@ ostream& operator<<(ostream& os, const ostringstream& v)
 
 namespace
 {
-    using namespace std;
-    using namespace error_handle;
-    static vector<ierror_writer*> writers { };
+    static std::vector<error_handle::ierror_writer*> writers { };
 
     template <typename T>
     static void raise_error(error_type err_type,
@@ -37,7 +35,7 @@ namespace
         using namespace std;
         static mutex mtx;
         ostringstream os;
-        os << error_type_to_char(err_type, err_type_char)
+        os << error_handle::error_type_to_char(err_type, err_type_char)
            << character.comma
            << character.blank
            << nowadays.long_time()
@@ -61,7 +59,6 @@ namespace
 
 namespace error_handle
 {
-    using namespace std;
     static void add_writer(ierror_writer* writer)
     {
         writers.push_back(writer);
@@ -111,6 +108,7 @@ namespace
     private:
         default_writers()
         {
+            using namespace error_handle;
             writers.push_back(new error_type_selected_error_writer<console_error_writer>
                              (console_error_writer(),
                               { error_type::critical,

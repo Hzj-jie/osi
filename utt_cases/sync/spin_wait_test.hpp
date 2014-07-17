@@ -9,7 +9,7 @@
 class spin_wait_test : public icase
 {
 private:
-    static bool wait_when_test_1(const function<void(const function<bool()>&)>& f)
+    static bool wait_when_test_1(const std::function<void(const std::function<bool()>&)>& f)
     {
         const int target = 100;
         int x = 0;
@@ -22,7 +22,7 @@ private:
         return true;
     }
 
-    static bool wait_when_test_2(const function<bool(const function<bool()>&, uint32_t)>& f)
+    static bool wait_when_test_2(const std::function<bool(const std::function<bool()>&, uint32_t)>& f)
     {
         const int target = 100;
         int x = 0;
@@ -55,7 +55,7 @@ private:
     static bool wait_when_timeout_test(T&& ms_timer)
     {
 #define WAIT_WHEN_TIMER_CONVERTOR(x) \
-            [&](const function<bool()>& f, uint32_t timeout_ms) { return x(ms_timer, f, timeout_ms); }
+            [&](const std::function<bool()>& f, uint32_t timeout_ms) { return x(ms_timer, f, timeout_ms); }
         return wait_when_test_2(WAIT_WHEN_TIMER_CONVERTOR(std::this_thread::lazy_wait_when_2)) &&
                wait_when_test_2(WAIT_WHEN_TIMER_CONVERTOR(std::this_thread::wait_when_2)) &&
                wait_when_test_2(WAIT_WHEN_TIMER_CONVERTOR(std::this_thread::strict_wait_when_2));

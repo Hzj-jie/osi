@@ -116,11 +116,10 @@ static std::string to_str(const char& i)
 
 namespace
 {
-    using namespace std;
-    void append_to_stream(ostream& s) { }
+    void append_to_stream(std::ostream& s) { }
 
     template <typename T, typename... Args>
-    void append_to_stream(ostream& s, T&& f, Args&&... others)
+    void append_to_stream(std::ostream& s, T&& f, Args&&... others)
     {
         s << f;
         append_to_stream(s, others...);

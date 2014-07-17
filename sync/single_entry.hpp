@@ -15,8 +15,8 @@ private:
 
 public:
     single_entry() : single_entry(false) { }
-    single_entry(bool init_value) :
-        v(init_value ? inuse : free) { }
+    single_entry(bool init_in_use) :
+        v(init_in_use ? inuse : free) { }
 
     operator bool()
     {

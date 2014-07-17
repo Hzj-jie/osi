@@ -6,31 +6,34 @@
 all: \
  utt
 
-utt: main.cpp icase.hpp ../app_info/k_assert.hpp cases.hpp \
+utt: main.cpp icase.hpp ../app_info/assert.hpp \
+ ../app_info/error_handle.hpp ../app_info/error_type.hpp \
+ ../app_info/error_writer.hpp ../app_info/k_assert.hpp \
+ ../app_info/../template/singleton.hpp \
+ ../app_info/../template/../envs/os.hpp ../app_info/../envs/deploys.hpp \
+ ../app_info/../envs/exeinfo.hpp \
+ ../app_info/../envs/../const/character.hpp \
+ ../app_info/../envs/../utils/auto_removed_folder.hpp \
+ ../app_info/../envs/../utils/sweeper.hpp \
+ ../app_info/../envs/../utils/uuid.hpp ../app_info/../envs/git.hpp \
+ ../app_info/../envs/nowadays.hpp \
+ ../app_info/../envs/../utils/strutils.hpp ../app_info/trace.hpp \
+ ../app_info/../utils/lazier.hpp ../app_info/assert_blocker.hpp cases.hpp \
  ../utt_cases/utt/utt_self_case.hpp \
- ../utt_cases/utt/../../app_info/trace.hpp \
- ../utt_cases/utt/../../app_info/../utils/strutils.hpp \
- ../utt_cases/utt/../../app_info/../const/character.hpp \
- ../utt_cases/utt/../../app_info/../const/../template/singleton.hpp \
- ../utt_cases/utt/../../app_info/../const/../template/../envs/os.hpp \
- ../utt_cases/utt/../../app_info/../utils/lazier.hpp \
  ../utt_cases/utt/../../utt/utt_assert.hpp \
- ../utt_cases/utt/../../utt/../app_info/error_handle.hpp \
- ../utt_cases/utt/../../utt/../app_info/error_type.hpp \
- ../utt_cases/utt/../../utt/../app_info/error_writer.hpp \
- ../utt_cases/utt/../../utt/../app_info/../envs/deploys.hpp \
- ../utt_cases/utt/../../utt/../app_info/../envs/exeinfo.hpp \
- ../utt_cases/utt/../../utt/../app_info/../envs/../utils/auto_removed_folder.hpp \
- ../utt_cases/utt/../../utt/../app_info/../envs/../utils/sweeper.hpp \
- ../utt_cases/utt/../../utt/../app_info/../envs/../utils/uuid.hpp \
- ../utt_cases/utt/../../utt/../app_info/../envs/git.hpp \
- ../utt_cases/utt/../../utt/../app_info/../envs/nowadays.hpp \
+ ../utt_cases/utt/../../utt/utt_error_handle.hpp \
  ../utt_cases/utils/sweeper_test.hpp \
  ../utt_cases/sync/single_entry_test.hpp \
  ../utt_cases/sync/../../sync/single_entry.hpp \
- ../utt_cases/sync/../../sync/../app_info/assert.hpp \
  ../utt_cases/sync/../../sync/yield.hpp \
- ../utt_cases/sync/../../sync/../envs/processor.hpp config.hpp
+ ../utt_cases/sync/../../sync/../envs/processor.hpp \
+ ../utt_cases/envs/nowadays_test.hpp \
+ ../utt_cases/utils/auto_removed_folder_test.hpp \
+ ../utt_cases/utils/uuid_test.hpp ../utt_cases/sync/spin_wait_test.hpp \
+ ../utt_cases/sync/../../sync/spin_wait.hpp \
+ ../utt_cases/sync/../../sync/../envs/loops_per_yield.hpp \
+ ../utt_cases/sync/reset_event_test.hpp \
+ ../utt_cases/sync/../../sync/reset_event.hpp config.hpp
 	g++ main.cpp -o utt -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3 -lboost_filesystem -lboost_system
 
 clean:

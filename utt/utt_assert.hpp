@@ -14,7 +14,7 @@ namespace utt
     const static class assert_t
     {
     private:
-        mutable atomic<uint32_t> _failure_count;
+        mutable std::atomic<uint32_t> _failure_count;
 #define UTT_ASSERT(v, cp) { \
             if(v) return true; \
             else { \
@@ -214,8 +214,8 @@ namespace utt
     private:
         assert_t() { }
         CONST_SINGLETON(assert_t);
-    }& assert = assert_t::instance();
+    }& utt_assert_instance = assert_t::instance();
 }
 
-static const utt::assert_t& utt_assert = utt::assert;
+static const utt::assert_t& utt_assert = utt::utt_assert_instance;
 

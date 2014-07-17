@@ -1,24 +1,105 @@
 
+#pragma once
 #include <thread>
 #include <atomic>
-using namespace std;
+#include "../app_info/assert.hpp"
+#include <stdint.h>
+#include "../envs/nowadays.hpp"
+#include "../sync/spin_wait.hpp"
 
+namespace
+{
+    const static auto& default_timer = nowadays.low_res;
+}
+
+template <bool auto_reset>
 class reset_event
 {
 private:
     const int PASS = 0;
     const int BLOCK = 1;
-    bool _auto_reset;
-    atomic_int _status;
+    std::atomic<int> s;
 public:
+    reset_event(bool init_pass) :
+        s(init_pass ? PASS : BLOCK) { }
+
+    reset_event() :
+        reset_event(true) { }
+
     bool set()
     {
-        return _status.compare_exchange_weak(BLOCK, PASS);
+        int v = BLOCK;
+        return s.compare_exchange_weak(v, PASS) &&
+               assert(v == BLOCK);
     }
 
-    bool operator bool() const
+    bool reset()
     {
-        return (_status.load() == PASS);
+        int v = PASS;
+        return s.compare_exchange_weak(v, BLOCK) &&
+               assert(v == PASS);
     }
+
+    operator bool() const
+    {
+        return (s == PASS);
+    }
+
+    bool try_wait()
+    {
+        if(auto_reset)
+        {
+            int v = PASS;
+            return s.compare_exchange_weak(v, BLOCK) &&
+                   assert(v == PASS);
+        }
+        else return s == PASS;
+    }
+
+    template <typename T>
+    bool wait(T&& ms_timer, uint32_t timeout_ms)
+    {
+        return std::this_thread::wait_when(
+                        ms_timer,
+                        [this]()
+                        {
+                            return !(this->try_wait());
+                        },
+                        timeout_ms);
+    }
+
+    inline bool wait(uint32_t timeout_ms)
+    {
+        return wait(default_timer, timeout_ms);
+    }
+
+    void wait()
+    {
+        return std::this_thread::wait_when(
+                    [this]()
+                    {
+                        return !(this->try_wait());
+                    });
+    }
+};
+
+class auto_reset_event : public reset_event<true>
+{
+public:
+    auto_reset_event(bool init_pass) :
+        reset_event(init_pass) { }
+
+    auto_reset_event() :
+        reset_event() { }
+};
+
+class manual_reset_event : public reset_event<false>
+{
+public:
+    manual_reset_event(bool init_pass) :
+        reset_event(init_pass) { }
+
+    manual_reset_event() :
+        reset_event() { }
 };
 

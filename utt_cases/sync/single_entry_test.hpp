@@ -40,7 +40,7 @@ public:
 
     virtual bool cleanup()
     {
-        utt::assert.equal(v, processor.count * round_per_thread, CODE_POSITION());
+        utt_assert.equal(v, processor.count * round_per_thread, CODE_POSITION());
         return true;
     }
 
