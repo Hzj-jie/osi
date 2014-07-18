@@ -37,7 +37,7 @@ namespace error_handle
         virtual void write(const std::string& s)
         {
             k_assert(writer != nullptr);
-            if(*writer) (*writer) << s;
+            if(*writer) ((*writer) << s).flush();
         }
 
         template <typename T>

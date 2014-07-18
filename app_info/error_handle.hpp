@@ -11,12 +11,12 @@
 #include "../template/singleton.hpp"
 #include "../envs/deploys.hpp"
 #include "../envs/os.hpp"
-#include "trace.hpp"
 #include "../utils/strutils.hpp"
 #include "../const/character.hpp"
 #include "../envs/nowadays.hpp"
+#include <utility>
 
-std::ostream& operator<<(std::ostream& os, const std::ostringstream& v)
+static std::ostream& operator<<(std::ostream& os, const std::ostringstream& v)
 {
     os << v.str();
     return os;
@@ -26,11 +26,10 @@ namespace
 {
     static std::vector<error_handle::ierror_writer*> writers { };
 
-    template <typename T>
-    static void raise_error(error_type err_type,
-                            char err_type_char,
-                            T&& err_msg,
-                            const code_position* cp)
+    template <typename... Args>
+    static void k_raise_error(error_type err_type,
+                              char err_type_char,
+                              Args&&... args)
     {
         using namespace std;
         static mutex mtx;
@@ -41,13 +40,8 @@ namespace
            << nowadays.long_time()
            << character.comma
            << character.blank
-           << err_msg;
-        if(cp != nullptr && (*cp))
-        {
-            os << character.blank
-               << (*cp);
-        }
-        os << endl;
+           << strcat(forward<Args>(args)...)
+           << endl;
         for(size_t i = 0; i < writers.size(); i++)
         {
             k_assert(writers[i] != nullptr);
@@ -121,56 +115,25 @@ namespace
     }& default_writers_instance = default_writers::instance();
 }
 
-template <typename T>
+template <typename... Args>
 static void raise_error(error_type err_type,
                         char err_type_char,
-                        T&& err_msg)
+                        Args&&... args)
 {
-    raise_error(err_type,
-                err_type_char,
-                err_msg,
-                nullptr);
+    k_raise_error(err_type,
+                  err_type_char,
+                  std::forward<Args>(args)...);
 }
 
-template <typename T>
-static void raise_error(error_type err_type,
-                        char err_type_char,
-                        T&& err_msg,
-                        const code_position& cp)
+template <typename... Args>
+static void raise_error(error_type err_type, Args&&... args)
 {
-    raise_error(err_type,
-                err_type_char,
-                err_msg,
-                &cp);
+    k_raise_error(err_type, character.null, std::forward<Args>(args)...);
 }
 
-template <typename T>
-static void raise_error(error_type err_type, T&& err_msg)
+template <typename... Args>
+static void raise_error(Args&&... args)
 {
-    raise_error(err_type, character.null, err_msg);
+    k_raise_error(error_type::information, character.null, std::forward<Args>(args)...);
 }
-
-template <typename T>
-static void raise_error(error_type err_type, T&& err_msg, const code_position& cp)
-{
-    raise_error(err_type, character.null, err_msg, cp);
-}
-
-template <typename T>
-static void raise_error(T&& err_msg)
-{
-    raise_error(error_type::information, err_msg);
-}
-
-template <typename T>
-static void raise_error(T&& err_msg, const code_position& cp)
-{
-    raise_error(error_type::information, err_msg, cp);
-}
-
-#define RAISE_ERROR(err_type, err_msg) { \
-    if(error_handle::should_show_code_position(err_type)) \
-        raise_error(err_type, err_msg, CODE_POSITION()); \
-    else \
-        raise_error(err_type, err_msg); }
 

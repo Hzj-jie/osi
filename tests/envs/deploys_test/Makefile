@@ -8,8 +8,8 @@ all: \
 
 deploys_test: deploys_test.cpp ../../../envs/deploys.hpp \
  ../../../envs/exeinfo.hpp ../../../envs/os.hpp \
- ../../../envs/../template/singleton.hpp \
  ../../../envs/../app_info/k_assert.hpp \
+ ../../../envs/../template/singleton.hpp \
  ../../../envs/../const/character.hpp \
  ../../../envs/../utils/auto_removed_folder.hpp \
  ../../../envs/../utils/sweeper.hpp ../../../envs/../utils/uuid.hpp \

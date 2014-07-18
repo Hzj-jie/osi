@@ -1,6 +1,7 @@
 
 #include "../../../app_info/error_handle.hpp"
 #include "../../../utils/strutils.hpp"
+#include "../../../app_info/trace.hpp"
 #include <stdint.h>
 #include <sstream>
 using namespace std;
@@ -25,6 +26,16 @@ int main(int argc, const char* const* const argv)
     {
         raise_error(error_type(i),
                     strcat("this is some sample log ", i),
+                    CODE_POS);
+    }
+
+    for(uint32_t i = uint32_t(error_type::first) + 1;
+        i < uint32_t(error_type::last);
+        i++)
+    {
+        raise_error(error_type(i),
+                    "this is some sample log ",
+                    i,
                     CODE_POS);
     }
 }

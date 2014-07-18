@@ -19,8 +19,7 @@ assert_test: assert_test.cpp ../../../app_info/error_handle.hpp \
  ../../../app_info/../envs/../utils/uuid.hpp \
  ../../../app_info/../envs/git.hpp ../../../app_info/../envs/nowadays.hpp \
  ../../../app_info/../envs/../utils/strutils.hpp \
- ../../../app_info/trace.hpp ../../../app_info/../utils/lazier.hpp \
- ../../../app_info/assert.hpp
+ ../../../app_info/assert.hpp ../../../app_info/assert_blocker.hpp
 	g++ assert_test.cpp -o assert_test -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3 -lboost_filesystem -lboost_system
 
 clean:

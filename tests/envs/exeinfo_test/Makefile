@@ -7,8 +7,8 @@ all: \
  exeinfo_test
 
 exeinfo_test: exeinfo_test.cpp ../../../envs/exeinfo.hpp \
- ../../../envs/os.hpp ../../../envs/../template/singleton.hpp \
- ../../../envs/../app_info/k_assert.hpp
+ ../../../envs/os.hpp ../../../envs/../app_info/k_assert.hpp \
+ ../../../envs/../template/singleton.hpp
 	g++ exeinfo_test.cpp -o exeinfo_test -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3 -lboost_system -lboost_filesystem
 
 clean:

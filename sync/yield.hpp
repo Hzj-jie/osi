@@ -2,7 +2,7 @@
 #pragma once
 #include <stdint.h>
 #include <thread>
-#include <chrono>
+#include "../const/threading.hpp"
 #include "../envs/processor.hpp"
 #include "../envs/nowadays.hpp"
 #include "../envs/processor.hpp"
@@ -19,23 +19,25 @@ namespace this_thread {
         }
     }
 
+    static void yield_strong()
+    {
+        if(!single_yield())
+            sleep_for(thread_interval);
+    }
+
     static bool yield_weak()
     {
         if(processor.single)
         {
-            while(!single_yield());
+            yield_strong();
             return true;
         }
-        else
-        {
-            return single_yield();
-        }
+        else return single_yield();
     }
 
-    static void yield_strong()
+    static void interval()
     {
-        if(!yield_weak())
-            sleep_for(chrono::milliseconds(1));
+        sleep_for(thread_interval);
     }
 
     inline static bool not_force_yield()

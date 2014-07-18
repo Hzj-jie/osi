@@ -2,8 +2,8 @@
 #pragma once
 #include "../app_info/error_type.hpp"
 #include "../app_info/error_handle.hpp"
-#include "../app_info/trace.hpp"
 #include "../const/character.hpp"
+#include <utility>
 
 namespace utt
 {
@@ -12,28 +12,11 @@ namespace utt
         const static error_type err_type = error_type::other;
         const static char err_type_char = character.t;
     }
-    template <typename T>
-    static void raise_error(T&& err_msg)
+
+    template <typename... Args>
+    static void utt_raise_error(Args&&... args)
     {
-        raise_error(err_type, err_type_char, err_msg);
+        raise_error(err_type, err_type_char, std::forward<Args>(args)...);
     }
-
-    template <typename T>
-    static void raise_error(T&& err_msg, const code_position& cp)
-    {
-        raise_error(err_type, err_type_char, err_msg, cp);
-    }
-}
-
-template <typename T>
-static void utt_raise_error(T&& err_msg)
-{
-    utt::raise_error(err_msg);
-}
-
-template <typename T>
-static void utt_raise_error(T&& err_msg, const code_position& cp)
-{
-    utt::raise_error(err_msg, cp);
 }
 

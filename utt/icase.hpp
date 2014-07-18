@@ -5,10 +5,12 @@
 #include <mutex>
 #include "../app_info/assert.hpp"
 #include <stdint.h>
+#include "utt_assert.hpp"
+#include "../app_info/trace.hpp"
 
 class icase
 {
-public:
+protected:
     virtual bool prepare()
     {
         return true;
@@ -30,6 +32,8 @@ public:
                execute() &&
                cleanup();
     }
+public:
+    utt::assert_t utt_assert;
 
     virtual uint32_t preserved_processor_count() const
     {
@@ -39,6 +43,12 @@ public:
     virtual const std::string& name() const = 0;
 
     virtual ~icase() { }
+
+    void operator()()
+    {
+        utt_assert.set_case_name(name());
+        utt_assert.is_true(run(), CODE_POSITION());
+    }
 };
 
 #define DEFINE_CASE(x) \

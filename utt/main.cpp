@@ -26,7 +26,7 @@ static void run(int id)
         icase* i = nullptr;
         if(fetch_next_case(i))
         {
-            ::assert(i != nullptr, code_position());
+            ::assert(i != nullptr, CODE_POSITION());
             icase& c = (*i);
             if(config.selected(c))
             {
@@ -36,15 +36,15 @@ static void run(int id)
                 if(should_run)
                 {
                     int64_t start_ms = nowadays.high_res.milliseconds();
-                    ::raise_error(strcat(id, ": starts case ", c.name()));
+                    raise_error(strcat(id, ": starts case ", c.name()));
                     runned_cases++;
-                    utt_assert.is_true(c.run(), CODE_POSITION());
-                    ::raise_error(strcat(id,
-                                         ": finished case ",
-                                         c.name(),
-                                         ", uses ",
-                                         nowadays.high_res.milliseconds() - start_ms,
-                                         " milliseconds"));
+                    c();
+                    raise_error(strcat(id,
+                                       ": finished case ",
+                                       c.name(),
+                                       ", uses ",
+                                       nowadays.high_res.milliseconds() - start_ms,
+                                       " milliseconds"));
                 }
                 using_processors.fetch_sub(c.preserved_processor_count());
                 if(should_run) finish_case(i);
@@ -57,7 +57,7 @@ static void run(int id)
         }
         else
         {
-            ::raise_error(strcat(id, ": no more cases to run, finished"));
+            raise_error(strcat(id, ": no more cases to run, finished"));
             break;
         }
     }
@@ -75,7 +75,7 @@ int main()
     utt_raise_error(strcat("finish running all ",
                            runned_cases,
                            " cases, total failures ",
-                           utt_assert.failure_count()));
+                           utt::assert_t::failure_count()));
     return 0;
 }
 

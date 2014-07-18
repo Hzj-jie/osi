@@ -50,7 +50,7 @@ private:
         while(finished < v.size())
         {
             re.set();
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            std::this_thread::interval();
         }
         for(size_t i = 0; i < v.size(); i++) v[i].join();
         v.clear();
@@ -58,13 +58,10 @@ private:
 
     static void pending()
     {
-        using namespace std::this_thread;
-        using namespace std::chrono;
-        force_yield();
-        sleep_for(milliseconds(1));
+        for(int i = 0; i < 2; i++) std::this_thread::interval();
     }
 
-    static bool auto_reset_event_test()
+    bool auto_reset_event_test()
     {
         using namespace std;
         auto_reset_event are;
@@ -88,7 +85,7 @@ private:
         return true;
     }
 
-    static bool manual_reset_event_test()
+    bool manual_reset_event_test()
     {
         using namespace std;
         manual_reset_event mre;

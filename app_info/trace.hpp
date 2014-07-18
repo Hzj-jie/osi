@@ -6,10 +6,33 @@
 #include "../utils/strutils.hpp"
 #include "../const/character.hpp"
 #include "../utils/lazier.hpp"
+#include <sstream>
+
+struct code_position;
+static std::ostream& operator<<(std::ostream&, const code_position&);
 
 struct code_position
 {
 private:
+    mutable lazier<std::string> formated_str;
+
+    static void output(std::ostream& os,
+                       const char* const file,
+                       const unsigned int line,
+                       const char* const func)
+    {
+        os << character.blank
+           << character.at
+           << character.blank
+           << func
+           << character.blank
+           << character.at
+           << character.blank
+           << file
+           << character.colon
+           << line;
+    }
+
     static bool valid(const char* const file,
                       const unsigned int line,
                       const char* const func)
@@ -19,31 +42,6 @@ private:
                func != nullptr;
     }
 
-    static std::string format(const char* const file,
-                              const unsigned int line,
-                              const char* const func)
-    {
-        if(valid(file, line, func))
-        {
-#define format_character(x) static_cast<const char>(character.x)
-            // the compiler cannot deduce the type, since character.at is a const intergeral
-            return strcat(format_character(at),
-                          format_character(blank),
-                          func,
-                          format_character(blank),
-                          format_character(at),
-                          format_character(blank),
-                          file,
-                          format_character(colon),
-                          line);
-#undef format_character
-        }
-        else return std::string();
-    }
-
-private:
-    mutable lazier<std::string> formated_str;
-
 public:
     const char* const file;
     const unsigned int line;
@@ -52,7 +50,12 @@ public:
     code_position(const char* const file = nullptr,
                   const unsigned int line = 0,
                   const char* const func = nullptr) :
-        formated_str([=]() { return format(file, line, func); }),
+        formated_str([=]()
+                     {
+                         std::ostringstream os;
+                         output(os, file, line, func);
+                         return os.str();
+                     }),
         file(file),
         line(line),
         func(func) { }
@@ -71,16 +74,15 @@ public:
     {
         return str();
     }
+
+private:
+    friend std::ostream& operator<<(std::ostream& os, const code_position& cp)
+    {
+        code_position::output(os, cp.file, cp.line, cp.func);
+        return os;
+    }
 };
 
 #define CODE_POSITION() code_position(__FILE__, __LINE__, BOOST_CURRENT_FUNCTION)
 #define CODE_POS CODE_POSITION()
-#define EMPTY_CODE_POSITION() static_cast<const code_position*>(nullptr)
-#define EMPTY_CODE_POS EMPTY_CODE_POSITION()
-
-static std::ostream& operator <<(std::ostream& os, const code_position& cp)
-{
-    os << cp.str();
-    return os;
-}
 

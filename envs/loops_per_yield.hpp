@@ -2,6 +2,7 @@
 #pragma once
 #include <stdint.h>
 #include "../template/singleton.hpp"
+#include "processor.hpp"
 
 const static class loops_per_yield_t
 {

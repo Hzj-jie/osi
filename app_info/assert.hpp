@@ -1,9 +1,9 @@
 
 #pragma once
 #include "error_handle.hpp"
-#include "trace.hpp"
 #include "k_assert.hpp"
 #include "../utils/strutils.hpp"
+#include <utility>
 
 #include "assert_blocker.hpp"
 
@@ -11,31 +11,16 @@ namespace
 {
     const static error_type assert_err_type = error_type::critical;
 
-#define ASSERT_ERROR_MSG(err_msg) strcat("ASSERT FAILED: ", err_msg)
-    template <typename T>
-    static void assert_raise_error(T&& err_msg)
+    template <typename... Args>
+    static void assert_raise_error(Args&&... args)
     {
-        raise_error(assert_err_type, ASSERT_ERROR_MSG(err_msg));
+        raise_error(assert_err_type, "ASSERT FAILED: ", std::forward<Args>(args)...);
     }
 
-    template <typename T>
-    static void assert_raise_error(T&& err_msg, const code_position& cp)
+    template <typename... Args>
+    static bool assert_failed(Args&&... args)
     {
-        raise_error(assert_err_type, ASSERT_ERROR_MSG(err_msg), cp);
-    }
-#undef ASSERT_ERROR_MSG
-
-    template <typename T>
-    static bool assert_failed(T&& err_msg)
-    {
-        assert_raise_error(err_msg);
-        return ::assert_failed();
-    }
-
-    template <typename T>
-    static bool assert_failed(T&& err_msg, const code_position& cp)
-    {
-        assert_raise_error(err_msg, cp);
+        assert_raise_error(std::forward<Args>(args)...);
         return ::assert_failed();
     }
 }
@@ -46,20 +31,9 @@ static bool assert(bool x)
     return x || assert_failed(x);
 }
 
-static bool assert(bool x, const code_position& cp)
+template <typename... Args>
+static bool assert(bool x, Args&&... args)
 {
-    return x || assert_failed(x, cp);
-}
-
-template <typename T>
-static bool assert(bool x, T&& err_msg)
-{
-    return x || assert_failed(err_msg);
-}
-
-template <typename T>
-static bool assert(bool x, T&& err_msg, const code_position& cp)
-{
-    return x || assert_failed(err_msg, cp);
+    return x || assert_failed(std::forward<Args>(args)...);
 }
 

@@ -2,220 +2,72 @@
 #pragma once
 #include <string.h>
 #include <string>
-#include "../template/singleton.hpp"
 #include "utt_error_handle.hpp"
-#include "../app_info/trace.hpp"
 #include "../const/character.hpp"
 #include <atomic>
 #include <stdint.h>
+#include "../template/singleton.hpp"
 
 namespace utt
 {
-    const static class assert_t
+    class assert_t
     {
     private:
-        mutable std::atomic<uint32_t> _failure_count;
-#define UTT_ASSERT(v, cp) { \
-            if(v) return true; \
-            else { \
-                _failure_count++; \
-                std::string err_msg = "UTT ASSERT FAILED: "#v; \
-                if(cp == nullptr) \
-                    utt_raise_error(err_msg); \
-                else \
-                    utt_raise_error(err_msg, *cp); \
-                return false; } }
+        std::string case_name;
+        SINGLETON_FUNC(std::atomic<uint32_t>, f, (0));
+
+        template <typename... Args>
+        bool utt_assert(bool v, Args&&... args) const
+        {
+            if(v) return true;
+            else
+            {
+                f()++;
+                utt_raise_error("UTT ", case_name, " ASSERT FAILED: ", std::forward<Args>(args)...);
+                return false;
+            }
+        }
     public:
-        uint32_t failure_count() const
+        void set_case_name(const std::string& name)
         {
-            return _failure_count;
+            case_name = name;
         }
 
-        template <typename T1, typename T2>
-        bool equal(T1&& i, T2&& j) const
+        static uint32_t failure_count()
         {
-            UTT_ASSERT(i == j, EMPTY_CODE_POSITION());
+            return f();
         }
 
-        template <typename T1, typename T2>
-        bool equal(T1&& i, T2&& j, const code_position& cp) const
-        {
-            UTT_ASSERT(i == j, &cp);
-        }
+#define UTT_ASSERT_TEMP(n, x, m) \
+            template <typename T1, typename T2, typename... Args> \
+            bool n(T1&& i, T2&& j, Args&&... args) const { \
+                return utt_assert(x, #x, std::forward<Args>(args)...); } \
+            template <typename... Args> \
+            bool n(const char* i, const char* j, Args&&... args) const { \
+                return utt_assert(strcmp(i, j) m, "strcmp(i, j) "#m, std::forward<Args>(args)...); }
+        UTT_ASSERT_TEMP(equal, i == j, == 0);
+        UTT_ASSERT_TEMP(not_equal, i != j, != 0);
+        UTT_ASSERT_TEMP(less, i < j, < 0);
+        UTT_ASSERT_TEMP(less_or_equal, i <= j, <= 0);
+        UTT_ASSERT_TEMP(more, i > j, > 0);
+        UTT_ASSERT_TEMP(more_or_equal, i >= j, >= 0);
+#undef UTT_ASSERT_TEMP
 
-        bool equal(const char* i, const char* j) const
-        {
-            UTT_ASSERT(strcmp(i, j) == 0, EMPTY_CODE_POSITION());
-        }
+#define UTT_ASSERT_TEMP(n, x) \
+            template <typename T, typename... Args> \
+            bool n(const T* i, Args&&... args) const { \
+                return utt_assert(i x nullptr, "i "#x" nullptr", std::forward<Args>(args)...); }
+        UTT_ASSERT_TEMP(is_null, ==);
+        UTT_ASSERT_TEMP(is_not_null, !=);
+#undef UTT_ASSERT_TEMP
 
-        bool equal(const char* i, const char* j, const code_position& cp) const
-        {
-            UTT_ASSERT(strcmp(i, j) == 0, &cp);
-        }
-
-        template <typename T1, typename T2>
-        bool not_equal(T1&& i, T2&& j) const
-        {
-            UTT_ASSERT(i != j, EMPTY_CODE_POSITION());
-        }
-
-        template <typename T1, typename T2>
-        bool not_equal(T1&& i, T2&& j, const code_position& cp) const
-        {
-            UTT_ASSERT(i != j, &cp);
-        }
-
-        bool not_equal(const char* i, const char* j) const
-        {
-            UTT_ASSERT(strcmp(i, j) != 0, EMPTY_CODE_POSITION());
-        }
-
-        bool not_equal(const char* i, const char* j, const code_position& cp) const
-        {
-            UTT_ASSERT(strcmp(i, j) != 0, &cp);
-        }
-
-        template <typename T1, typename T2>
-        bool less(T1&& i, T2&& j) const
-        {
-            UTT_ASSERT(i < j, EMPTY_CODE_POSITION());
-        }
-
-        template <typename T1, typename T2>
-        bool less(T1&& i, T2&& j, const code_position& cp) const
-        {
-            UTT_ASSERT(i < j, &cp);
-        }
-
-        bool less(const char* i, const char* j) const
-        {
-            UTT_ASSERT(strcmp(i, j) < 0, EMPTY_CODE_POSITION());
-        }
-
-        bool less(const char* i, const char* j, const code_position& cp) const
-        {
-            UTT_ASSERT(strcmp(i, j) < 0, &cp);
-        }
-
-        template <typename T1, typename T2>
-        bool less_or_equal(T1&& i, T2&& j) const
-        {
-            UTT_ASSERT(i <= j, EMPTY_CODE_POSITION());
-        }
-
-        template <typename T1, typename T2>
-        bool less_or_equal(T1&& i, T2&& j, const code_position& cp) const
-        {
-            UTT_ASSERT(i <= j, &cp);
-        }
-
-        bool less_or_equal(const char* i, const char* j) const
-        {
-            UTT_ASSERT(strcmp(i, j) <= 0, EMPTY_CODE_POSITION());
-        }
-
-        bool less_or_equal(const char* i, const char* j, const code_position& cp) const
-        {
-            UTT_ASSERT(strcmp(i, j) <= 0, &cp);
-        }
-
-        template <typename T1, typename T2>
-        bool more(T1&& i, T2&& j) const
-        {
-            UTT_ASSERT(i > j, EMPTY_CODE_POSITION());
-        }
-
-        template <typename T1, typename T2>
-        bool more(T1&& i, T2&& j, const code_position& cp) const
-        {
-            UTT_ASSERT(i > j, &cp);
-        }
-
-        bool more(const char* i, const char* j) const
-        {
-            UTT_ASSERT(strcmp(i, j) > 0, EMPTY_CODE_POSITION());
-        }
-
-        bool more(const char* i, const char* j, const code_position& cp) const
-        {
-            UTT_ASSERT(strcmp(i, j) > 0, &cp);
-        }
-
-        template <typename T1, typename T2>
-        bool more_or_equal(T1&& i, T2&& j) const
-        {
-            UTT_ASSERT(i >= j, EMPTY_CODE_POSITION());
-        }
-
-        template <typename T1, typename T2>
-        bool more_or_equal(T1&& i, T2&& j, const code_position& cp) const
-        {
-            UTT_ASSERT(i >= j, &cp);
-        }
-
-        bool more_or_equal(const char* i, const char* j) const
-        {
-            UTT_ASSERT(strcmp(i, j) >= 0, EMPTY_CODE_POSITION());
-        }
-
-        bool more_or_equal(const char* i, const char* j, const code_position& cp) const
-        {
-            UTT_ASSERT(strcmp(i, j) >= 0, &cp);
-        }
-
-        template <typename T>
-        bool is_null(const T* i) const
-        {
-            UTT_ASSERT(i == nullptr, EMPTY_CODE_POSITION());
-        }
-
-        template <typename T>
-        bool is_null(const T* i, const code_position& cp) const
-        {
-            UTT_ASSERT(i == nullptr, &cp);
-        }
-
-        template <typename T>
-        bool is_not_null(const T* i) const
-        {
-            UTT_ASSERT(i != nullptr, EMPTY_CODE_POSITION());
-        }
-
-        template <typename T>
-        bool is_not_null(const T* i, const code_position& cp) const
-        {
-            UTT_ASSERT(i != nullptr, &cp);
-        }
-
-        template <typename T>
-        bool is_true(T&& i) const
-        {
-            UTT_ASSERT(i, EMPTY_CODE_POSITION());
-        }
-
-        template <typename T>
-        bool is_true(T&& i, const code_position& cp) const
-        {
-            UTT_ASSERT(i, &cp);
-        }
-
-        template <typename T>
-        bool is_false(T&& i) const
-        {
-            UTT_ASSERT(!(i), EMPTY_CODE_POSITION());
-        }
-
-        template <typename T>
-        bool is_false(T&& i, const code_position& cp) const
-        {
-            UTT_ASSERT(!(i), &cp);
-        }
-#undef UTT_ASSERT
-    private:
-        assert_t() { }
-        CONST_SINGLETON(assert_t);
-    }& utt_assert_instance = assert_t::instance();
+#define UTT_ASSERT_TEMP(n, x) \
+            template <typename T, typename... Args> \
+            bool n(T&& i, Args&&... args) const { \
+                return utt_assert(i x true, "i "#x" true", std::forward<Args>(args)...); }
+        UTT_ASSERT_TEMP(is_true, ==);
+        UTT_ASSERT_TEMP(is_false, !=);
+#undef UTT_ASSERT_TEMP
+    };
 }
-
-static const utt::assert_t& utt_assert = utt::utt_assert_instance;
 

@@ -17,15 +17,14 @@ utt: main.cpp icase.hpp ../app_info/assert.hpp \
  ../app_info/../envs/../utils/sweeper.hpp \
  ../app_info/../envs/../utils/uuid.hpp ../app_info/../envs/git.hpp \
  ../app_info/../envs/nowadays.hpp \
- ../app_info/../envs/../utils/strutils.hpp ../app_info/trace.hpp \
- ../app_info/../utils/lazier.hpp ../app_info/assert_blocker.hpp cases.hpp \
- ../utt_cases/utt/utt_self_case.hpp \
- ../utt_cases/utt/../../utt/utt_assert.hpp \
- ../utt_cases/utt/../../utt/utt_error_handle.hpp \
- ../utt_cases/utils/sweeper_test.hpp \
+ ../app_info/../envs/../utils/strutils.hpp ../app_info/assert_blocker.hpp \
+ utt_assert.hpp utt_error_handle.hpp ../app_info/trace.hpp \
+ ../app_info/../utils/lazier.hpp cases.hpp \
+ ../utt_cases/utt/utt_self_case.hpp ../utt_cases/utils/sweeper_test.hpp \
  ../utt_cases/sync/single_entry_test.hpp \
  ../utt_cases/sync/../../sync/single_entry.hpp \
  ../utt_cases/sync/../../sync/yield.hpp \
+ ../utt_cases/sync/../../sync/../const/threading.hpp \
  ../utt_cases/sync/../../sync/../envs/processor.hpp \
  ../utt_cases/envs/nowadays_test.hpp \
  ../utt_cases/utils/auto_removed_folder_test.hpp \
