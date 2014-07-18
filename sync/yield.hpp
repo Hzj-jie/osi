@@ -5,14 +5,31 @@
 #include <chrono>
 #include "../envs/processor.hpp"
 #include "../envs/nowadays.hpp"
+#include "../envs/processor.hpp"
 
 namespace std {
 namespace this_thread {
+    namespace
+    {
+        static bool single_yield()
+        {
+            int64_t n = nowadays.low_res.milliseconds();
+            this_thread::yield();
+            return (nowadays.low_res.milliseconds() - n > 1);
+        }
+    }
+
     static bool yield_weak()
     {
-        int64_t n = nowadays.low_res.milliseconds();
-        this_thread::yield();
-        return (nowadays.low_res.milliseconds() - n > 1);
+        if(processor.single)
+        {
+            while(!single_yield());
+            return true;
+        }
+        else
+        {
+            return single_yield();
+        }
     }
 
     static void yield_strong()

@@ -7,42 +7,48 @@
 #include "yield.hpp"
 #include "../envs/nowadays.hpp"
 
+// TODO: wait_until
 namespace std {
 namespace this_thread {
     static void lazy_wait_when(const function<bool()>& f)
     {
-        while(f()) this_thread::yield();
+        while(f()) yield_weak();
     }
 
     static void strict_wait_when(const function<bool()>& f)
     {
-        while(f());
+        if(processor.single) lazy_wait_when(f);
+        else while(f());
     }
 
     static void wait_when(const function<bool()>& f)
     {
-        uint32_t i = 0;
-        while(f())
+        if(processor.single) lazy_wait_when(f);
+        else
         {
-            i++;
-#ifdef USE_YIELD_STRONG
-            if(i == loops_per_yield.count)
+            uint32_t i = 0;
+            while(f())
             {
-                if(yield_weak()) i = 0;
-                else i = loops_per_yield.count;
-            }
-            else if(i > loops_per_yield.count)
-            {
-                yield_strong();
-                i = 0;
-            }
+                i++;
+#if (false)
+                if(i == loops_per_yield.count)
+                {
+                    if(yield_weak()) i = 0;
+                    else i = loops_per_yield.count;
+                }
+                else if(i > loops_per_yield.count)
+                {
+                    yield_strong();
+                    i = 0;
+                }
 #else
-            if(i >= loops_per_yield.count)
-            {
-                if(yield_weak()) i = 0;
-                else i = loops_per_yield.count;
-            }
+                if(i >= loops_per_yield.count)
+                {
+                    if(yield_weak()) i = 0;
+                    else i = loops_per_yield.count;
+                }
 #endif
+            }
         }
     }
 
