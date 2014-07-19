@@ -9,7 +9,7 @@
 
 namespace std {
 namespace this_thread {
-    namespace
+    namespace __yield_private
     {
         static bool single_yield()
         {
@@ -26,12 +26,14 @@ namespace this_thread {
 
     static void yield_strong()
     {
+        using namespace __yield_private;
         if(!single_yield()) interval();
     }
 
     static bool yield_weak()
     {
-        if(processor.single)
+        using namespace __yield_private;
+		if(processor.single)
         {
             yield_strong();
             return true;

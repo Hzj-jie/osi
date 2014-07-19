@@ -7,7 +7,7 @@
 
 #include "assert_blocker.hpp"
 
-namespace
+namespace __assert_private
 {
     const static error_type assert_err_type = error_type::critical;
 
@@ -28,12 +28,12 @@ namespace
 #undef assert
 static bool assert(bool x)
 {
-    return x || assert_failed(x);
+    return x || __assert_private::assert_failed(x);
 }
 
 template <typename... Args>
 static bool assert(bool x, Args&&... args)
 {
-    return x || assert_failed(std::forward<Args>(args)...);
+    return x || __assert_private::assert_failed(std::forward<Args>(args)...);
 }
 

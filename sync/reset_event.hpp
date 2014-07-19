@@ -7,7 +7,7 @@
 #include "../envs/nowadays.hpp"
 #include "../sync/spin_wait.hpp"
 
-namespace
+namespace __reset_event_private
 {
     const static auto& default_timer = nowadays.low_res;
 }
@@ -70,7 +70,7 @@ public:
 
     inline bool wait(uint32_t timeout_ms)
     {
-        return wait(default_timer, timeout_ms);
+        return wait(__reset_event_private::default_timer, timeout_ms);
     }
 
     void wait()

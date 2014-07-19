@@ -7,7 +7,7 @@
 
 #if defined(OS_WINDOWS)
 #include <windows.h>
-namespace
+namespace __exeinfo_private
 {
     std::string getexepath()
     {
@@ -18,7 +18,7 @@ namespace
 #elif defined(OS_POSIX)
 #include <limits.h>
 #include <unistd.h>
-namespace
+namespace __exeinfo_private
 {
     std::string getexepath()
     {
@@ -38,7 +38,7 @@ private:
 
     exeinfo_t()
     {
-        _path = getexepath();
+        _path = __exeinfo_private::getexepath();
         namespace bt = boost::filesystem;
         bt::path p(_path);
         if(!p.empty() && p.has_filename())

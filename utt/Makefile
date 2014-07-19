@@ -36,6 +36,11 @@ utt: main.cpp icase.hpp ../app_info/assert.hpp \
  ../utt_cases/sync/../../sync/reset_event.hpp \
  ../utt_cases/formation/concurrent/slimqless_single_test.hpp \
  ../utt_cases/formation/concurrent/../../../formation/concurrent/slimqless.hpp \
+ ../utt_cases/formation/concurrent/slimqless_test.hpp \
+ ../utt_cases/formation/concurrent/../../../utils/random.hpp \
+ ../utt_cases/formation/concurrent/../../../utt/case_wrapper/multithreading_case_wrapper.hpp \
+ ../utt_cases/formation/concurrent/../../../utt/case_wrapper/case_wrapper.hpp \
+ ../utt_cases/formation/concurrent/../../../utt/case_wrapper/repeat_case_wrapper.hpp \
  config.hpp
 	g++ main.cpp -o utt -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3 -lboost_filesystem -lboost_system
 

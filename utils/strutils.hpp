@@ -115,7 +115,7 @@ static std::string to_str(const char& i)
     return o;
 }
 
-namespace
+namespace __strutils_private
 {
     void append_to_stream(std::ostream& s) { }
 
@@ -131,6 +131,7 @@ template <typename... Args>
 std::string strcat(Args&&... args)
 {
     using namespace std;
+	using namespace __strutils_private;
     ostringstream os;
     append_to_stream(os, forward<Args>(args)...);
     return os.str();

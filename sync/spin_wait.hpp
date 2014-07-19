@@ -124,7 +124,7 @@ namespace this_thread {
     inline static void busy_wait_until_1(const function<bool()>& f) { busy_wait_until(f); }
     inline static void strict_wait_until_1(const function<bool()>& f) { strict_wait_until(f); }
 
-    namespace
+    namespace __spin_wait_private
     {
         /*
         // inlined in the macro defination
@@ -153,7 +153,7 @@ namespace this_thread {
             return r && ms_timer.milliseconds() - start_ms < timeout_ms; }); \
         return !r; } \
     static bool x(const function<bool()>& f, uint32_t timeout_ms) { \
-        return x(default_timer, f, timeout_ms); } \
+        return x(__spin_wait_private::default_timer, f, timeout_ms); } \
     template <typename T> \
     inline static bool x##_2(T&& ms_timer, const function<bool()>& f, uint32_t timeout_ms) { \
         return x(ms_timer, f, timeout_ms); } \
@@ -178,7 +178,7 @@ namespace this_thread {
             return r || ms_timer.milliseconds() - start_ms >= timeout_ms; }); \
         return r; } \
     static bool x(const function<bool()>& f, uint32_t timeout_ms) { \
-        return x(default_timer, f, timeout_ms); } \
+        return x(__spin_wait_private::default_timer, f, timeout_ms); } \
     template <typename T> \
     inline static bool x##_2(T&& ms_timer, const function<bool()>& f, uint32_t timeout_ms) { \
         return x(ms_timer, f, timeout_ms); } \

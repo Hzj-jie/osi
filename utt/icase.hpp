@@ -10,7 +10,9 @@
 
 class icase
 {
-private:
+public:
+    utt::assert_t utt_assert;
+
     virtual bool prepare()
     {
         return true;
@@ -32,8 +34,6 @@ private:
                execute() &&
                cleanup();
     }
-public:
-    utt::assert_t utt_assert;
 
     virtual uint32_t preserved_processor_count() const
     {

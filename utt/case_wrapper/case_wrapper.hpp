@@ -3,14 +3,15 @@
 #include <utility>
 #include <stdint.h>
 #include "../icase.hpp"
+#include <string>
 
 template <typename T>
 class case_wrapper : public icase
 {
 private:
-    const T c;
+    T c;
 
-protected:
+public:
     bool prepare() override
     {
         return c.prepare();
@@ -31,13 +32,17 @@ protected:
         return icase::run();
     }
 
-public:
     template <typename... Args>
     case_wrapper(Args&&... args) : c(std::forward<Args>(args)...) { }
 
-    virtual uint32_t preserved_processor_count() const
+    uint32_t preserved_processor_count() const override
     {
         return c.preserved_processor_count();
+    }
+
+    const std::string& name() const override
+    {
+        return c.name();
     }
 };
 

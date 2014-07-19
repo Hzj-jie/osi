@@ -22,7 +22,7 @@ static std::ostream& operator<<(std::ostream& os, const std::ostringstream& v)
     return os;
 }
 
-namespace
+namespace __error_handle_private
 {
     static std::vector<error_handle::ierror_writer*> writers { };
 
@@ -55,11 +55,13 @@ namespace error_handle
 {
     static void add_writer(ierror_writer* writer)
     {
+    	using namespace __error_handle_private;
         writers.push_back(writer);
     }
 
     static bool remove_writer(ierror_writer* writer)
     {
+    	using namespace __error_handle_private;
         for(size_t i = 0; i < writers.size(); i++)
         {
             if(writer == writers[i])
@@ -74,7 +76,8 @@ namespace error_handle
 
     static void clear_writers()
     {
-        for(size_t i = 0; i < writers.size(); i++)
+    	using namespace __error_handle_private;
+		for(size_t i = 0; i < writers.size(); i++)
             delete writers[i];
         writers.clear();
     }
@@ -83,6 +86,7 @@ namespace error_handle
     {
         using namespace error_handle;
         using namespace boost::filesystem;
+    	using namespace __error_handle_private;		
         create_directories(deploys.service_log_folder());
         add_writer(new file_error_writer(
                           append_path(deploys.service_log_folder(),
@@ -90,7 +94,7 @@ namespace error_handle
     }
 }
 
-namespace
+namespace __error_handle_private
 {
     static const class default_writers
     {
@@ -120,20 +124,24 @@ static void raise_error(error_type err_type,
                         char err_type_char,
                         Args&&... args)
 {
-    k_raise_error(err_type,
-                  err_type_char,
-                  std::forward<Args>(args)...);
+    __error_handle_private::k_raise_error(err_type,
+						                  err_type_char,
+						                  std::forward<Args>(args)...);
 }
 
 template <typename... Args>
 static void raise_error(error_type err_type, Args&&... args)
 {
-    k_raise_error(err_type, character.null, std::forward<Args>(args)...);
+    __error_handle_private::k_raise_error(err_type,
+										  character.null,
+										  std::forward<Args>(args)...);
 }
 
 template <typename... Args>
 static void raise_error(Args&&... args)
 {
-    k_raise_error(error_type::information, character.null, std::forward<Args>(args)...);
+    __error_handle_private::k_raise_error(error_type::information,
+										  character.null,
+										  std::forward<Args>(args)...);
 }
 
