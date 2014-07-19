@@ -58,7 +58,7 @@ private:
             vs() { }
     };
 
-    std::atomic<node*> f;
+    node f;
     std::atomic<node*> e;
 
     inline void wait_mark_writting()
@@ -96,9 +96,8 @@ private:
 public:
     slimqless()
     {
-        f = new node();
         e = new node();
-        f.load()->next.store(e);
+        f.next.store(e);
     }
 
     void push(const T& v)
@@ -119,7 +118,7 @@ public:
 
     bool pop(T& v)
     {
-        node* nf = f.load()->next;
+        node* nf = f.next;
         while(1)
         {
             assert(nf != nullptr);
@@ -127,7 +126,7 @@ public:
             else
             {
                 node* t = nf;
-                if(f.load()->next.compare_exchange_weak(t, nf->next) &&
+                if(f.next.compare_exchange_weak(t, nf->next) &&
                    assert(t == nf))
                 {
                     assert(nf->vs.not_no_value());
@@ -135,7 +134,7 @@ public:
                     new (&v) T(std::move(nf->v));
                     return true;
                 }
-                else nf = f.load()->next;
+                else nf = f.next;
             }
         }
         return assert(false);
