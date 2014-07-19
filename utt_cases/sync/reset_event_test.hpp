@@ -120,12 +120,12 @@ private:
     }
 
 public:
-    virtual uint32_t preserved_processor_count() const
+    uint32_t preserved_processor_count() const override
     {
         return icase::preserved_processor_count() + waiters_thread_count;
     }
 
-    virtual bool run()
+    bool run() override
     {
         return auto_reset_event_test() &&
                manual_reset_event_test();

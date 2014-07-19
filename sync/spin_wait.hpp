@@ -6,8 +6,8 @@
 #include "../envs/loops_per_yield.hpp"
 #include "yield.hpp"
 #include "../envs/nowadays.hpp"
+#include "../delegates/transform.hpp"
 
-// TODO: wait_until
 namespace std {
 namespace this_thread {
     static void lazy_wait_when(const function<bool()>& f)
@@ -15,9 +15,69 @@ namespace this_thread {
         while(f()) interval();
     }
 
-    static void lazy_wait_until(const function<bool()>& f)
+    static void slack_wait_when(const function<bool()>& f)
     {
-        lazy_wait_when([&]() { return !f(); });
+        if(processor.single) lazy_wait_when(f);
+        else
+        {
+            uint32_t lpy = loops_per_yield.count;
+            uint32_t i = 0;
+            while(f())
+            {
+                i++;
+                if(i >= lpy)
+                {
+                    interval();
+                    i = 0;
+                    if(lpy > loops_per_yield.min) lpy >>= 1;
+                }
+            }
+        }
+    }
+
+    static void wait_when(const function<bool()>& f)
+    {
+        if(processor.single) lazy_wait_when(f);
+        else
+        {
+            uint32_t lpy = loops_per_yield.count;
+            uint32_t i = 0;
+            while(f())
+            {
+                i++;
+                if(i == lpy)
+                {
+                    if(yield_weak()) i = 0;
+                    else i = lpy;
+                    if(lpy > loops_per_yield.min) lpy >>= 1;
+                }
+                else if(i > lpy)
+                {
+                    yield_strong();
+                    i = 0;
+                }
+            }
+        }
+    }
+
+    static void busy_wait_when(const function<bool()>& f)
+    {
+        if(processor.single) lazy_wait_when(f);
+        else
+        {
+            uint32_t lpy = loops_per_yield.count;
+            uint32_t i = 0;
+            while(f())
+            {
+                i++;
+                if(i >= lpy)
+                {
+                    if(yield_weak()) i = 0;
+                    else i = lpy;
+                    if(lpy > loops_per_yield.min) lpy >>= 1;
+                }
+            }
+        }
     }
 
     static void strict_wait_when(const function<bool()>& f)
@@ -26,60 +86,43 @@ namespace this_thread {
         else while(f());
     }
 
-    static void strict_wait_until(const function<bool()>& f)
+    static void lazy_wait_until(const function<bool()>& f)
     {
-        strict_wait_when([&]() { return !f(); });
+        lazy_wait_when(::reverse(f));
     }
 
-    static void wait_when(const function<bool()>& f)
+    static void slack_wait_until(const function<bool()>& f)
     {
-        if(processor.single) lazy_wait_when(f);
-        else
-        {
-            uint32_t i = 0;
-            while(f())
-            {
-                i++;
-#if (0)
-                if(i == loops_per_yield.count)
-                {
-                    if(yield_weak()) i = 0;
-                    else i = loops_per_yield.count;
-                }
-                else if(i > loops_per_yield.count)
-                {
-                    yield_strong();
-                    i = 0;
-                }
-#elif (0)
-                if(i >= loops_per_yield.count)
-                {
-                    if(yield_weak()) i = 0;
-                    else i = loops_per_yield.count;
-                }
-#else
-                if(i >= loops_per_yield.count)
-                {
-                    interval();
-                    i = 0;
-                }
-#endif
-            }
-        }
+        slack_wait_when(::reverse(f));
     }
 
     static void wait_until(const function<bool()>& f)
     {
-        wait_when([&]() { return !f(); });
+        wait_when(::reverse(f));
+    }
+
+    static void busy_wait_until(const function<bool()>& f)
+    {
+        busy_wait_when(::reverse(f));
+    }
+
+    static void strict_wait_until(const function<bool()>& f)
+    {
+        strict_wait_when(::reverse(f));
     }
 
     // for test
     inline static void lazy_wait_when_1(const function<bool()>& f) { lazy_wait_when(f); }
-    inline static void strict_wait_when_1(const function<bool()>& f) { strict_wait_when(f); }
+    inline static void slack_wait_when_1(const function<bool()>& f) { slack_wait_when(f); }
     inline static void wait_when_1(const function<bool()>& f) { wait_when(f); }
+    inline static void busy_wait_when_1(const function<bool()>& f) { busy_wait_when(f); }
+    inline static void strict_wait_when_1(const function<bool()>& f) { strict_wait_when(f); }
+
     inline static void lazy_wait_until_1(const function<bool()>& f) { lazy_wait_until(f); }
-    inline static void strict_wait_until_1(const function<bool()>& f) { strict_wait_until(f); }
+    inline static void slack_wait_until_1(const function<bool()>& f) { slack_wait_until(f); }
     inline static void wait_until_1(const function<bool()>& f) { wait_until(f); }
+    inline static void busy_wait_until_1(const function<bool()>& f) { busy_wait_until(f); }
+    inline static void strict_wait_until_1(const function<bool()>& f) { strict_wait_until(f); }
 
     namespace
     {
@@ -118,8 +161,10 @@ namespace this_thread {
         return x(f, timeout_ms); }
 
     WAIT_WHEN_TEMPLATE(lazy_wait_when);
-    WAIT_WHEN_TEMPLATE(strict_wait_when);
+    WAIT_WHEN_TEMPLATE(slack_wait_when);
     WAIT_WHEN_TEMPLATE(wait_when);
+    WAIT_WHEN_TEMPLATE(busy_wait_when);
+    WAIT_WHEN_TEMPLATE(strict_wait_when);
 
 #undef WAIT_WHEN_TEMPLATE
 
@@ -141,8 +186,10 @@ namespace this_thread {
         return x(f, timeout_ms); }
 
     WAIT_UNTIL_TEMPLATE(lazy_wait_until);
-    WAIT_UNTIL_TEMPLATE(strict_wait_until);
+    WAIT_UNTIL_TEMPLATE(slack_wait_until);
     WAIT_UNTIL_TEMPLATE(wait_until);
+    WAIT_UNTIL_TEMPLATE(busy_wait_until);
+    WAIT_UNTIL_TEMPLATE(strict_wait_until);
 
 #undef WAIT_UNTIL_TEMPLATE
 } }

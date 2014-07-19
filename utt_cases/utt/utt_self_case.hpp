@@ -9,7 +9,7 @@
 class utt_self_case : public icase
 {
 public:
-    virtual bool run()
+    bool run() override
     {
         utt_assert.is_true(true);
         utt_assert.is_true(true, CODE_POSITION());

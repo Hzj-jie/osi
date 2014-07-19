@@ -1,5 +1,6 @@
 
 #pragma once
+#include <utility>
 #include <algorithm>
 #include <functional>
 #include <cctype>
@@ -131,7 +132,7 @@ std::string strcat(Args&&... args)
 {
     using namespace std;
     ostringstream os;
-    append_to_stream(os, args...);
+    append_to_stream(os, forward<Args>(args)...);
     return os.str();
 }
 

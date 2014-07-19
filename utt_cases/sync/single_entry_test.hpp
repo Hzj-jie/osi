@@ -25,7 +25,7 @@ private:
         }
     }
 public:
-    virtual bool execute()
+    bool execute() override
     {
         using namespace std;
         v = 0;
@@ -38,13 +38,13 @@ public:
         return true;
     }
 
-    virtual bool cleanup()
+    bool cleanup() override
     {
         utt_assert.equal(v, processor.count * round_per_thread, CODE_POSITION());
         return true;
     }
 
-    virtual uint32_t preserved_processor_count() const
+    uint32_t preserved_processor_count() const override
     {
         return processor.count;
     }

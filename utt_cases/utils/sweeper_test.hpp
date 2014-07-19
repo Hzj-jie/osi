@@ -7,7 +7,7 @@
 class sweeper_test : public icase
 {
 public:
-    virtual bool run()
+    bool run() override
     {
         int x = 0;
         {

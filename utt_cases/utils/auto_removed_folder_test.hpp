@@ -9,7 +9,7 @@
 class auto_removed_folder_test : public icase
 {
 public:
-    virtual bool run()
+    bool run() override
     {
         using namespace boost::filesystem;
         path p(deploys.service_temp_folder());

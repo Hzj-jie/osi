@@ -19,10 +19,14 @@ namespace this_thread {
         }
     }
 
+    static void interval()
+    {
+        sleep_for(thread_interval);
+    }
+
     static void yield_strong()
     {
-        if(!single_yield())
-            sleep_for(thread_interval);
+        if(!single_yield()) interval();
     }
 
     static bool yield_weak()
@@ -33,11 +37,6 @@ namespace this_thread {
             return true;
         }
         else return single_yield();
-    }
-
-    static void interval()
-    {
-        sleep_for(thread_interval);
     }
 
     inline static bool not_force_yield()

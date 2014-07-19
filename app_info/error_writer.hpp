@@ -22,7 +22,7 @@ namespace error_handle
     class console_error_writer : public ierror_writer
     {
     public:
-        virtual void write(const std::string& s)
+        void write(const std::string& s) override
         {
             std::cout << s;
         }
@@ -34,7 +34,7 @@ namespace error_handle
         // std::ofstream is not moveable in g++ 4.8.2
         boost::filesystem::ofstream* const writer;
     public:
-        virtual void write(const std::string& s)
+        void write(const std::string& s) override
         {
             k_assert(writer != nullptr);
             if(*writer) ((*writer) << s).flush();
@@ -47,7 +47,7 @@ namespace error_handle
         file_error_writer(file_error_writer&& other) :
             writer(std::move(other.writer)) { }
 
-        virtual ~file_error_writer()
+        ~file_error_writer() override
         {
             k_assert(writer != nullptr);
             writer->close();
@@ -63,7 +63,7 @@ namespace error_handle
         std::array<bool, uint32_t(error_type::last) - uint32_t(error_type::first) - 1> selected;
     public:
 #define ERROR_TYPE_SELECTED_ERROR_WRITER_CTOR \
-    impl(impl) { \
+    impl(std::forward<IMPL_T>(impl)) { \
         selected.fill(false); \
         for(auto it = input_selected.begin(); it != input_selected.end(); it++) { \
             if(uint32_t(*it) > uint32_t(error_type::first) && \
@@ -78,7 +78,7 @@ namespace error_handle
             ERROR_TYPE_SELECTED_ERROR_WRITER_CTOR;
 #undef ERROR_TYPE_SELECTED_ERROR_WRITER_CTOR
 
-        virtual void write(const std::string& s)
+        void write(const std::string& s) override
         {
             if(!s.empty())
             {

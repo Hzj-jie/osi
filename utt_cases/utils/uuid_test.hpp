@@ -8,7 +8,7 @@
 class uuid_test : public icase
 {
 public:
-    virtual bool run()
+    bool run() override
     {
         using namespace std;
         utt_assert.equal(uuid_short_str().size(), 32);

@@ -31,8 +31,12 @@ utt: main.cpp icase.hpp ../app_info/assert.hpp \
  ../utt_cases/utils/uuid_test.hpp ../utt_cases/sync/spin_wait_test.hpp \
  ../utt_cases/sync/../../sync/spin_wait.hpp \
  ../utt_cases/sync/../../sync/../envs/loops_per_yield.hpp \
+ ../utt_cases/sync/../../sync/../delegates/transform.hpp \
  ../utt_cases/sync/reset_event_test.hpp \
- ../utt_cases/sync/../../sync/reset_event.hpp config.hpp
+ ../utt_cases/sync/../../sync/reset_event.hpp \
+ ../utt_cases/formation/concurrent/slimqless_single_test.hpp \
+ ../utt_cases/formation/concurrent/../../../formation/concurrent/slimqless.hpp \
+ config.hpp
 	g++ main.cpp -o utt -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3 -lboost_filesystem -lboost_system
 
 clean:

@@ -1,6 +1,8 @@
 
+#pragma once
+#include <utility>
 #include <atomic>
-#include "../app_info/assert.hpp"
+#include "../../app_info/assert.hpp"
 #include "../../sync/spin_wait.hpp"
 
 template <typename T>
@@ -14,7 +16,7 @@ private:
         const static int bw = 1;
         const static int aw = 2;
 
-        atomic<int> v;
+        std::atomic<int> v;
     public:
         value_status() : v(nv) { }
 
@@ -46,63 +48,97 @@ private:
     struct node
     {
     public:
-        node* next;
+        std::atomic<node*> next;
         T v;
         value_status vs;
 
-        node(T&& v) :
+        node() :
             next(nullptr),
-            v(std::move(v)),
-            vs() { }
-
-        node(const T& v) :
-            next(nullptr),
-            v(v),
+            v(),
             vs() { }
     };
 
-    node f;
-    node* e;
+    std::atomic<node*> f;
+    std::atomic<node*> e;
 
-    void wait_mark_writting()
+    inline void wait_mark_writting()
     {
-        // TODO: slimqless, wait_until
-        wait_when([this]()
-                  {
-                      assert(e != nullptr);
-                  });
+        std::this_thread::busy_wait_until(
+                [this]() -> bool
+                {
+                    assert(e.load() != nullptr);
+                    return e.load()->vs.mark_value_writting();
+                });
     }
 
-    void wait_mark_written()
+    inline static void wait_mark_written(const node* n)
     {
+        assert(n != nullptr);
+        std::this_thread::busy_wait_until(
+                [&]() -> bool
+                {
+                    return n->vs.value_written();
+                });
     }
 
-    void push(node&& n)
+    template <typename... Args>
+    void insert(Args&&... args)
     {
+        node* ne = new node();
+        wait_mark_writting();
+        node* n = e;
+        n->next = ne;
+        e = ne;
+        new (&(n->v)) T(std::forward<Args>(args)...);
+        n->vs.mark_value_written();
     }
 
 public:
     slimqless()
     {
+        f = new node();
         e = new node();
-        f.next = e;
+        f.load()->next.store(e);
     }
 
     void push(const T& v)
     {
+        insert(v);
     }
 
     void push(T&& v)
     {
+        insert(std::forward<T>(v));
     }
 
     template <typename... Args>
     void emplace_push(Args&&... args)
     {
+        insert(std::forward<Args>(args)...);
     }
 
     bool pop(T& v)
     {
+        node* nf = f.load()->next;
+        while(1)
+        {
+            assert(nf != nullptr);
+            if(nf == e) return false;
+            else
+            {
+                node* t = nf;
+                if(f.load()->next.compare_exchange_weak(t, nf->next) &&
+                   assert(t == nf))
+                {
+                    assert(nf->vs.not_no_value());
+                    wait_mark_written(nf);
+                    new (&v) T(std::move(nf->v));
+                    return true;
+                }
+                else nf = f.load()->next;
+            }
+        }
+        return assert(false);
     }
 };
 

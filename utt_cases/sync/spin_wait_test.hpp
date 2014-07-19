@@ -48,7 +48,9 @@ private:
     bool wait_when_no_timeout_test()
     {
         return wait_when_test_1(std::this_thread::lazy_wait_when_1) &&
+               wait_when_test_1(std::this_thread::slack_wait_when_1) &&
                wait_when_test_1(std::this_thread::wait_when_1) &&
+               wait_when_test_1(std::this_thread::busy_wait_when_1) &&
                wait_when_test_1(std::this_thread::strict_wait_when_1);
     }
 
@@ -58,7 +60,9 @@ private:
 #define WAIT_WHEN_TIMER_CONVERTOR(x) \
             [&](const std::function<bool()>& f, uint32_t timeout_ms) { return x(ms_timer, f, timeout_ms); }
         return wait_when_test_2(WAIT_WHEN_TIMER_CONVERTOR(std::this_thread::lazy_wait_when_2)) &&
+               wait_when_test_2(WAIT_WHEN_TIMER_CONVERTOR(std::this_thread::slack_wait_when_2)) &&
                wait_when_test_2(WAIT_WHEN_TIMER_CONVERTOR(std::this_thread::wait_when_2)) &&
+               wait_when_test_2(WAIT_WHEN_TIMER_CONVERTOR(std::this_thread::busy_wait_when_2)) &&
                wait_when_test_2(WAIT_WHEN_TIMER_CONVERTOR(std::this_thread::strict_wait_when_2));
 #undef WAIT_WHEN_TIMER_CONVERTOR
     }
@@ -66,7 +70,9 @@ private:
     bool wait_when_timeout_test()
     {
         return wait_when_test_2(std::this_thread::lazy_wait_when_3) &&
+               wait_when_test_2(std::this_thread::slack_wait_when_3) &&
                wait_when_test_2(std::this_thread::wait_when_3) &&
+               wait_when_test_2(std::this_thread::busy_wait_when_3) &&
                wait_when_test_2(std::this_thread::strict_wait_when_3);
     }
 
@@ -99,7 +105,9 @@ private:
     bool wait_until_no_timeout_test()
     {
         return wait_until_test_1(std::this_thread::lazy_wait_until_1) &&
+               wait_until_test_1(std::this_thread::slack_wait_until_1) &&
                wait_until_test_1(std::this_thread::wait_until_1) &&
+               wait_until_test_1(std::this_thread::busy_wait_until_1) &&
                wait_until_test_1(std::this_thread::strict_wait_until_1);
     }
 
@@ -132,7 +140,9 @@ private:
 #define WAIT_UNTIL_TIMER_CONVERTOR(x) \
         [&](const std::function<bool()>& f, uint32_t timeout_ms) { return x(ms_timer, f, timeout_ms); }
         return wait_until_test_2(WAIT_UNTIL_TIMER_CONVERTOR(std::this_thread::lazy_wait_until_2)) &&
+               wait_until_test_2(WAIT_UNTIL_TIMER_CONVERTOR(std::this_thread::slack_wait_until_2)) &&
                wait_until_test_2(WAIT_UNTIL_TIMER_CONVERTOR(std::this_thread::wait_until_2)) &&
+               wait_until_test_2(WAIT_UNTIL_TIMER_CONVERTOR(std::this_thread::busy_wait_until_2)) &&
                wait_until_test_2(WAIT_UNTIL_TIMER_CONVERTOR(std::this_thread::strict_wait_until_2));
 #undef WAIT_UNTIL_TIMER_CONVERTOR
     }
@@ -140,7 +150,9 @@ private:
     bool wait_until_timeout_test()
     {
         return wait_until_test_2(std::this_thread::lazy_wait_until_3) &&
+               wait_until_test_2(std::this_thread::slack_wait_until_3) &&
                wait_until_test_2(std::this_thread::wait_until_3) &&
+               wait_until_test_2(std::this_thread::busy_wait_until_3) &&
                wait_until_test_2(std::this_thread::strict_wait_until_3);
     }
 
@@ -157,7 +169,7 @@ private:
                wait_until_timeout_test_2();
     }
 public:
-    virtual bool run()
+    bool run() override
     {
         return wait_when_test() &&
                wait_until_test();

@@ -10,7 +10,7 @@
 
 class icase
 {
-protected:
+private:
     virtual bool prepare()
     {
         return true;

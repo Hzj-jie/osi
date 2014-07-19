@@ -9,4 +9,6 @@
 #include "../utt_cases/utils/uuid_test.hpp"
 #include "../utt_cases/sync/spin_wait_test.hpp"
 #include "../utt_cases/sync/reset_event_test.hpp"
+#include "../utt_cases/formation/concurrent/slimqless_single_test.hpp"
+#include "../utt_cases/formation/concurrent/slimqless_test.hpp"
 
