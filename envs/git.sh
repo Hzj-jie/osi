@@ -10,7 +10,7 @@ else
     cp git.tmp git.tmp2
 fi
 
-diff git.hpp git.tmp2
+diff git.hpp git.tmp2 > /dev/null
 if [ $? -ne 0 ]
 then
     mv git.tmp2 git.hpp
