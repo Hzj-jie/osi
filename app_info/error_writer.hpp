@@ -9,6 +9,7 @@
 #include "k_assert.hpp"
 #include <boost/filesystem/fstream.hpp>
 #include <array>
+#include "../sync/lock.hpp"
 
 namespace error_handle
 {
@@ -24,6 +25,7 @@ namespace error_handle
     public:
         void write(const std::string& s) override
         {
+            static_scope_lock();
             std::cout << s;
         }
     };
@@ -37,7 +39,11 @@ namespace error_handle
         void write(const std::string& s) override
         {
             k_assert(writer != nullptr);
-            if(*writer) ((*writer) << s).flush();
+            if(*writer)
+            {
+                static_scope_lock();
+                ((*writer) << s).flush();
+            }
         }
 
         template <typename T>

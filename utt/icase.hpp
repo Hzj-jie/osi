@@ -3,6 +3,7 @@
 #include <string>
 #include <list>
 #include <mutex>
+#include "../sync/lock.hpp"
 #include "../app_info/assert.hpp"
 #include <stdint.h>
 #include "utt_assert.hpp"
@@ -72,9 +73,8 @@ namespace utt
     
     static bool fetch_next_case(icase*& r)
     {
-        using namespace std;
         r = nullptr;
-        unique_lock<mutex> lck(mtx);
+        scope_lock(mtx);
         if(cases.empty()) return false;
         else
         {
@@ -91,9 +91,8 @@ namespace utt
 
     static void pending_case(icase* c)
     {
-        using namespace std;
         k_assert(c != nullptr);
-        unique_lock<mutex> lck(mtx);
+        scope_lock(mtx);
         cases.push_back(c);
     }
 }

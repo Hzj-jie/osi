@@ -5,7 +5,6 @@
 #include <vector>
 #include <boost/current_function.hpp>
 #include <boost/filesystem.hpp>
-#include <mutex>
 #include "error_type.hpp"
 #include "error_writer.hpp"
 #include "../envs/exeinfo.hpp"
@@ -33,7 +32,6 @@ namespace __error_handle_private
                               Args&&... args)
     {
         using namespace std;
-        static mutex mtx;
         ostringstream os;
         os << error_handle::error_type_to_char(err_type, err_type_char)
            << character.comma
@@ -46,7 +44,6 @@ namespace __error_handle_private
         for(size_t i = 0; i < writers.size(); i++)
         {
             k_assert(writers[i] != nullptr);
-            unique_lock<mutex> lck;
             writers[i] -> write(os.str());
         }
     }
