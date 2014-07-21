@@ -132,6 +132,7 @@ public:
                     assert(nf->vs.not_no_value());
                     wait_mark_written(nf);
                     new (&v) T(std::move(nf->v));
+                    delete nf;
                     return true;
                 }
                 else nf = f.next;

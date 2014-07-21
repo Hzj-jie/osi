@@ -8,6 +8,7 @@
 #include <mutex>
 #include "error_type.hpp"
 #include "error_writer.hpp"
+#include "../envs/exeinfo.hpp"
 #include "../template/singleton.hpp"
 #include "../envs/deploys.hpp"
 #include "../envs/os.hpp"
@@ -109,7 +110,8 @@ namespace __error_handle_private
             using namespace error_handle;
             writers.push_back(new error_type_selected_error_writer<console_error_writer>
                              (console_error_writer(),
-                              { error_type::critical,
+                              { error_type::application,
+                                error_type::critical,
                                 error_type::exclamation,
                                 error_type::system,
                                 error_type::other }));
@@ -117,13 +119,40 @@ namespace __error_handle_private
 
         CONST_SINGLETON(default_writers);
     }& default_writers_instance = default_writers::instance();
+
+    class error_handle_startup_message_t
+    {
+    private:
+        error_handle_startup_message_t()
+        {
+            k_raise_error(error_type::application,
+                          character.null,
+                          "start error_handle for process ",
+                          exeinfo.name(),
+                          ", process id ",
+                          exeinfo.id(),
+                          ", commit id ",
+                          git.commit(),
+                          ", build at ",
+                          __DATE__,
+                          " ",
+                          __TIME__);
+        }
+        CONST_SINGLETON(error_handle_startup_message_t);
+    };
 }
 
+#define ERROR_HANDLE_STARTUP_MESSAGE() \
+            const __error_handle_private::error_handle_startup_message_t& \
+                error_handle_startup_message_instance = \
+                __error_handle_private::error_handle_startup_message_t:: \
+                instance();
 template <typename... Args>
 static void raise_error(error_type err_type,
                         char err_type_char,
                         Args&&... args)
 {
+    ERROR_HANDLE_STARTUP_MESSAGE();
     __error_handle_private::k_raise_error(err_type,
 						                  err_type_char,
 						                  std::forward<Args>(args)...);
@@ -132,6 +161,7 @@ static void raise_error(error_type err_type,
 template <typename... Args>
 static void raise_error(error_type err_type, Args&&... args)
 {
+    ERROR_HANDLE_STARTUP_MESSAGE();
     __error_handle_private::k_raise_error(err_type,
 										  character.null,
 										  std::forward<Args>(args)...);
@@ -140,6 +170,7 @@ static void raise_error(error_type err_type, Args&&... args)
 template <typename... Args>
 static void raise_error(Args&&... args)
 {
+    ERROR_HANDLE_STARTUP_MESSAGE();
     __error_handle_private::k_raise_error(error_type::information,
 										  character.null,
 										  std::forward<Args>(args)...);
