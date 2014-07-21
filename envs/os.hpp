@@ -43,6 +43,14 @@ static boost::filesystem::path::string_type append_path(const RT& p, T&& v)
     return c.native();
 }
 
+template <typename T>
+static boost::filesystem::path::string_type path_string(T&& v)
+{
+    using namespace boost::filesystem;
+    path c(v);
+    return c.native();
+}
+
 #if BOOST_COMP_MSVC
 #define WIDE_STRING(x) L#x
 #define INLINE __forceinline

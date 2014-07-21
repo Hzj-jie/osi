@@ -54,7 +54,7 @@ private:
             }
             else
             {
-                _service_name = (path_char*)"unknown";
+                _service_name = ::path_string("unknown");
             }
             if(!p.empty() &&
                !p.parent_path().empty() &&

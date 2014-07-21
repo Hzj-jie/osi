@@ -13,7 +13,8 @@ namespace __exeinfo_private
     static std::string getexepath()
     {
         char result[MAX_PATH];
-        return std::string(result, GetModuleFileName(nullptr, result, MAX_PATH));
+        DWORD l = GetModuleFileName(nullptr, result, MAX_PATH);
+        return std::string(result, l);
     }
 
     static int64_t get_current_process_id()
