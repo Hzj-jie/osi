@@ -3,4 +3,5 @@ out utt
 #cc-flag2 -ggdb -static
 #libs /usr/local/lib/libboost_filesystem.a /usr/local/lib/libboost_system.a
 dlibs boost_filesystem boost_system
+#cc-flag2 -ggdb -fno-inline-functions
 

@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <ctype.h>
+#include "strcmp.hpp"
 
 template <typename Equal = equal<char> >
 struct str_pattern_matcher_typedef
@@ -458,14 +458,6 @@ public:
 
 class case_sensitive_str_pattern_matcher :
         public str_pattern_matcher<equal<char> > { };
-
-struct case_insensitive_equal
-{
-    bool operator()(const char& a, const char& b) const
-    {
-        return tolower(a) == tolower(b);
-    }
-};
 
 class case_insensitive_str_pattern_matcher :
         public str_pattern_matcher<case_insensitive_equal> { };

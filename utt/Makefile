@@ -20,7 +20,7 @@ utt: main.cpp icase.hpp ../sync/lock.hpp ../app_info/assert.hpp \
  ../app_info/../envs/../utils/strutils.hpp ../app_info/assert_blocker.hpp \
  utt_assert.hpp utt_error_handle.hpp ../app_info/trace.hpp \
  ../app_info/../utils/lazier.hpp cases.hpp \
- ../utt_cases/utt/utt_self_case.hpp ../utt_cases/utils/sweeper_test.hpp \
+ ../utt_cases/utt/utt_self_test.hpp ../utt_cases/utils/sweeper_test.hpp \
  ../utt_cases/sync/single_entry_test.hpp \
  ../utt_cases/sync/../../sync/single_entry.hpp \
  ../utt_cases/sync/../../sync/yield.hpp \
@@ -45,7 +45,12 @@ utt: main.cpp icase.hpp ../sync/lock.hpp ../app_info/assert.hpp \
  ../utt_cases/formation/concurrent/../../../formation/concurrent/qless.hpp \
  ../utt_cases/utils/pattern_matcher_test.hpp \
  ../utt_cases/utils/../../utils/str_pattern_matcher.hpp \
- ../utt_cases/utils/../../utils/pattern_matcher.hpp config.hpp
+ ../utt_cases/utils/../../utils/pattern_matcher.hpp \
+ ../utt_cases/utils/../../utils/strcmp.hpp \
+ ../utt_cases/utt/utt_specific_test.hpp \
+ ../utt_cases/utt/utt_failure_test.hpp \
+ ../utt_cases/utt/../../utt/case_wrapper/specific_case_wrapper.hpp \
+ ../utt_cases/utt/../../utt/case_wrapper/../config.hpp
 	g++ main.cpp -o utt -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3 -lboost_filesystem -lboost_system
 
 clean:

@@ -17,7 +17,6 @@ using namespace utt;
 using namespace std;
 
 static atomic<uint32_t> runned_cases;
-static config_t config;
 
 static void run(int id)
 {

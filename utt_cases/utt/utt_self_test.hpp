@@ -6,7 +6,7 @@
 #include "../../utt/icase.hpp"
 #include "../../utt/utt_assert.hpp"
 
-class utt_self_case : public icase
+class utt_self_test : public icase
 {
 public:
     bool run() override
@@ -29,8 +29,8 @@ public:
         utt_assert.not_equal(0, 1, CODE_POSITION());
         return true;
     }
-    DEFINE_CASE(utt_self_case);
+    DEFINE_CASE(utt_self_test);
 };
 
-REGISTER_CASE(utt_self_case);
+REGISTER_CASE(utt_self_test);
 
