@@ -390,7 +390,7 @@ public:
                           const std::string& str)
     {
         return Base::match_any(convert(patterns),
-                               str,
+                               str.c_str(),
                                0,
                                str.length());
     }

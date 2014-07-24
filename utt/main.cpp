@@ -17,6 +17,7 @@ using namespace utt;
 using namespace std;
 
 static atomic<uint32_t> runned_cases;
+static config_t config;
 
 static void run(int id)
 {
@@ -63,8 +64,9 @@ static void run(int id)
     }
 }
 
-int main()
+int main(int argc, const char* const* const argv)
 {
+    new (&config) config_t(argc, argv);
     error_handle::enable_default_file_error_writer();
     vector<thread> threads;
     for(uint32_t i = 0; i < config.thread_count - 1; i++)

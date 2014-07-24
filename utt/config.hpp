@@ -2,24 +2,36 @@
 #pragma once
 #include <thread>
 #include <stdint.h>
-#include "../template/singleton.hpp"
+#include <vector>
+#include <string>
+#include "../utils/str_pattern_matcher.hpp"
 
-const static class config_t
+class config_t
 {
+private:
+    std::vector<std::string> args;
+
 public:
     const uint32_t thread_count;
 
     bool selected(const std::string& name) const
     {
-        return true;
+        return args.empty() ||
+               case_insensitive_str_pattern_matcher::match_any(args, name);
     }
 
     bool selected(const icase& c) const
     {
         return selected(c.name());
     }
-private:
-    config_t() : thread_count(std::thread::hardware_concurrency()) { }
-CONST_SINGLETON(config_t);
-}& config = config_t::instance();
+
+    config_t(const int argc, const char* const* const argv) :
+        thread_count(std::thread::hardware_concurrency())
+    {
+        for(int i = 1; i < argc; i++)
+            args.push_back(std::string(argv[i]));
+    }
+
+    config_t() : thread_count(0) { }
+};
 

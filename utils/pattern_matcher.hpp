@@ -107,7 +107,7 @@ public:
         }
     }
 
-    static bool match_any(const std::vector<std::pair<const CharT* const, uint32_t> >& patterns,
+    static bool match_any(const std::vector<std::pair<const CharT*, uint32_t> >& patterns,
                           const CharT* const str,
                           const uint32_t str_start,
                           const uint32_t str_len)
