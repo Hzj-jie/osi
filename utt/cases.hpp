@@ -11,4 +11,6 @@
 #include "../utt_cases/sync/reset_event_test.hpp"
 #include "../utt_cases/formation/concurrent/slimqless_single_test.hpp"
 #include "../utt_cases/formation/concurrent/slimqless_test.hpp"
+#include "../utt_cases/formation/concurrent/qless_test.hpp"
+#include "../utt_cases/utils/pattern_matcher_test.hpp"
 

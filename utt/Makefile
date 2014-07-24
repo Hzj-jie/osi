@@ -41,7 +41,11 @@ utt: main.cpp icase.hpp ../sync/lock.hpp ../app_info/assert.hpp \
  ../utt_cases/formation/concurrent/../../../utt/case_wrapper/multithreading_case_wrapper.hpp \
  ../utt_cases/formation/concurrent/../../../utt/case_wrapper/case_wrapper.hpp \
  ../utt_cases/formation/concurrent/../../../utt/case_wrapper/repeat_case_wrapper.hpp \
- config.hpp
+ ../utt_cases/formation/concurrent/qless_test.hpp \
+ ../utt_cases/formation/concurrent/../../../formation/concurrent/qless.hpp \
+ ../utt_cases/utils/pattern_matcher_test.hpp \
+ ../utt_cases/utils/../../utils/str_pattern_matcher.hpp \
+ ../utt_cases/utils/../../utils/pattern_matcher.hpp config.hpp
 	g++ main.cpp -o utt -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3 -lboost_filesystem -lboost_system
 
 clean:

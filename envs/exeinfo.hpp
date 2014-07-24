@@ -57,7 +57,7 @@ private:
         _path = __exeinfo_private::getexepath();
         namespace bt = boost::filesystem;
         bt::path p(_path);
-        if(!p.empty() && p.has_filename())
+        if(!p.empty() && p.has_filename() && !p.parent_path().empty())
         {
             _name = p.filename().string();
             _directory = p.parent_path().string();

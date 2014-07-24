@@ -13,6 +13,9 @@ public:
     DEFINE_CHARACTER(null, '\0');
     DEFINE_CHARACTER(blank, ' ');
     DEFINE_CHARACTER(minus_sign, '-');
+    DEFINE_CHARACTER(add_sign, '+');
+    DEFINE_CHARACTER(asterisk, '*');
+    DEFINE_CHARACTER(question_mark, '?');
     DEFINE_CHARACTER(colon, ':');
     DEFINE_CHARACTER(underscore, '_');
     DEFINE_CHARACTER(at, '@');

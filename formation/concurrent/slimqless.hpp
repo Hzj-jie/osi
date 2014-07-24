@@ -6,7 +6,7 @@
 #include "../../sync/spin_wait.hpp"
 
 template <typename T>
-class slimqless
+class slimqless final
 {
 private:
     struct value_status
@@ -139,6 +139,17 @@ public:
             }
         }
         return assert(false);
+    }
+
+    void clear()
+    {
+        T v;
+        while(pop(v));
+    }
+
+    ~slimqless()
+    {
+        clear();
     }
 };
 
