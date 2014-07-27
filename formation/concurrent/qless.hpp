@@ -3,7 +3,7 @@
 #include "slimqless.hpp"
 #include <atomic>
 #include <utility>
-#include <stdint.h>
+#include <stdlib.h>
 #include "../../app_info/assert.hpp"
 
 template <typename T>
@@ -44,7 +44,7 @@ public:
         else return false;
     }
 
-    uint32_t size() const
+    size_t size() const
     {
         int ss = s;
         return (ss < 0 ? 0 : ss);

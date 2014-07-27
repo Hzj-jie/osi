@@ -43,7 +43,7 @@ private:
             if(equal(pattern[i], multi_matching_sign))
             {
                 i++;
-                while(equal(pattern[i], multi_matching_sign)) i++;
+                while(i < pattern_len && equal(pattern[i], multi_matching_sign)) i++;
                 while(j <= str_len)
                 {
                     if(match_pattern(pattern, i, pattern_len, str, j, str_len)) return true;
@@ -66,7 +66,7 @@ private:
                 else break;
             }
         }
-        while(equal(pattern[i], multi_matching_sign)) i++;
+        while(i < pattern_len && equal(pattern[i], multi_matching_sign)) i++;
         return (i == pattern_len && j == str_len);
     }
 

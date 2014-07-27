@@ -9,27 +9,35 @@
 #include <boost/tokenizer.hpp>
 #include <sstream>
 #include "../app_info/k_assert.hpp"
+#include <vector>
+#include <boost/algorithm/string.hpp>
+#include <ctype.h>
 
-static std::string& ltrim(std::string& s)
+static void to_upper(std::vector<std::string>& vs)
 {
-    using namespace std;
-    s.erase(s.begin(), find_if(s.begin(), s.end(), not1(ptr_fun<int, int>(isspace))));
-    return s;
+    for(size_t i = 0; i < vs.size(); i++)
+        boost::algorithm::to_upper(vs[i]);
 }
 
-static std::string& rtrim(std::string& s)
+static void to_lower(std::vector<std::string>& vs)
 {
-    using namespace std;
-    s.erase(find_if(s.rbegin(), s.rend(), not1(ptr_fun<int, int>(isspace))).base(), s.end());
-    return s;
+    for(size_t i = 0; i < vs.size(); i++)
+        boost::algorithm::to_lower(vs[i]);
 }
 
-static std::string& trim(std::string& s)
+static void to_initial_upper(std::vector<std::string>& vs)
 {
-    return ltrim(rtrim(s));
+    for(size_t i = 0; i < vs.size(); i++)
+    {
+        if(!vs[i].empty())
+        {
+            boost::algorithm::to_lower(vs[i]);
+            vs[i][0] = toupper(vs[i][0]);
+        }
+    }
 }
 
-static void split(const std::string& s, std::vector<std::string>& o, const char* const delims)
+static void split(const std::string& s, std::vector<std::string>& o, const char* delims)
 {
     using namespace boost;
     o.clear();
@@ -48,7 +56,7 @@ static void split(const std::string& s, std::vector<std::string>& o)
     split(s, o, "\t,; ");
 }
 
-static bool split(const std::string& s, std::string& first, std::string& second, const char* const delims)
+static bool split(const std::string& s, std::string& first, std::string& second, const char* delims)
 {
     using namespace std;
     if(s.empty()) return false;

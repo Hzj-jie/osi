@@ -17,6 +17,7 @@ public:
     DEFINE_CHARACTER(asterisk, '*');
     DEFINE_CHARACTER(question_mark, '?');
     DEFINE_CHARACTER(colon, ':');
+    DEFINE_CHARACTER(equal_sign, '=');
     DEFINE_CHARACTER(underscore, '_');
     DEFINE_CHARACTER(at, '@');
     DEFINE_CHARACTER(comma, ',');
@@ -29,3 +30,4 @@ private:
 #undef DEFINE_CHARACTER
     CONST_SINGLETON(character_t);
 }& character = character_t::instance();
+
