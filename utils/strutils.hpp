@@ -12,6 +12,7 @@
 #include <vector>
 #include <boost/algorithm/string.hpp>
 #include <ctype.h>
+#include <boost/predef.h>
 
 static void to_upper(std::vector<std::string>& vs)
 {
@@ -93,7 +94,11 @@ static bool from_str(const std::string& s, T& o)
 {
     using namespace std;
     istringstream convert(s);
+#if BOOST_COMP_MSVC
+    return !!(convert >> o);
+#else
     return (convert >> o);
+#endif
 }
 
 template <typename T>

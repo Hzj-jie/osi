@@ -3,12 +3,17 @@
 #include <ctype.h>
 #include <string>
 #include <string.h>
+#include "../envs/os.hpp"
 
 namespace __strcmp_private
 {
     static int case_insensitive_compare(const char* a, const char* b)
     {
+#if defined (OS_POSIX)
         return strcasecmp(a, b);
+#elif defined (OS_WINDOWS)
+        return stricmp(a, b);
+#endif
     }
 
     static int case_insensitive_compare(const char& a, const char& b)

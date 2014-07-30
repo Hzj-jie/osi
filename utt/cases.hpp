@@ -15,5 +15,6 @@
 #include "../utt_cases/utils/pattern_matcher_test.hpp"
 #include "../utt_cases/utt/utt_specific_test.hpp"
 #include "../utt_cases/utt/utt_failure_test.hpp"
-#include "../utt_cases/utils/queue_runner_test.hpp"
+#include "../utt_cases/threadpool/queue_runner_test.hpp"
+#include "../utt_cases/envs/envs_test.hpp"
 

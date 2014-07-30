@@ -16,9 +16,9 @@ namespace __envs_private
     static std::vector<std::string> getenvs()
     {
         std::vector<std::string> r;
-        LPTCH envs = GetEnvironmentVariables();
+        LPTCH envs = GetEnvironmentStrings();
         split(std::string(envs), r, character.null_s());
-        FreeEnvironmentVariables(envs);
+        FreeEnvironmentStrings(envs);
         return r;
     }
 }

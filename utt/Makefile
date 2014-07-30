@@ -51,11 +51,11 @@ utt: main.cpp icase.hpp ../sync/lock.hpp ../app_info/assert.hpp \
  ../utt_cases/utt/utt_failure_test.hpp \
  ../utt_cases/utt/../../utt/case_wrapper/specific_case_wrapper.hpp \
  ../utt_cases/utt/../../utt/case_wrapper/../config.hpp \
- ../utt_cases/utils/queue_runner_test.hpp \
- ../utt_cases/utils/../../utils/queue_runner.hpp \
- ../utt_cases/utils/../../utils/../envs/preenv.hpp \
- ../utt_cases/utils/../../utils/../envs/envs.hpp \
- ../utt_cases/utils/../../utils/../const/queue_runner.hpp
+ ../utt_cases/threadpool/queue_runner_test.hpp \
+ ../utt_cases/threadpool/../../threadpool/queue_runner.hpp \
+ ../utt_cases/threadpool/../../threadpool/../envs/preenv.hpp \
+ ../utt_cases/threadpool/../../threadpool/../envs/envs.hpp \
+ ../utt_cases/threadpool/../../threadpool/../const/queue_runner.hpp
 	g++ main.cpp -o utt -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3 -lboost_filesystem -lboost_system
 
 clean:
