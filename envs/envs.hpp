@@ -57,6 +57,19 @@ public:
         return e;
     }
 
+    const std::string& operator[](const std::string& key) const
+    {
+        static std::string empty;
+        auto it = e.find(key);
+        if(it == e.end()) return empty;
+        else return (*it).second;
+    }
+
+    const std::string& operator[](const char* key) const
+    {
+        return operator[](std::string(key));
+    }
+
     bool operator()(const std::string& key, std::string& r) const
     {
         auto it = e.find(key);
@@ -90,18 +103,10 @@ public:
     }
 
     template <typename KEY_T, typename T>
-    T operator()(const KEY_T& key) const
+    T get(const KEY_T& key) const
     {
         T r;
         return (operator()(key, r) ? r : T());
-    }
-
-    template <typename T>
-    const std::string& operator[](const T& key) const
-    {
-        static std::string empty;
-        std::string r;
-        return (operator()(key, r) ? r : empty);
     }
 
     bool has(const std::string& key) const

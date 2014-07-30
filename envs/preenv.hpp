@@ -46,10 +46,15 @@ private:
         else return T();
     }
 
+    std::string string_envs(const std::vector<std::string>& keys)
+    {
+        return ::envs.get<std::vector<std::string>, std::string>(keys);
+    }
+
     preenv_t() :
         busy_wait(envs.has(env_keys({"busy", "wait"}))),
-        queue_runner_thread_count(from_str<uint32_t>(envs[env_keys({"queue", "runner", "thread", "count"})])),
-        threadpool_thread_count(from_str<uint32_t>(envs[env_keys({"threadpool", "thread", "count"})]))
+        queue_runner_thread_count(from_str<uint32_t>(string_envs(env_keys({"queue", "runner", "thread", "count"})))),
+        threadpool_thread_count(from_str<uint32_t>(string_envs(env_keys({"threadpool", "thread", "count"}))))
     {}
 
     CONST_SINGLETON(preenv_t);
