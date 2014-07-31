@@ -12,7 +12,7 @@ spin_wait_test: spin_wait_test.cpp ../../../sync/spin_wait.hpp \
  ../../../sync/../envs/../template/../envs/os.hpp \
  ../../../sync/../envs/../template/../envs/../app_info/k_assert.hpp \
  ../../../sync/../envs/processor.hpp ../../../sync/yield.hpp \
- ../../../sync/../const/threading.hpp ../../../sync/../envs/nowadays.hpp \
+ ../../../sync/../envs/nowadays.hpp \
  ../../../sync/../envs/../const/character.hpp \
  ../../../sync/../envs/../utils/strutils.hpp \
  ../../../sync/../delegates/transform.hpp

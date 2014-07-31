@@ -41,25 +41,27 @@ utt: main.cpp icase.hpp ../sync/lock.hpp ../app_info/assert.hpp \
  ../utt_cases/formation/concurrent/../../../utt/case_wrapper/multithreading_case_wrapper.hpp \
  ../utt_cases/formation/concurrent/../../../utt/case_wrapper/case_wrapper.hpp \
  ../utt_cases/formation/concurrent/../../../utt/case_wrapper/repeat_case_wrapper.hpp \
+ ../utt_cases/formation/concurrent/../../../utt/case_wrapper/specific_case_wrapper.hpp \
+ ../utt_cases/formation/concurrent/../../../utt/case_wrapper/../config.hpp \
+ ../utt_cases/formation/concurrent/../../../utt/case_wrapper/../../utils/str_pattern_matcher.hpp \
+ ../utt_cases/formation/concurrent/../../../utt/case_wrapper/../../utils/pattern_matcher.hpp \
+ ../utt_cases/formation/concurrent/../../../utt/case_wrapper/../../utils/strcmp.hpp \
  ../utt_cases/formation/concurrent/slimqless2_test.hpp \
  ../utt_cases/formation/concurrent/../../../formation/concurrent/slimqless2.hpp \
  ../utt_cases/formation/concurrent/qless_test.hpp \
  ../utt_cases/formation/concurrent/../../../formation/concurrent/qless.hpp \
  ../utt_cases/utils/pattern_matcher_test.hpp \
- ../utt_cases/utils/../../utils/str_pattern_matcher.hpp \
- ../utt_cases/utils/../../utils/pattern_matcher.hpp \
- ../utt_cases/utils/../../utils/strcmp.hpp \
  ../utt_cases/utt/utt_specific_test.hpp \
  ../utt_cases/utt/utt_failure_test.hpp \
- ../utt_cases/utt/../../utt/case_wrapper/specific_case_wrapper.hpp \
- ../utt_cases/utt/../../utt/case_wrapper/../config.hpp \
  ../utt_cases/threadpool/queue_runner_test.hpp \
  ../utt_cases/threadpool/../../threadpool/queue_runner.hpp \
  ../utt_cases/threadpool/../../threadpool/../envs/preenv.hpp \
  ../utt_cases/threadpool/../../threadpool/../envs/envs.hpp \
  ../utt_cases/envs/envs_test.hpp ../utt_cases/utils/str_contains_test.hpp \
  ../utt_cases/utils/timing_counter_test.hpp \
- ../utt_cases/utils/../../utils/timing_counter.hpp
+ ../utt_cases/utils/../../utils/timing_counter.hpp \
+ ../utt_cases/formation/concurrent/slimqless_perf_test.hpp \
+ ../utt_cases/formation/concurrent/slimqless2_perf_test.hpp
 	g++ main.cpp -o utt -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3 -lboost_filesystem -lboost_system
 
 clean:
