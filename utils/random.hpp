@@ -3,11 +3,12 @@
 #include <random>
 #include <limits>
 #include "../template/singleton.hpp"
+#include <boost/predef.h>
 
 #undef min
 #undef max
 
-static class uniform_int_generator_t
+class uniform_int_generator_t
 {
 private:
     std::random_device rd;
@@ -23,22 +24,33 @@ public:
     int operator()() { return dist(eng); }
     void reset() { dist.reset(); }
 
-SINGLETON(uniform_int_generator_t);
-}& uniform_int_generator = uniform_int_generator_t::instance();
+#if BOOST_COMP_MSVC
+    static uniform_int_generator_t instance()
+    {
+        return uniform_int_generator_t();
+    }
+#else
+    static uniform_int_generator_t& instance()
+    {
+        thread_local static uniform_int_generator_t i;
+        return i;
+    }
+#endif
+};
 
 static int rnd_int()
 {
-    return uniform_int_generator();
+    return uniform_int_generator_t::instance()();
 }
 
 static unsigned int rnd_uint()
 {
-    return uniform_int_generator();
+    return uniform_int_generator_t::instance()();
 }
 
 static bool rnd_bool()
 {
-    return (uniform_int_generator() & 1) == 1;
+    return (uniform_int_generator_t::instance()() & 1) == 1;
 }
 
 // return an int in [min, max)

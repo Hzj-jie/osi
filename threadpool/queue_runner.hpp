@@ -9,7 +9,11 @@
 #include <vector>
 #include <thread>
 #include "../envs/preenv.hpp"
-#include "../const/queue_runner.hpp"
+
+namespace __queue_runner_private
+{
+    const static uint32_t interval_ms = 5;
+}
 
 static class queue_runner_t
 {
@@ -35,7 +39,7 @@ private:
             size_t size = q.size();
             // TODO: queue_runner
             if(!preenv.busy_wait)
-                are.wait(queue_runner_interval_ms);
+                are.wait(__queue_runner_private::interval_ms);
         }
     }
 

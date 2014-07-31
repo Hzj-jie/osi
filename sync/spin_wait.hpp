@@ -83,6 +83,7 @@ namespace this_thread {
     static void strict_wait_when(const function<bool()>& f)
     {
         if(processor.single) lazy_wait_when(f);
+        else if(processor.few) busy_wait_when(f);
         else while(f());
     }
 

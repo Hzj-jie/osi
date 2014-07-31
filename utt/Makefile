@@ -24,7 +24,6 @@ utt: main.cpp icase.hpp ../sync/lock.hpp ../app_info/assert.hpp \
  ../utt_cases/sync/single_entry_test.hpp \
  ../utt_cases/sync/../../sync/single_entry.hpp \
  ../utt_cases/sync/../../sync/yield.hpp \
- ../utt_cases/sync/../../sync/../const/threading.hpp \
  ../utt_cases/sync/../../sync/../envs/processor.hpp \
  ../utt_cases/envs/nowadays_test.hpp \
  ../utt_cases/utils/auto_removed_folder_test.hpp \
@@ -37,10 +36,13 @@ utt: main.cpp icase.hpp ../sync/lock.hpp ../app_info/assert.hpp \
  ../utt_cases/formation/concurrent/slimqless_single_test.hpp \
  ../utt_cases/formation/concurrent/../../../formation/concurrent/slimqless.hpp \
  ../utt_cases/formation/concurrent/slimqless_test.hpp \
+ ../utt_cases/formation/concurrent/slimqless_test_template.hpp \
  ../utt_cases/formation/concurrent/../../../utils/random.hpp \
  ../utt_cases/formation/concurrent/../../../utt/case_wrapper/multithreading_case_wrapper.hpp \
  ../utt_cases/formation/concurrent/../../../utt/case_wrapper/case_wrapper.hpp \
  ../utt_cases/formation/concurrent/../../../utt/case_wrapper/repeat_case_wrapper.hpp \
+ ../utt_cases/formation/concurrent/slimqless2_test.hpp \
+ ../utt_cases/formation/concurrent/../../../formation/concurrent/slimqless2.hpp \
  ../utt_cases/formation/concurrent/qless_test.hpp \
  ../utt_cases/formation/concurrent/../../../formation/concurrent/qless.hpp \
  ../utt_cases/utils/pattern_matcher_test.hpp \
@@ -55,8 +57,9 @@ utt: main.cpp icase.hpp ../sync/lock.hpp ../app_info/assert.hpp \
  ../utt_cases/threadpool/../../threadpool/queue_runner.hpp \
  ../utt_cases/threadpool/../../threadpool/../envs/preenv.hpp \
  ../utt_cases/threadpool/../../threadpool/../envs/envs.hpp \
- ../utt_cases/threadpool/../../threadpool/../const/queue_runner.hpp \
- ../utt_cases/envs/envs_test.hpp ../utt_cases/utils/str_contains_test.hpp
+ ../utt_cases/envs/envs_test.hpp ../utt_cases/utils/str_contains_test.hpp \
+ ../utt_cases/utils/timing_counter_test.hpp \
+ ../utt_cases/utils/../../utils/timing_counter.hpp
 	g++ main.cpp -o utt -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3 -lboost_filesystem -lboost_system
 
 clean:

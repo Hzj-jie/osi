@@ -20,7 +20,7 @@ static atomic<uint32_t> runned_cases;
 
 static void run(int id)
 {
-    static atomic_int using_processors;
+    static atomic<uint32_t> using_processors;
     while(1)
     {
         icase* i = nullptr;
@@ -30,7 +30,7 @@ static void run(int id)
             icase& c = (*i);
             if(config.selected(c))
             {
-                uint32_t current_using_processors = using_processors.fetch_add(c.preserved_processor_count());
+                uint32_t current_using_processors = using_processors.fetch_add(c.preserved_processor_count()) + c.preserved_processor_count();
                 bool should_run = (current_using_processors <= processor.count ||
                                    current_using_processors == c.preserved_processor_count());
                 if(should_run)
