@@ -20,7 +20,7 @@ private:
 public:
     bool execute() override
     {
-        static atomic<int> count;
+        static std::atomic<int> count;
         if(count > 1024 * 1024 || rnd_bool())
         {
             int v;
