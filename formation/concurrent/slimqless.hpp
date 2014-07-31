@@ -63,7 +63,7 @@ private:
 
     inline void wait_mark_writting()
     {
-        std::this_thread::busy_wait_until(
+        std::this_thread::strict_wait_until(
                 [this]() -> bool
                 {
                     assert(e.load() != nullptr);
@@ -74,7 +74,7 @@ private:
     inline static void wait_mark_written(const node* n)
     {
         assert(n != nullptr);
-        std::this_thread::busy_wait_until(
+        std::this_thread::strict_wait_until(
                 [&]() -> bool
                 {
                     return n->vs.value_written();
@@ -116,29 +116,44 @@ public:
         insert(std::forward<Args>(args)...);
     }
 
+    bool empty() const
+    {
+        return f.next == e.load();
+    }
+
     bool pop(T& v)
     {
         node* nf = f.next;
-        while(1)
-        {
-            assert(nf != nullptr);
-            if(nf == e) return false;
-            else
-            {
-                node* t = nf;
-                if(f.next.compare_exchange_weak(t, nf->next) &&
-                   assert(t == nf))
+        std::this_thread::strict_wait_when(
+                [&]()
                 {
-                    assert(nf->vs.not_no_value());
-                    wait_mark_written(nf);
-                    new (&v) T(std::move(nf->v));
-                    delete nf;
-                    return true;
-                }
-                else nf = f.next;
-            }
+                     assert(nf != nullptr);
+                     if(nf == e)
+                     {
+                         nf = nullptr;
+                         return false;
+                     }
+                     else
+                     {
+                         node* t = nf;
+                         if(f.next.compare_exchange_weak(t, nf->next) &&
+                            assert(t == nf)) return false;
+                         else
+                         {
+                             nf = f.next;
+                             return true;
+                         }
+                     }
+                });
+        if(nf == nullptr) return false;
+        else
+        {
+            assert(nf->vs.not_no_value());
+            wait_mark_written(nf);
+            new (&v) T(std::move(nf->v));
+            delete nf;
+            return true;
         }
-        return assert(false);
     }
 
     void clear()

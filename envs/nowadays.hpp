@@ -118,7 +118,11 @@ public:
           << time_separator;
         o.fill('0');
         o.width(2);
-        o << t.time_of_day().minutes();
+        o << t.time_of_day().minutes()
+          << time_separator;
+        o.fill('0');
+        o.width(2);
+        o << t.time_of_day().seconds();
         return o.str();
     }
 

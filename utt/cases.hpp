@@ -11,6 +11,7 @@
 #include "../utt_cases/sync/reset_event_test.hpp"
 #include "../utt_cases/formation/concurrent/slimqless_single_test.hpp"
 #include "../utt_cases/formation/concurrent/slimqless_test.hpp"
+#include "../utt_cases/formation/concurrent/slimqless2_test.hpp"
 #include "../utt_cases/formation/concurrent/qless_test.hpp"
 #include "../utt_cases/utils/pattern_matcher_test.hpp"
 #include "../utt_cases/utt/utt_specific_test.hpp"
@@ -18,4 +19,7 @@
 #include "../utt_cases/threadpool/queue_runner_test.hpp"
 #include "../utt_cases/envs/envs_test.hpp"
 #include "../utt_cases/utils/str_contains_test.hpp"
+#include "../utt_cases/utils/timing_counter_test.hpp"
+#include "../utt_cases/formation/concurrent/slimqless_perf_test.hpp"
+#include "../utt_cases/formation/concurrent/slimqless2_perf_test.hpp"
 

@@ -2,7 +2,7 @@
 #pragma once
 #include <stdint.h>
 #include <thread>
-#include "../const/threading.hpp"
+#include <chrono>
 #include "../envs/processor.hpp"
 #include "../envs/nowadays.hpp"
 #include "../envs/processor.hpp"
@@ -17,11 +17,13 @@ namespace this_thread {
             this_thread::yield();
             return (nowadays.low_res.milliseconds() - n > 1);
         }
+
+        const static std::chrono::milliseconds thread_interval(std::chrono::milliseconds(5));
     }
 
     static void interval()
     {
-        sleep_for(thread_interval);
+        sleep_for(__yield_private::thread_interval);
     }
 
     static void yield_strong()

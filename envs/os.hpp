@@ -54,6 +54,7 @@ static boost::filesystem::path::string_type path_string(T&& v)
 #if BOOST_COMP_MSVC
 #define WIDE_STRING(x) L#x
 #define INLINE __forceinline
+#define thread_local __declspec(thread)
 #else
 #define WIDE_STRING(x) L""#x
 #define INLINE inline

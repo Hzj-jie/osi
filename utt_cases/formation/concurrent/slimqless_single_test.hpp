@@ -5,39 +5,45 @@
 #include "../../../formation/concurrent/slimqless.hpp"
 #include "../../../utils/strutils.hpp"
 #include <string>
+#include <functional>
 
 class slimqless_single_test : public icase
 {
 private:
-    bool int_case()
+    template <typename T>
+    bool run_case(const std::function<T(int)>& from_int)
     {
         const int MAX = 10000;
-        slimqless<int> q;
+        slimqless<T> q;
         for(int i = 0; i < MAX; i++)
-            q.push(i);
+            q.push(from_int(i));
         for(int i = 0; i < MAX; i++)
         {
-            int j = 0;
+            T j;
+            utt_assert.is_false(q.empty());
             utt_assert.is_true(q.pop(j));
-            utt_assert.equal(i, j);
+            utt_assert.equal(from_int(i), j);
+            utt_assert.equal(q.empty(), i == MAX - 1);
         }
         return true;
     }
 
+    bool int_case()
+    {
+        return run_case<int>(
+                        [](int i)
+                        {
+                            return i;
+                        });
+    }
+
     bool string_case()
     {
-        using namespace std;
-        const int MAX = 10000;
-        slimqless<string> q;
-        for(int i = 0; i < MAX; i++)
-            q.push(strcat(i));
-        for(int i = 0; i < MAX; i++)
-        {
-            string j;
-            utt_assert.is_true(q.pop(j));
-            utt_assert.equal(strcat(i), j);
-        }
-        return true;
+        return run_case<std::string>(
+                       [](int i)
+                       {
+                           return strcat(i);
+                       });
     }
 
 public:
