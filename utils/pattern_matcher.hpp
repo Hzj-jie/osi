@@ -8,6 +8,7 @@
 template <typename T>
 struct equal
 {
+    equal() { }
     bool operator()(const T& a, const T& b) const
     {
         return a == b;

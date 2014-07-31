@@ -33,6 +33,7 @@ namespace __strcmp_private
                 return __strcmp_private::case_insensitive_compare(a, b) OP 0; }
 #define STRCMP_STRUCT_TEMPLATE(name, OP) \
         struct case_insensitive_##name { \
+            case_insensitive_##name() { } \
             STRCMP_COMPARE_TEMPLATE(const char&, OP); \
             STRCMP_COMPARE_TEMPLATE(const char*, OP); \
             STRCMP_COMPARE_TEMPLATE(const std::string&, OP); };
