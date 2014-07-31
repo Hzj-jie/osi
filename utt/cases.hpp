@@ -17,4 +17,5 @@
 #include "../utt_cases/utt/utt_failure_test.hpp"
 #include "../utt_cases/threadpool/queue_runner_test.hpp"
 #include "../utt_cases/envs/envs_test.hpp"
+#include "../utt_cases/utils/str_contains_test.hpp"
 

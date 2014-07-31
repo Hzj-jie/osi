@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <vector>
 #include <map>
+#include "../template/singleton.hpp"
 
 template <typename T>
 struct equal
@@ -27,7 +28,7 @@ public:
     const static int undetermined = 0;
 
 private:
-    const static Equal equal;
+    CONST_DEFAULT_SINGLETON_FUNC(Equal, equal)
 
     const static bool match_pattern(const CharT* const pattern,
                                     const uint32_t pattern_start,
@@ -40,10 +41,10 @@ private:
         uint32_t j = str_start;
         while(i < pattern_len && j < str_len)
         {
-            if(equal(pattern[i], multi_matching_sign))
+            if(equal()(pattern[i], multi_matching_sign))
             {
                 i++;
-                while(i < pattern_len && equal(pattern[i], multi_matching_sign)) i++;
+                while(i < pattern_len && equal()(pattern[i], multi_matching_sign)) i++;
                 while(j <= str_len)
                 {
                     if(match_pattern(pattern, i, pattern_len, str, j, str_len)) return true;
@@ -58,7 +59,7 @@ private:
             }
             else
             {
-                if(equal(pattern[i], str[j]))
+                if(equal()(pattern[i], str[j]))
                 {
                     i++;
                     j++;
@@ -66,7 +67,7 @@ private:
                 else break;
             }
         }
-        while(i < pattern_len && equal(pattern[i], multi_matching_sign)) i++;
+        while(i < pattern_len && equal()(pattern[i], multi_matching_sign)) i++;
         return (i == pattern_len && j == str_len);
     }
 
@@ -79,7 +80,7 @@ public:
                          const uint32_t str_len)
     {
         if(pattern_len > pattern_start &&
-           equal(pattern[pattern_start], cut_sign))
+           equal()(pattern[pattern_start], cut_sign))
         {
             return (match_pattern(pattern,
                                   pattern_start + 1,
@@ -93,7 +94,7 @@ public:
         else
         {
             uint32_t offset = ((pattern_len > pattern_start &&
-                               equal(pattern[pattern_start], add_sign)) ?
+                               equal()(pattern[pattern_start], add_sign)) ?
                                1:
                                0);
             return (match_pattern(pattern,

@@ -4,6 +4,7 @@
 #include <string>
 #include <string.h>
 #include "../envs/os.hpp"
+#include <algorithm>
 
 namespace __strcmp_private
 {
@@ -39,4 +40,39 @@ STRCMP_STRUCT_TEMPLATE(equal, ==);
 STRCMP_STRUCT_TEMPLATE(less, <);
 #undef STRCMP_STRUCT_TEMPLATE
 #undef STRCMP_COMPARE_TEMPLATE
+
+static int isnull(int c)
+{
+    return c;
+}
+
+template <typename UnaryPredicate>
+static bool str_contains(const char* s, UnaryPredicate&& pred)
+{
+    return std::any_of(s, s + strlen(s), pred);
+}
+
+template <typename UnaryPredicate>
+static bool str_contains(const std::string& s, UnaryPredicate&& pred)
+{
+    return std::any_of(s.begin(), s.end(), pred);
+}
+
+static bool str_contains(const char* s, const char c)
+{
+    return str_contains(s,
+                        [&](const char cur)
+                        {
+                            return cur == c;
+                        });
+}
+
+static bool str_contains(const std::string& s, const char c)
+{
+    return str_contains(s,
+                        [&](const char cur)
+                        {
+                            return cur == c;
+                        });
+}
 

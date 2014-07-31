@@ -55,7 +55,8 @@ utt: main.cpp icase.hpp ../sync/lock.hpp ../app_info/assert.hpp \
  ../utt_cases/threadpool/../../threadpool/queue_runner.hpp \
  ../utt_cases/threadpool/../../threadpool/../envs/preenv.hpp \
  ../utt_cases/threadpool/../../threadpool/../envs/envs.hpp \
- ../utt_cases/threadpool/../../threadpool/../const/queue_runner.hpp
+ ../utt_cases/threadpool/../../threadpool/../const/queue_runner.hpp \
+ ../utt_cases/envs/envs_test.hpp ../utt_cases/utils/str_contains_test.hpp
 	g++ main.cpp -o utt -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3 -lboost_filesystem -lboost_system
 
 clean:
