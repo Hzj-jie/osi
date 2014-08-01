@@ -1,11 +1,11 @@
 
-#pragma once
+#ifndef __OSI_ASSERT__
+#define __OSI_ASSERT__
+
 #include "error_handle.hpp"
 #include "k_assert.hpp"
 #include "../utils/strutils.hpp"
 #include <utility>
-
-#include "assert_blocker.hpp"
 
 namespace __assert_private
 {
@@ -36,4 +36,8 @@ static bool assert(bool x, Args&&... args)
 {
     return x || __assert_private::assert_failed(std::forward<Args>(args)...);
 }
+
+#endif
+
+#undef assert
 

@@ -136,6 +136,7 @@ public:
                      }
                      else
                      {
+                         assert(nf->next != nullptr, CODE_POSITION());
                          node* t = nf;
                          if(f.next.compare_exchange_weak(t, nf->next) &&
                             assert(t == nf, CODE_POSITION())) return false;
