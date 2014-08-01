@@ -27,7 +27,7 @@ public:
         return c.cleanup();
     }
 
-    bool run() final
+    bool run() override final
     {
         return icase::run();
     }

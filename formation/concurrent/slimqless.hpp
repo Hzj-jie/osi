@@ -3,6 +3,7 @@
 #include <utility>
 #include <atomic>
 #include "../../app_info/assert.hpp"
+#include "../../app_info/trace.hpp"
 #include "../../sync/spin_wait.hpp"
 
 template <typename T>
@@ -16,7 +17,7 @@ private:
         const static int bw = 1;
         const static int aw = 2;
 
-        std::atomic<int> v;
+        volatile std::atomic<int> v;
     public:
         value_status() : v(nv) { }
 
@@ -24,12 +25,12 @@ private:
         {
             int exp = nv;
             return v.compare_exchange_weak(exp, bw) &&
-                   assert(exp == nv);
+                   assert(exp == nv, CODE_POSITION());
         }
 
         void mark_value_written()
         {
-            assert(v == bw);
+            assert(v == bw, CODE_POSITION());
             v = aw;
         }
 
@@ -40,7 +41,7 @@ private:
 
         bool value_written() const
         {
-            assert(not_no_value());
+            assert(not_no_value(), CODE_POSITION());
             return v == aw;
         }
     };
@@ -66,14 +67,14 @@ private:
         std::this_thread::strict_wait_until(
                 [this]() -> bool
                 {
-                    assert(e.load() != nullptr);
+                    assert(e.load() != nullptr, CODE_POSITION());
                     return e.load()->vs.mark_value_writting();
                 });
     }
 
     inline static void wait_mark_written(const node* n)
     {
-        assert(n != nullptr);
+        assert(n != nullptr, CODE_POSITION());
         std::this_thread::strict_wait_until(
                 [&]() -> bool
                 {
@@ -127,7 +128,7 @@ public:
         std::this_thread::strict_wait_when(
                 [&]()
                 {
-                     assert(nf != nullptr);
+                     assert(nf != nullptr, CODE_POSITION());
                      if(nf == e)
                      {
                          nf = nullptr;
@@ -137,7 +138,7 @@ public:
                      {
                          node* t = nf;
                          if(f.next.compare_exchange_weak(t, nf->next) &&
-                            assert(t == nf)) return false;
+                            assert(t == nf, CODE_POSITION())) return false;
                          else
                          {
                              nf = f.next;
@@ -148,7 +149,7 @@ public:
         if(nf == nullptr) return false;
         else
         {
-            assert(nf->vs.not_no_value());
+            assert(nf->vs.not_no_value(), CODE_POSITION());
             wait_mark_written(nf);
             new (&v) T(std::move(nf->v));
             delete nf;
