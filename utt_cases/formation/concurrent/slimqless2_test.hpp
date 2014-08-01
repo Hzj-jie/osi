@@ -1,6 +1,7 @@
 
 #pragma once
 #include "slimqless_test_template.hpp"
+#include "../../../utt/icase.hpp"
 #include "../../../formation/concurrent/slimqless2.hpp"
 
 class slimqless2_test : public slimqless_test_template<slimqless2>

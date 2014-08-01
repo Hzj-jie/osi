@@ -17,7 +17,7 @@ private:
         const static int bw = 1;
         const static int aw = 2;
 
-        volatile std::atomic<int> v;
+        std::atomic<int> v;
     public:
         value_status() : v(nv) { }
 
@@ -30,7 +30,7 @@ private:
 
         void mark_value_written()
         {
-            assert(v == bw, CODE_POSITION());
+            assert(v == bw, CODE_POSITION(), ", ", v);
             v = aw;
         }
 
@@ -41,7 +41,7 @@ private:
 
         bool value_written() const
         {
-            assert(not_no_value(), CODE_POSITION());
+            assert(not_no_value(), CODE_POSITION(), ", ", v);
             return v == aw;
         }
     };
@@ -65,7 +65,7 @@ private:
     inline void wait_mark_writting()
     {
         std::this_thread::strict_wait_until(
-                [this]() -> bool
+                [this]()
                 {
                     assert(e.load() != nullptr, CODE_POSITION());
                     return e.load()->vs.mark_value_writting();
@@ -76,7 +76,7 @@ private:
     {
         assert(n != nullptr, CODE_POSITION());
         std::this_thread::strict_wait_until(
-                [&]() -> bool
+                [&]()
                 {
                     return n->vs.value_written();
                 });
@@ -98,7 +98,7 @@ public:
     slimqless()
     {
         e = new node();
-        f.next.store(e);
+        f.next = e.load();
     }
 
     void push(const T& v)
@@ -119,7 +119,7 @@ public:
 
     bool empty() const
     {
-        return f.next == e.load();
+        return f.next.load() == e;
     }
 
     bool pop(T& v)
@@ -149,7 +149,6 @@ public:
         if(nf == nullptr) return false;
         else
         {
-            assert(nf->vs.not_no_value(), CODE_POSITION());
             wait_mark_written(nf);
             new (&v) T(std::move(nf->v));
             delete nf;

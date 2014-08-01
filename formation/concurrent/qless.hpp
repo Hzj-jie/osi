@@ -1,20 +1,21 @@
 
 #pragma once
 #include "slimqless.hpp"
+#include "slimqless2.hpp"
 #include <atomic>
 #include <utility>
 #include <stdlib.h>
 #include "../../app_info/assert.hpp"
 
-template <typename T>
-class qless final
+template <template <typename T> class slimqless, typename T>
+class qless_template final
 {
 private:
     slimqless<T> q;
     std::atomic<int> s;
 
 public:
-    qless() :
+    qless_template() :
         q(),
         s(0) { }
 
@@ -50,10 +51,21 @@ public:
         return (ss < 0 ? 0 : ss);
     }
 
+    bool empty() const
+    {
+        return size() == 0;
+    }
+
     void clear()
     {
         T v;
         while(pop(v));
     }
 };
+
+template <typename T>
+using qless = qless_template<slimqless, T>;
+
+template <typename T>
+using qless2 = qless_template<slimqless2, T>;
 

@@ -54,16 +54,13 @@ class slimqless_perf_test_template :
                    thread_count> > { };
 
 template <template <typename T> class slimqless>
-class slimqless_perf_test_8_template :
-    public slimqless_perf_test_template<slimqless, 8> { };
+using slimqless_perf_test_8_template = slimqless_perf_test_template<slimqless, 8>;
 
 template <template <typename T> class slimqless>
-class slimqless_perf_test_32_template :
-    public slimqless_perf_test_template<slimqless, 32> { };
+using slimqless_perf_test_32_template = slimqless_perf_test_template<slimqless, 32>;
 
 template <template <typename T> class slimqless>
-class slimqless_perf_test_128_template :
-    public slimqless_perf_test_template<slimqless, 128> { };
+using slimqless_perf_test_128_template = slimqless_perf_test_template<slimqless, 128>;
 
 template <template <typename T> class slimqless>
 class slimqless_case : public icase

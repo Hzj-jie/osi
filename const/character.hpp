@@ -24,10 +24,10 @@ public:
     DEFINE_CHARACTER(dot, '.');
     DEFINE_CHARACTER(u, 'u');
     DEFINE_CHARACTER(t, 't');
+#undef DEFINE_CHARACTER
 
 private:
     character_t() { }
-#undef DEFINE_CHARACTER
     CONST_SINGLETON(character_t);
 }& character = character_t::instance();
 
