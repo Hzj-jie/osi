@@ -6,23 +6,23 @@
 all: \
  utt
 
-utt: main.cpp icase.hpp ../sync/lock.hpp ../app_info/assert.hpp \
- ../app_info/error_handle.hpp ../app_info/error_type.hpp \
- ../app_info/error_writer.hpp ../app_info/k_assert.hpp \
- ../app_info/../envs/exeinfo.hpp ../app_info/../envs/os.hpp \
- ../app_info/../envs/../template/singleton.hpp \
+utt: main.cpp icase.hpp ../sync/lock.hpp utt_assert.hpp \
+ utt_error_handle.hpp ../app_info/error_type.hpp \
+ ../app_info/error_handle.hpp ../app_info/error_writer.hpp \
+ ../app_info/k_assert.hpp ../app_info/../envs/exeinfo.hpp \
+ ../app_info/../envs/os.hpp ../app_info/../envs/../template/singleton.hpp \
  ../app_info/../envs/deploys.hpp \
  ../app_info/../envs/../const/character.hpp \
  ../app_info/../envs/../utils/auto_removed_folder.hpp \
  ../app_info/../envs/../utils/sweeper.hpp \
  ../app_info/../envs/../utils/uuid.hpp ../app_info/../envs/git.hpp \
  ../app_info/../envs/nowadays.hpp \
- ../app_info/../envs/../utils/strutils.hpp ../app_info/assert_blocker.hpp \
- utt_assert.hpp utt_error_handle.hpp ../app_info/trace.hpp \
- ../app_info/../utils/lazier.hpp cases.hpp \
+ ../app_info/../envs/../utils/strutils.hpp ../app_info/trace.hpp \
+ ../app_info/../utils/lazier.hpp ../app_info/assert.hpp cases.hpp \
  ../utt_cases/utt/utt_self_test.hpp ../utt_cases/utils/sweeper_test.hpp \
  ../utt_cases/sync/single_entry_test.hpp \
  ../utt_cases/sync/../../sync/single_entry.hpp \
+ ../utt_cases/sync/../../sync/../app_info/assert.hpp \
  ../utt_cases/sync/../../sync/yield.hpp \
  ../utt_cases/sync/../../sync/../envs/processor.hpp \
  ../utt_cases/envs/nowadays_test.hpp \
@@ -35,10 +35,13 @@ utt: main.cpp icase.hpp ../sync/lock.hpp ../app_info/assert.hpp \
  ../utt_cases/sync/../../sync/reset_event.hpp \
  ../utt_cases/formation/concurrent/slimqless_single_test.hpp \
  ../utt_cases/formation/concurrent/../../../formation/concurrent/slimqless.hpp \
+ ../utt_cases/formation/concurrent/../../../formation/concurrent/../../app_info/assert.hpp \
  ../utt_cases/formation/concurrent/slimqless_test.hpp \
  ../utt_cases/formation/concurrent/slimqless_test_template.hpp \
+ ../utt_cases/formation/concurrent/../../../app_info/assert.hpp \
  ../utt_cases/formation/concurrent/../../../utils/random.hpp \
  ../utt_cases/formation/concurrent/../../../utt/case_wrapper/multithreading_case_wrapper.hpp \
+ ../utt_cases/formation/concurrent/../../../utt/case_wrapper/../../app_info/assert.hpp \
  ../utt_cases/formation/concurrent/../../../utt/case_wrapper/case_wrapper.hpp \
  ../utt_cases/formation/concurrent/../../../utt/case_wrapper/repeat_case_wrapper.hpp \
  ../utt_cases/formation/concurrent/../../../utt/case_wrapper/specific_case_wrapper.hpp \
@@ -58,6 +61,7 @@ utt: main.cpp icase.hpp ../sync/lock.hpp ../app_info/assert.hpp \
  ../utt_cases/threadpool/../../threadpool/../envs/preenv.hpp \
  ../utt_cases/threadpool/../../threadpool/../envs/envs.hpp \
  ../utt_cases/envs/envs_test.hpp ../utt_cases/utils/str_contains_test.hpp \
+ ../utt_cases/utils/../../app_info/assert.hpp \
  ../utt_cases/utils/timing_counter_test.hpp \
  ../utt_cases/utils/../../utils/timing_counter.hpp \
  ../utt_cases/formation/concurrent/slimqless_perf_test.hpp \

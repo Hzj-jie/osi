@@ -4,10 +4,10 @@
 #include <list>
 #include <mutex>
 #include "../sync/lock.hpp"
-#include "../app_info/assert.hpp"
 #include <stdint.h>
 #include "utt_assert.hpp"
 #include "../app_info/trace.hpp"
+#include "../app_info/assert.hpp"
 
 class icase
 {
