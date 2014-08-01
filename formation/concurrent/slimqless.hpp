@@ -17,7 +17,7 @@ private:
         const static int bw = 1;
         const static int aw = 2;
 
-        std::atomic<int> v;
+        volatile std::atomic<int> v;
     public:
         value_status() : v(nv) { }
 
@@ -49,7 +49,7 @@ private:
     struct node
     {
     public:
-        std::atomic<node*> next;
+        volatile std::atomic<node*> next;
         T v;
         value_status vs;
 
@@ -60,7 +60,7 @@ private:
     };
 
     node f;
-    std::atomic<node*> e;
+    volatile std::atomic<node*> e;
 
     inline void wait_mark_writting()
     {
