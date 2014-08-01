@@ -61,7 +61,10 @@ utt: main.cpp icase.hpp ../sync/lock.hpp ../app_info/assert.hpp \
  ../utt_cases/utils/timing_counter_test.hpp \
  ../utt_cases/utils/../../utils/timing_counter.hpp \
  ../utt_cases/formation/concurrent/slimqless_perf_test.hpp \
- ../utt_cases/formation/concurrent/slimqless2_perf_test.hpp
+ ../utt_cases/formation/concurrent/slimqless2_perf_test.hpp \
+ ../utt_cases/formation/concurrent/qless3_test.hpp \
+ ../utt_cases/formation/concurrent/../../../formation/concurrent/qless3.hpp \
+ ../utt_cases/formation/concurrent/qless3_perf_test.hpp
 	g++ main.cpp -o utt -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3 -lboost_filesystem -lboost_system
 
 clean:

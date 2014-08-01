@@ -44,14 +44,29 @@ public:
     DEFINE_CASE(slimqless_perf_case);
 };
 
+namespace __slimqless_test_template_private
+{
+    template <template <typename T> class slimqless,
+              uint32_t thread_count,
+              uint32_t repeat_count>
+    class slimqless_perf_test_template :
+        public specific_case_wrapper<
+                   multithreading_case_wrapper<
+                       repeat_case_wrapper<
+                           slimqless_perf_case<slimqless>,
+                           repeat_count>,
+                       thread_count> > { };
+}
+
 template <template <typename T> class slimqless, uint32_t thread_count>
-class slimqless_perf_test_template :
-    public specific_case_wrapper<
-               multithreading_case_wrapper<
-                   repeat_case_wrapper<
-                       slimqless_perf_case<slimqless>,
-                       32 * 1024 / thread_count * 1024>,
-                   thread_count> > { };
+using slimqless_perf_test_template =
+        __slimqless_test_template_private::slimqless_perf_test_template
+            <slimqless, thread_count, 32 * 1024 / thread_count * 1024>;
+
+template <template <typename T> class slimqless, uint32_t thread_count>
+using slimqless_inf_perf_test_template =
+        __slimqless_test_template_private::slimqless_perf_test_template
+            <slimqless, thread_count, UINT32_MAX>;
 
 template <template <typename T> class slimqless>
 using slimqless_perf_test_8_template = slimqless_perf_test_template<slimqless, 8>;
@@ -61,6 +76,15 @@ using slimqless_perf_test_32_template = slimqless_perf_test_template<slimqless, 
 
 template <template <typename T> class slimqless>
 using slimqless_perf_test_128_template = slimqless_perf_test_template<slimqless, 128>;
+
+template <template <typename T> class slimqless>
+using slimqless_inf_perf_test_8_template = slimqless_inf_perf_test_template<slimqless, 8>;
+
+template <template <typename T> class slimqless>
+using slimqless_inf_perf_test_32_template = slimqless_inf_perf_test_template<slimqless, 32>;
+
+template <template <typename T> class slimqless>
+using slimqless_inf_perf_test_128_template = slimqless_inf_perf_test_template<slimqless, 128>;
 
 template <template <typename T> class slimqless>
 class slimqless_case : public icase
