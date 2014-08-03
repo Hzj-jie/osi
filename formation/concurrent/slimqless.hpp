@@ -2,9 +2,11 @@
 #pragma once
 #include <utility>
 #include <atomic>
+#include <memory>
 #include "../../app_info/assert.hpp"
 #include "../../app_info/trace.hpp"
 #include "../../sync/spin_wait.hpp"
+#include "../../sync/shared_atomic.hpp"
 
 template <typename T>
 class slimqless final
@@ -17,7 +19,7 @@ private:
         const static int bw = 1;
         const static int aw = 2;
 
-        volatile std::atomic<int> v;
+        std::atomic<int> v;
     public:
         value_status() : v(nv) { }
 
@@ -49,18 +51,13 @@ private:
     struct node
     {
     public:
-        volatile std::atomic<node*> next;
+        shared_atomic_ptr<node> next;
         T v;
         value_status vs;
-
-        node() :
-            next(nullptr),
-            v(),
-            vs() { }
     };
 
     node f;
-    volatile std::atomic<node*> e;
+    std::atomic<node*> e;
 
     inline void wait_mark_writting()
     {
@@ -88,7 +85,7 @@ private:
         node* ne = new node();
         wait_mark_writting();
         node* n = e;
-        n->next = ne;
+        n->next.set(ne);
         e = ne;
         new (&(n->v)) T(std::forward<Args>(args)...);
         n->vs.mark_value_written();
@@ -98,7 +95,7 @@ public:
     slimqless()
     {
         e = new node();
-        f.next = e.load();
+        f.next.set(e);
     }
 
     void push(const T& v)
@@ -124,22 +121,30 @@ public:
 
     bool pop(T& v)
     {
-        node* nf = f.next;
+        shared_atomic_ptr<node> nf = f.next;
+        bool failed = false;
         std::this_thread::strict_wait_when(
                 [&]()
                 {
-                     assert(nf != nullptr, CODE_POSITION());
-                     if(nf == e)
+                     assert(nf.load() != nullptr, CODE_POSITION());
+                     if(nf.load() == e)
                      {
-                         nf = nullptr;
+                         failed = true;
                          return false;
                      }
                      else
                      {
-                         assert(nf->next.load() != nullptr, CODE_POSITION());
-                         node* t = nf;
-                         if(f.next.compare_exchange_weak(t, nf->next) &&
-                            assert(t == nf, CODE_POSITION())) return false;
+                         assert(nf.load()->next.load() != nullptr,
+                                CODE_POSITION(),
+                                ", ",
+                                nf.load(),
+                                ", ",
+                                e.load(),
+                                ", ",
+                                nf.load()->next.load());
+                         node* t = nf.load();
+                         if(f.next.compare_exchange_weak(t, nf.load()->next.load()) &&
+                            assert(t == nf.load(), CODE_POSITION(), ", ", t, ", ", nf.load())) return false;
                          else
                          {
                              nf = f.next;
@@ -147,12 +152,11 @@ public:
                          }
                      }
                 });
-        if(nf == nullptr) return false;
+        if(failed) return false;
         else
         {
-            wait_mark_written(nf);
-            new (&v) T(std::move(nf->v));
-            delete nf;
+            wait_mark_written(nf.load());
+            new (&v) T(std::move(nf.load()->v));
             return true;
         }
     }
