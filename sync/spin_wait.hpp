@@ -8,108 +8,108 @@
 #include "../envs/nowadays.hpp"
 #include "../delegates/transform.hpp"
 
+#define std_this_thread_lazy_wait_when(x) { \
+            while(x) std::this_thread::interval(); }
+#define std_this_thread_lazy_wait_until(x) std_this_thread_lazy_wait_when(!(x))
+
+#define std_this_thread_slack_wait_when(x) { \
+            if(processor.single) { std_this_thread_lazy_wait_when(x); } \
+            else { \
+                uint32_t lpy = loops_per_yield.count; \
+                uint32_t i = 0; \
+                while(x) { \
+                    i++; \
+                    if(i >= lpy) { \
+                        std::this_thread::interval(); \
+                        i = 0; \
+                        if(lpy > loops_per_yield.min) lpy >>= 1; } } } }
+#define std_this_thread_slack_wait_until(x) std_this_thread_slack_wait_when(!(x))
+
+#define std_this_thread_wait_when(x) { \
+            if(processor.single) { std_this_thread_lazy_wait_when(x); } \
+            else { \
+                uint32_t lpy = loops_per_yield.count; \
+                uint32_t i = 0; \
+                while(x) { \
+                    i++; \
+                    if(i == lpy) { \
+                        if(std::this_thread::yield_weak()) i = 0; \
+                        else i = lpy; \
+                        if(lpy > loops_per_yield.min) lpy >>= 1; } \
+                    else if(i > lpy) { \
+                        std::this_thread::yield_strong(); \
+                        i = 0; } } } }
+#define std_this_thread_wait_until(x) std_this_thread_wait_when(!(x))
+
+#define std_this_thread_busy_wait_when(x) { \
+            if(processor.single) { std_this_thread_lazy_wait_when(x); } \
+            else { \
+                uint32_t lpy = loops_per_yield.count; \
+                uint32_t i = 0; \
+                while(x) { \
+                    i++; \
+                    if(i >= lpy) { \
+                        if(std::this_thread::yield_weak()) i = 0; \
+                        else i = lpy; \
+                        if(lpy > loops_per_yield.min) lpy >>= 1; } } } }
+#define std_this_thread_busy_wait_until(x) std_this_thread_busy_wait_when(!(x))
+
+#define std_this_thread_strict_wait_when(x) { \
+            if(processor.single) { std_this_thread_lazy_wait_when(x); } \
+            else if(processor.few) { std_this_thread_busy_wait_when(x); } \
+            else while(x); }
+#define std_this_thread_strict_wait_until(x) std_this_thread_strict_wait_when(!(x))
+
 namespace std {
 namespace this_thread {
     static void lazy_wait_when(const function<bool()>& f)
     {
-        while(f()) interval();
+        std_this_thread_lazy_wait_when(f());
     }
 
     static void slack_wait_when(const function<bool()>& f)
     {
-        if(processor.single) lazy_wait_when(f);
-        else
-        {
-            uint32_t lpy = loops_per_yield.count;
-            uint32_t i = 0;
-            while(f())
-            {
-                i++;
-                if(i >= lpy)
-                {
-                    interval();
-                    i = 0;
-                    if(lpy > loops_per_yield.min) lpy >>= 1;
-                }
-            }
-        }
+        std_this_thread_slack_wait_when(f());
     }
 
     static void wait_when(const function<bool()>& f)
     {
-        if(processor.single) lazy_wait_when(f);
-        else
-        {
-            uint32_t lpy = loops_per_yield.count;
-            uint32_t i = 0;
-            while(f())
-            {
-                i++;
-                if(i == lpy)
-                {
-                    if(yield_weak()) i = 0;
-                    else i = lpy;
-                    if(lpy > loops_per_yield.min) lpy >>= 1;
-                }
-                else if(i > lpy)
-                {
-                    yield_strong();
-                    i = 0;
-                }
-            }
-        }
+        std_this_thread_wait_when(f());
     }
 
     static void busy_wait_when(const function<bool()>& f)
     {
-        if(processor.single) lazy_wait_when(f);
-        else
-        {
-            uint32_t lpy = loops_per_yield.count;
-            uint32_t i = 0;
-            while(f())
-            {
-                i++;
-                if(i >= lpy)
-                {
-                    if(yield_weak()) i = 0;
-                    else i = lpy;
-                    if(lpy > loops_per_yield.min) lpy >>= 1;
-                }
-            }
-        }
+        std_this_thread_busy_wait_when(f());
     }
 
     static void strict_wait_when(const function<bool()>& f)
     {
-        if(processor.single) lazy_wait_when(f);
-        else if(processor.few) busy_wait_when(f);
-        else while(f());
+        std_this_thread_strict_wait_when(f());
     }
 
     static void lazy_wait_until(const function<bool()>& f)
     {
-        lazy_wait_when(::reverse(f));
+        std_this_thread_lazy_wait_until(f());
     }
 
     static void slack_wait_until(const function<bool()>& f)
     {
-        slack_wait_when(::reverse(f));
+        std_this_thread_slack_wait_until(f());
     }
 
     static void wait_until(const function<bool()>& f)
     {
-        wait_when(::reverse(f));
+        std_this_thread_wait_until(f());
     }
 
     static void busy_wait_until(const function<bool()>& f)
     {
-        busy_wait_when(::reverse(f));
+        std_this_thread_busy_wait_until(f());
     }
 
     static void strict_wait_until(const function<bool()>& f)
     {
-        strict_wait_when(::reverse(f));
+        std_this_thread_strict_wait_until(f());
     }
 
     // for test

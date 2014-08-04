@@ -64,9 +64,9 @@ public:
     {
         return std::this_thread::wait_when(
                         ms_timer,
-                        [this]()
+                        [&]()
                         {
-                            return !(this->try_wait());
+                            return !try_wait();
                         },
                         timeout_ms);
     }
@@ -78,11 +78,11 @@ public:
 
     void wait()
     {
-        return std::this_thread::wait_when(
-                    [this]()
-                    {
-                        return !(this->try_wait());
-                    });
+        std::this_thread::wait_when(
+            [&]()
+            {
+                return !try_wait();
+            });
     }
 };
 
