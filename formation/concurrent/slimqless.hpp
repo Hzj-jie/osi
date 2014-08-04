@@ -1,12 +1,12 @@
 
 #pragma once
+/*
 #include <utility>
 #include <atomic>
 #include <memory>
 #include "../../app_info/assert.hpp"
 #include "../../app_info/trace.hpp"
 #include "../../sync/spin_wait.hpp"
-#include "../../sync/shared_atomic.hpp"
 
 template <typename T>
 class slimqless final
@@ -51,7 +51,7 @@ private:
     struct node
     {
     public:
-        shared_atomic_ptr<node> next;
+        std::atomic<node*> next;
         T v;
         value_status vs;
     };
@@ -85,7 +85,7 @@ private:
         node* ne = new node();
         wait_mark_writting();
         node* n = e;
-        n->next.set(ne);
+        n->next = ne;
         e = ne;
         new (&(n->v)) T(std::forward<Args>(args)...);
         n->vs.mark_value_written();
@@ -95,7 +95,7 @@ public:
     slimqless()
     {
         e = new node();
-        f.next.set(e);
+        f.next = e.load();
     }
 
     void push(const T& v)
@@ -116,35 +116,29 @@ public:
 
     bool empty() const
     {
-        return f.next.load() == e;
+        return f.next == e.load();
     }
 
     bool pop(T& v)
     {
-        shared_atomic_ptr<node> nf = f.next;
-        bool failed = false;
+        node* nf = f.next;
         std::this_thread::strict_wait_when(
                 [&]()
                 {
-                     assert(nf.load() != nullptr, CODE_POSITION());
-                     if(nf.load() == e)
+                     assert(nf != nullptr, CODE_POSITION());
+                     if(nf == e)
+                     // if(nf->next.load() == nullptr) // nf == e
                      {
-                         failed = true;
+                         nf = nullptr;
                          return false;
                      }
                      else
                      {
-                         assert(nf.load()->next.load() != nullptr,
-                                CODE_POSITION(),
-                                ", ",
-                                nf.load(),
-                                ", ",
-                                e.load(),
-                                ", ",
-                                nf.load()->next.load());
-                         node* t = nf.load();
-                         if(f.next.compare_exchange_weak(t, nf.load()->next.load()) &&
-                            assert(t == nf.load(), CODE_POSITION(), ", ", t, ", ", nf.load())) return false;
+                         // the nf may be deleted already.
+                         assert(nf->next != nullptr, CODE_POSITION());
+                         node* t = nf;
+                         if(f.next.compare_exchange_weak(t, nf->next.load()) &&
+                            assert(t == nf, CODE_POSITION(), ", ", t, ", ", nf)) return false;
                          else
                          {
                              nf = f.next;
@@ -152,11 +146,12 @@ public:
                          }
                      }
                 });
-        if(failed) return false;
+        if(nf == nullptr) return false;
         else
         {
-            wait_mark_written(nf.load());
-            new (&v) T(std::move(nf.load()->v));
+            wait_mark_written(nf);
+            new (&v) T(std::move(nf->v));
+            delete nf;
             return true;
         }
     }
@@ -172,4 +167,10 @@ public:
         clear();
     }
 };
+*/
+
+#include "qless3.hpp"
+
+template <typename T>
+using slimqless = qless3<T>;
 

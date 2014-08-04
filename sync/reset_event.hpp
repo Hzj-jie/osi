@@ -29,20 +29,20 @@ public:
     bool set()
     {
         int v = BLOCK;
-        return s.compare_exchange_weak(v, PASS) &&
+        return s.compare_exchange_weak(v, PASS, std::memory_order_consume) &&
                assert(v == BLOCK);
     }
 
     bool reset()
     {
         int v = PASS;
-        return s.compare_exchange_weak(v, BLOCK) &&
+        return s.compare_exchange_weak(v, BLOCK, std::memory_order_consume) &&
                assert(v == PASS);
     }
 
     operator bool() const
     {
-        return (s == PASS);
+        return (s.load(std::memory_order_consume) == PASS);
     }
 
     bool try_wait()
@@ -50,10 +50,13 @@ public:
         if(auto_reset)
         {
             int v = PASS;
-            return s.compare_exchange_weak(v, BLOCK) &&
+            return s.compare_exchange_weak(v, BLOCK, std::memory_order_consume) &&
                    assert(v == PASS);
         }
-        else return s == PASS;
+        else
+        {
+            return s.load(std::memory_order_consume) == PASS;
+        }
     }
 
     template <typename T>

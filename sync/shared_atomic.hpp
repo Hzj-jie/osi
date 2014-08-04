@@ -142,7 +142,7 @@ public:
 
     bool compare_exchange_weak(T& expected,
                                T val,
-                               std::memory_order order = std::memory_order_seq_cst) noexcept
+                               std::memory_order order = std::memory_order_seq_cst)
     {
         return (*v).compare_exchange_weak(expected, val, order);
     }

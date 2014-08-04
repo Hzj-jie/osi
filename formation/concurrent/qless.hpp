@@ -64,7 +64,8 @@ public:
 };
 
 template <typename T>
-using qless = qless_template<slimqless, T>;
+// using qless = qless_template<slimqless, T>;
+using qless = slimqless<T>;
 
 template <typename T>
 using qless2 = qless_template<slimqless2, T>;

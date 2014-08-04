@@ -11,7 +11,7 @@ class qless3 final
 {
 private:
     std::queue<T> q;
-    std::mutex mtx;
+    mutable std::mutex mtx;
 
 public:
     void push(const T& v)
@@ -59,7 +59,7 @@ public:
     void clear()
     {
         scope_lock(mtx);
-        q.clear();
+        while(!q.empty()) q.pop();
     }
 };
 

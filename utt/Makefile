@@ -36,6 +36,8 @@ utt: main.cpp icase.hpp ../sync/lock.hpp utt_assert.hpp \
  ../utt_cases/formation/concurrent/slimqless_single_test.hpp \
  ../utt_cases/formation/concurrent/../../../formation/concurrent/slimqless.hpp \
  ../utt_cases/formation/concurrent/../../../formation/concurrent/../../app_info/assert.hpp \
+ ../utt_cases/formation/concurrent/../../../formation/concurrent/../../sync/shared_atomic.hpp \
+ ../utt_cases/formation/concurrent/../../../formation/concurrent/../../sync/../app_info/assert.hpp \
  ../utt_cases/formation/concurrent/slimqless_test.hpp \
  ../utt_cases/formation/concurrent/slimqless_test_template.hpp \
  ../utt_cases/formation/concurrent/../../../app_info/assert.hpp \
