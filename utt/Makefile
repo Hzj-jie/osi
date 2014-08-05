@@ -68,7 +68,9 @@ utt: main.cpp icase.hpp ../sync/lock.hpp utt_assert.hpp \
  ../utt_cases/formation/concurrent/slimqless_perf_test.hpp \
  ../utt_cases/formation/concurrent/slimqless2_perf_test.hpp \
  ../utt_cases/formation/concurrent/qless3_test.hpp \
- ../utt_cases/formation/concurrent/qless3_perf_test.hpp
+ ../utt_cases/formation/concurrent/qless3_perf_test.hpp \
+ ../utt_cases/sync/exclusive_container_test.hpp \
+ ../utt_cases/sync/../../sync/exclusive_container.hpp
 	g++ main.cpp -o utt -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3 -lboost_filesystem -lboost_system
 
 clean:

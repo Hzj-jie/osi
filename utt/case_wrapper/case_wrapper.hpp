@@ -6,7 +6,7 @@
 #include <string>
 
 template <typename T>
-class case_wrapper : public icase
+class case_forwarder : public icase
 {
 private:
     T c;
@@ -27,13 +27,13 @@ public:
         return c.cleanup();
     }
 
-    bool run() override final
+    bool run() override
     {
-        return icase::run();
+        return c.run();
     }
 
     template <typename... Args>
-    case_wrapper(Args&&... args) : c(std::forward<Args>(args)...) { }
+    case_forwarder(Args&&... args) : c(std::forward<Args>(args)...) { }
 
     uint32_t preserved_processor_count() const override
     {
@@ -44,5 +44,19 @@ public:
     {
         return c.name();
     }
+};
+
+template <typename T>
+class case_wrapper : public case_forwarder<T>
+{
+public:
+    bool run() override final
+    {
+        return icase::run();
+    }
+
+    template <typename... Args>
+    case_wrapper(Args&&... args) :
+        case_forwarder<T>(std::forward<Args>(args)...) { }
 };
 

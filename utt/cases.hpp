@@ -24,4 +24,5 @@
 #include "../utt_cases/formation/concurrent/slimqless2_perf_test.hpp"
 #include "../utt_cases/formation/concurrent/qless3_test.hpp"
 #include "../utt_cases/formation/concurrent/qless3_perf_test.hpp"
+#include "../utt_cases/sync/exclusive_container_test.hpp"
 
