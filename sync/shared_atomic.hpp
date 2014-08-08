@@ -1,150 +1,179 @@
 
 #pragma once
+#include <boost/predef.h>
 #include <atomic>
 #include <memory>
 #include <utility>
 #include "../app_info/assert.hpp"
 
+#if BOOST_COMP_MSVC
+#include "lock.hpp"
+#include <mutex>
+#endif
+
 template <typename T>
-struct shared_atomic
+struct shared_atomic final
 {
 private:
-    std::shared_ptr<std::atomic<T> > v;
+    std::shared_ptr<T> v;
+#if BOOST_COMP_MSVC
+    std::mutex mtx;
+#endif
+
+    bool has_value() const
+    {
+#if BOOST_COMP_MSVC
+        scope_lock(mtx);
+        return (bool)(v);
+#else
+        return (bool)(atomic_load_explicit(&v, std::memory_order_consume));
+#endif
+    }
+
 public:
     shared_atomic() { }
 
-    void set(T i)
+    static bool is_lockfree()
     {
-        v = std::make_shared<std::atomic<T> >(i);
+#if BOOST_COMP_MSVC
+        return false;
+#else
+        return std::atomic_is_lock_free(std::shared_ptr<T>());
+#endif
     }
 
-    void set(const std::atomic<T>& i)
+    template <typename U>
+    void reset(U* p)
     {
-        set(i.load());
+#if BOOST_COMP_MSVC
+        scope_lock(mtx);
+        v.reset(p);
+#else
+        std::atomic_store_explicit(&v, std::make_shared<T>(p), std::memory_order_consume);
+#endif
     }
 
-    void set(const std::shared_ptr<std::atomic<T> >& i)
+    template <typename U>
+    shared_atomic& operator=(const std::shared_ptr<U>& x)
     {
-        v = i;
-    }
-
-    void set(const shared_atomic<T>& i)
-    {
-        v = i.raw();
-    }
-
-    shared_atomic(T i)
-    {
-        set(i);
-    }
-
-    shared_atomic(const std::atomic<T>& i)
-    {
-        set(i);
-    }
-
-    shared_atomic(const std::shared_ptr<std::atomic<T> >& i)
-    {
-        set(i);
-    }
-
-    shared_atomic(const shared_atomic<T>& i)
-    {
-        set(i);
-    }
-
-    shared_atomic<T>& operator=(T i)
-    {
-        set(i);
+#if BOOST_COMP_MSVC
+        scope_lock(mtx);
+        v = x;
+#else
+        std::atomic_store_explicit(&v, x, std::memory_order_consume);
+#endif
         return *this;
     }
 
-    shared_atomic<T>& operator=(const std::atomic<T>& i)
+    template <typename U>
+    shared_atomic& operator=(const shared_atomic<U>& x)
     {
-        set(i);
+#if BOOST_COMP_MSVC
+        scope_lock(mtx);
+        v = x.v;
+#else
+        std::atomic_store_explicit(&v, x.v, std::memory_order_consume);
+#endif
         return *this;
     }
 
-    shared_atomic<T>& operator=(const std::shared_ptr<std::atomic<T> >& i)
+    template <typename U>
+    shared_atomic(U&& i)
     {
-        set(i);
-        return *this;
-    }
-
-    shared_atomic<T>& operator=(const shared_atomic<T>& i)
-    {
-        set(i);
-        return *this;
-    }
-
-    std::atomic<T>* atomic() const
-    {
-        return v.get();
-    }
-
-private:
-    bool has_value() const
-    {
-        return atomic() != nullptr;
+        operator=(i);
     }
 
 public:
-    const std::shared_ptr<std::atomic<T> >& shared_ptr_ref() const
+    operator std::shared_ptr<T>() const
     {
+#if BOOST_COMP_MSVC
+        scope_lock(mtx);
         return v;
+#else
+        return std::atomic_load_explicit(v, std::memory_order_consume);
+#endif
     }
 
-    std::shared_ptr<std::atomic<T> >& shared_ptr_ref()
+    T* get() const
     {
-        return v;
+        return (operator std::shared_ptr<T>)().get();
     }
 
-    const std::shared_ptr<std::atomic<T> >& raw() const
+    T& load() const
     {
-        return shared_ptr_ref();
+        return *get();
     }
 
-    std::shared_ptr<std::atomic<T> >& raw()
+    T* operator->() const
     {
-        return shared_ptr_ref();
+        return get();
     }
 
-    std::atomic<T>& atomic_ref() const
-    {
-        assert(has_value());
-        return (*v);
-    }
-
-    T load() const
-    {
-        return atomic_ref().load();
-    }
-
-    T operator*() const
+    T& operator*() const
     {
         return load();
     }
 
-    std::atomic<T>& operator+() const
+    template <typename U>
+    void swap(std::shared_ptr<U>& i)
     {
-        return atomic_ref();
+#if BOOST_COMP_MSVC
+        scope_lock(mtx);
+        v.swap(i);
+#else
+        i = std::make_shared<T>(
+                std::atomic_exchange_explicit(&v,
+                                              i,
+                                              std::memory_order_consume));
+#endif
     }
 
-    const std::shared_ptr<std::atomic<T> >& operator-() const
+    template <typename U>
+    void swap(shared_atomic<U>& i)
     {
-        return shared_ptr_ref();
+#if BOOST_COMP_MSVC
+        scope_lock(mtx);
+        scope_lock(i.mtx);
+        v.swap(i.v);
+#else
+        i = std::make_shared<T>(
+                std::atomic_exchange_explicit(&v,
+                    std::atomic_load_explicit(i.v,
+                                              std::memory_order_consume)),
+                    std::memory_order_consume);
+#endif
     }
 
-    std::shared_ptr<std::atomic<T> >& operator-()
+    template <typename U>
+    void compare_exchange_weak(std::shared_ptr<T>* expected,
+                               std::shared_ptr<T> desired)
     {
-        return shared_ptr_ref();
+        return std::atomic_compare_exchange_weak_explicit(
+                    &v,
+                    expected,
+                    desired,
+                    std::memory_order_consume);
     }
 
-    bool compare_exchange_weak(T& expected,
-                               T val,
-                               std::memory_order order = std::memory_order_seq_cst)
+    template <typename U>
+    void compare_exchange_strong(std::shared_ptr<T>* expected,
+                                 std::shared_ptr<T> desired)
     {
-        return (*v).compare_exchange_weak(expected, val, order);
+        return std::atomic_compare_exchange_strong_explicit(
+                    &v,
+                    expected,
+                    desired,
+                    std::memory_order_consume);
+    }
+
+    long int used_count() const
+    {
+        return v.used_count();
+    }
+
+    bool unique() const
+    {
+        return v.unique();
     }
 };
 

@@ -5,6 +5,7 @@
 #include <atomic>
 #include <utility>
 #include <stdlib.h>
+#include <boost/predef.h>
 #include "../../app_info/assert.hpp"
 
 template <template <typename T> class slimqless, typename T>
@@ -64,8 +65,11 @@ public:
 };
 
 template <typename T>
-// using qless = qless_template<slimqless, T>;
+#if BOOST_COMP_MSVC
 using qless = slimqless<T>;
+#else
+using qless = qless_template<slimqless, T>;
+#endif
 
 template <typename T>
 using qless2 = qless_template<slimqless2, T>;

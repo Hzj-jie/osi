@@ -1,6 +1,21 @@
 
 #pragma once
-/*
+#include <boost/predef.h>
+
+#include "qless3.hpp"
+
+template <typename T>
+using slimqless = qless3<T>;
+
+#if false
+
+#if BOOST_COMP_MSVC
+#include "qless3.hpp"
+
+template <typename T>
+using slimqless = qless3<T>;
+#else
+
 #include <utility>
 #include <atomic>
 #include <memory>
@@ -167,10 +182,8 @@ public:
         clear();
     }
 };
-*/
 
-#include "qless3.hpp"
+#endif
 
-template <typename T>
-using slimqless = qless3<T>;
+#endif
 

@@ -35,7 +35,7 @@ utt: main.cpp icase.hpp ../sync/lock.hpp utt_assert.hpp \
  ../utt_cases/sync/../../sync/reset_event.hpp \
  ../utt_cases/formation/concurrent/slimqless_single_test.hpp \
  ../utt_cases/formation/concurrent/../../../formation/concurrent/slimqless.hpp \
- ../utt_cases/formation/concurrent/../../../formation/concurrent/qless3.hpp \
+ ../utt_cases/formation/concurrent/../../../formation/concurrent/../../app_info/assert.hpp \
  ../utt_cases/formation/concurrent/slimqless_test.hpp \
  ../utt_cases/formation/concurrent/slimqless_test_template.hpp \
  ../utt_cases/formation/concurrent/../../../app_info/assert.hpp \
@@ -53,7 +53,6 @@ utt: main.cpp icase.hpp ../sync/lock.hpp utt_assert.hpp \
  ../utt_cases/formation/concurrent/../../../formation/concurrent/slimqless2.hpp \
  ../utt_cases/formation/concurrent/qless_test.hpp \
  ../utt_cases/formation/concurrent/../../../formation/concurrent/qless.hpp \
- ../utt_cases/formation/concurrent/../../../formation/concurrent/../../app_info/assert.hpp \
  ../utt_cases/utils/pattern_matcher_test.hpp \
  ../utt_cases/utt/utt_specific_test.hpp \
  ../utt_cases/utt/utt_failure_test.hpp \
@@ -68,9 +67,12 @@ utt: main.cpp icase.hpp ../sync/lock.hpp utt_assert.hpp \
  ../utt_cases/formation/concurrent/slimqless_perf_test.hpp \
  ../utt_cases/formation/concurrent/slimqless2_perf_test.hpp \
  ../utt_cases/formation/concurrent/qless3_test.hpp \
+ ../utt_cases/formation/concurrent/../../../formation/concurrent/qless3.hpp \
  ../utt_cases/formation/concurrent/qless3_perf_test.hpp \
  ../utt_cases/sync/exclusive_container_test.hpp \
- ../utt_cases/sync/../../sync/exclusive_container.hpp
+ ../utt_cases/sync/../../sync/exclusive_container.hpp \
+ ../utt_cases/sync/shared_atomic_test.hpp \
+ ../utt_cases/sync/../../sync/shared_atomic.hpp
 	g++ main.cpp -o utt -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3 -lboost_filesystem -lboost_system
 
 clean:
