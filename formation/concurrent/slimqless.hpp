@@ -7,7 +7,7 @@
 template <typename T>
 using slimqless = qless3<T>;
 
-#if false
+#if 0
 
 #if BOOST_COMP_MSVC
 #include "qless3.hpp"

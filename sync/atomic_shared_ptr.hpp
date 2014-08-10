@@ -12,7 +12,7 @@
 #endif
 
 template <typename T>
-struct shared_atomic final
+struct atomic_shared_ptr final
 {
 private:
     std::shared_ptr<T> v;
@@ -31,7 +31,7 @@ private:
     }
 
 public:
-    shared_atomic() { }
+    atomic_shared_ptr() { }
 
     static bool is_lockfree()
     {
@@ -54,7 +54,7 @@ public:
     }
 
     template <typename U>
-    shared_atomic& operator=(const std::shared_ptr<U>& x)
+    atomic_shared_ptr& operator=(const std::shared_ptr<U>& x)
     {
 #if BOOST_COMP_MSVC
         scope_lock(mtx);
@@ -66,7 +66,7 @@ public:
     }
 
     template <typename U>
-    shared_atomic& operator=(const shared_atomic<U>& x)
+    atomic_shared_ptr& operator=(const atomic_shared_ptr<U>& x)
     {
 #if BOOST_COMP_MSVC
         scope_lock(mtx);
@@ -78,7 +78,7 @@ public:
     }
 
     template <typename U>
-    shared_atomic(U&& i)
+    atomic_shared_ptr(U&& i)
     {
         operator=(i);
     }
@@ -129,18 +129,18 @@ public:
     }
 
     template <typename U>
-    void swap(shared_atomic<U>& i)
+    void swap(atomic_shared_ptr<U>& i)
     {
 #if BOOST_COMP_MSVC
         scope_lock(mtx);
         scope_lock(i.mtx);
         v.swap(i.v);
 #else
-        i = std::make_shared<T>(
-                std::atomic_exchange_explicit(&v,
-                    std::atomic_load_explicit(i.v,
-                                              std::memory_order_consume)),
-                    std::memory_order_consume);
+        i.v = std::make_shared<T>(
+                  std::atomic_exchange_explicit(&v,
+                      std::atomic_load_explicit(i.v,
+                                                std::memory_order_consume)),
+                      std::memory_order_consume);
 #endif
     }
 
@@ -176,7 +176,4 @@ public:
         return v.unique();
     }
 };
-
-template <typename T>
-using shared_atomic_ptr = shared_atomic<T*>;
 
