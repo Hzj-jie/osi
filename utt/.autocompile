@@ -1,8 +1,9 @@
 
 out utt
-#cc-flag2 -ggdb -static
+#cc-flag2 -static -pthread
+cc-flag2 -pthread
 libs /usr/local/lib/libboost_filesystem.a /usr/local/lib/libboost_system.a
 #dlibs boost_filesystem boost_system
-#cc-flag2 -ggdb -fno-inline-functions
-#cc-flag2 -static -g3 -fno-inline -O0 -pthread
+#cc-flag2 -ggdb -fno-inline-functions -pthread
+#cc-flag2 -static -g3 -fno-inline -O0 -pthread -D_GLIBCXX_DEBUG /usr/lib/i386-linux-gnu/debug/libstdc++.a
 
