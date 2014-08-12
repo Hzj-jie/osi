@@ -26,4 +26,5 @@
 #include "../utt_cases/formation/concurrent/qless3_perf_test.hpp"
 #include "../utt_cases/sync/exclusive_container_test.hpp"
 #include "../utt_cases/sync/atomic_shared_ptr_test.hpp"
+#include "../utt_cases/utils/cd_object_test.hpp"
 

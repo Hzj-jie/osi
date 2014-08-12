@@ -18,7 +18,7 @@ namespace __queue_runner_private
 static class queue_runner_t
 {
 private:
-    qless<std::function<bool()> > q;
+    qless<std::function<bool()>> q;
     auto_reset_event are;
     std::vector<std::thread> threads;
     volatile bool running;

@@ -20,14 +20,14 @@ private:
         {
             using namespace std;
             using namespace std::chrono;
-            return duration_cast<duration<int64_t, nano> >(T::now().time_since_epoch()).count();
+            return duration_cast<duration<int64_t, nano>>(T::now().time_since_epoch()).count();
         }
 
         int64_t milliseconds() const
         {
             using namespace std;
             using namespace std::chrono;
-            return duration_cast<duration<int64_t, milli> >(T::now().time_since_epoch()).count();
+            return duration_cast<duration<int64_t, milli>>(T::now().time_since_epoch()).count();
         }
     };
 public:

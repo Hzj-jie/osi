@@ -8,7 +8,7 @@
 #include <map>
 #include "strcmp.hpp"
 
-template <typename Equal = equal<char> >
+template <typename Equal = equal<char>>
 struct str_pattern_matcher_typedef
 {
 public:
@@ -21,38 +21,38 @@ public:
             Type;
 };
 
-template <typename Equal = equal<char> >
+template <typename Equal = equal<char>>
 class str_pattern_matcher :
         public str_pattern_matcher_typedef<Equal>::Type
 {
 private:
     typedef typename str_pattern_matcher_typedef<Equal>::Type Base;
 
-    static std::vector<std::pair<const char*, uint32_t> >
+    static std::vector<std::pair<const char*, uint32_t>>
            convert(const std::vector<const char*>& v)
     {
         using namespace std;
-        vector<pair<const char*, uint32_t> > r;
+        vector<pair<const char*, uint32_t>> r;
         for(size_t i = 0; i < v.size(); i++)
             r.push_back(make_pair(v[i], strlen(v[i])));
         return r;
     }
 
-    static std::vector<std::pair<const char*, uint32_t> >
+    static std::vector<std::pair<const char*, uint32_t>>
            convert(const std::vector<std::string>& v)
     {
         using namespace std;
-        vector<pair<const char*, uint32_t> > r;
+        vector<pair<const char*, uint32_t>> r;
         for(size_t i = 0; i < v.size(); i++)
             r.push_back(make_pair(v[i].c_str(), v[i].length()));
         return r;
     }
 
-    static std::vector<std::pair<const char*, uint32_t> >
-           convert(const std::vector<std::pair<const std::string, uint32_t> >& v)
+    static std::vector<std::pair<const char*, uint32_t>>
+           convert(const std::vector<std::pair<const std::string, uint32_t>>& v)
     {
         using namespace std;
-        vector<pair<const char*, uint32_t> > r;
+        vector<pair<const char*, uint32_t>> r;
         for(size_t i = 0; i < v.size(); i++)
             r.push_back(make_pair(v[i].first.c_str(), v[i].second));
         return r;
@@ -226,7 +226,7 @@ public:
                                str.length());
     }
 
-    static bool match_any(const std::vector<std::pair<const char*, uint32_t> >& patterns,
+    static bool match_any(const std::vector<std::pair<const char*, uint32_t>>& patterns,
                           const char* const str,
                           const uint32_t str_start)
     {
@@ -236,7 +236,7 @@ public:
                                strlen(str));
     }
 
-    static bool match_any(const std::vector<std::pair<const char*, uint32_t> >& patterns,
+    static bool match_any(const std::vector<std::pair<const char*, uint32_t>>& patterns,
                           const char* const str)
     {
         return Base::match_any(patterns,
@@ -245,7 +245,7 @@ public:
                                strlen(str));
     }
 
-    static bool match_any(const std::vector<std::pair<const char*, uint32_t> >& patterns,
+    static bool match_any(const std::vector<std::pair<const char*, uint32_t>>& patterns,
                           const std::string& str,
                           const uint32_t str_start,
                           const uint32_t str_len)
@@ -256,7 +256,7 @@ public:
                                str_len);
     }
 
-    static bool match_any(const std::vector<std::pair<const char*, uint32_t> >& patterns,
+    static bool match_any(const std::vector<std::pair<const char*, uint32_t>>& patterns,
                           const std::string& str,
                           const uint32_t str_start)
     {
@@ -266,7 +266,7 @@ public:
                                str.length());
     }
 
-    static bool match_any(const std::vector<std::pair<const char*, uint32_t> >& patterns,
+    static bool match_any(const std::vector<std::pair<const char*, uint32_t>>& patterns,
                           const std::string& str)
     {
         return Base::match_any(patterns,
@@ -395,7 +395,7 @@ public:
                                str.length());
     }
 
-    static bool match_any(const std::vector<std::pair<const std::string, uint32_t> >& patterns,
+    static bool match_any(const std::vector<std::pair<const std::string, uint32_t>>& patterns,
                           const char* const str,
                           const uint32_t str_start,
                           const uint32_t str_len)
@@ -406,7 +406,7 @@ public:
                                str_len);
     }
 
-    static bool match_any(const std::vector<std::pair<const std::string, uint32_t> >& patterns,
+    static bool match_any(const std::vector<std::pair<const std::string, uint32_t>>& patterns,
                           const char* const str,
                           const uint32_t str_start)
     {
@@ -416,7 +416,7 @@ public:
                                strlen(str));
     }
 
-    static bool match_any(const std::vector<std::pair<const std::string, uint32_t> >& patterns,
+    static bool match_any(const std::vector<std::pair<const std::string, uint32_t>>& patterns,
                           const char* const str)
     {
         return Base::match_any(convert(patterns),
@@ -425,7 +425,7 @@ public:
                                strlen(str));
     }
 
-    static bool match_any(const std::vector<std::pair<const std::string, uint32_t> >& patterns,
+    static bool match_any(const std::vector<std::pair<const std::string, uint32_t>>& patterns,
                           const std::string& str,
                           const uint32_t str_start,
                           const uint32_t str_len)
@@ -436,7 +436,7 @@ public:
                                str_len);
     }
 
-    static bool match_any(const std::vector<std::pair<const std::string, uint32_t> >& patterns,
+    static bool match_any(const std::vector<std::pair<const std::string, uint32_t>>& patterns,
                           const std::string& str,
                           const uint32_t str_start)
     {
@@ -446,7 +446,7 @@ public:
                                str.length());
     }
 
-    static bool match_any(const std::vector<std::pair<const std::string, uint32_t> >& patterns,
+    static bool match_any(const std::vector<std::pair<const std::string, uint32_t>>& patterns,
                           const std::string& str)
     {
         return Base::match_any(convert(patterns),
@@ -457,7 +457,7 @@ public:
 };
 
 class case_sensitive_str_pattern_matcher :
-        public str_pattern_matcher<equal<char> > { };
+        public str_pattern_matcher<equal<char>> { };
 
 class case_insensitive_str_pattern_matcher :
         public str_pattern_matcher<case_insensitive_equal> { };

@@ -7,6 +7,8 @@
 #endif
 #define scope_lock(x) \
             std::unique_lock<std::mutex> __SCOPE_LOCK_UNIQUE_LOCK_INSTANCE(x);
+#define scope_lock2(x) \
+            std::unique_lock<std::mutex> __SCOPE_LOCK_UNIQUE_LOCK_INSTANCE2(x);
 
 #ifdef static_scope_lock
     static_scope_lock redefined

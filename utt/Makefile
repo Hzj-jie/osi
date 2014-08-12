@@ -72,7 +72,10 @@ utt: main.cpp icase.hpp ../sync/lock.hpp utt_assert.hpp \
  ../utt_cases/sync/exclusive_container_test.hpp \
  ../utt_cases/sync/../../sync/exclusive_container.hpp \
  ../utt_cases/sync/atomic_shared_ptr_test.hpp \
+ ../utt_cases/sync/../../app_info/assert.hpp \
  ../utt_cases/sync/../../sync/atomic_shared_ptr.hpp \
+ ../utt_cases/sync/../../utils/cd_object.hpp \
+ ../utt_cases/utils/cd_object_test.hpp \
  /usr/local/lib/libboost_filesystem.a \
  /usr/local/lib/libboost_system.a
 	g++ main.cpp -o utt -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3 -pthread /usr/local/lib/libboost_filesystem.a /usr/local/lib/libboost_system.a

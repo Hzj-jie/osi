@@ -5,8 +5,11 @@
 #include <memory>
 #include <utility>
 #include "../app_info/assert.hpp"
+#include "../sync/spin_wait.hpp"
+#include <utility>
 
-#if BOOST_COMP_MSVC
+#define ATOMIC_SHARED_PTR_USE_LOCK (!BOOST_COMP_CLANG)
+#if ATOMIC_SHARED_PTR_USE_LOCK
 #include "lock.hpp"
 #include <mutex>
 #endif
@@ -16,26 +19,26 @@ struct atomic_shared_ptr final
 {
 private:
     std::shared_ptr<T> v;
-#if BOOST_COMP_MSVC
-    std::mutex mtx;
+#if ATOMIC_SHARED_PTR_USE_LOCK
+    mutable std::mutex mtx;
 #endif
 
     bool has_value() const
     {
-#if BOOST_COMP_MSVC
+#if ATOMIC_SHARED_PTR_USE_LOCK
         scope_lock(mtx);
         return (bool)(v);
 #else
-        return (bool)(atomic_load_explicit(&v, std::memory_order_consume));
+        return (bool)(std::atomic_load_explicit(&v, std::memory_order_consume));
 #endif
     }
 
 public:
     atomic_shared_ptr() { }
 
-    static bool is_lockfree()
+    static bool is_lock_free()
     {
-#if BOOST_COMP_MSVC
+#if ATOMIC_SHARED_PTR_USE_LOCK
         return false;
 #else
         return std::atomic_is_lock_free(std::shared_ptr<T>());
@@ -45,7 +48,7 @@ public:
     template <typename U>
     void reset(U* p)
     {
-#if BOOST_COMP_MSVC
+#if ATOMIC_SHARED_PTR_USE_LOCK
         scope_lock(mtx);
         v.reset(p);
 #else
@@ -56,7 +59,7 @@ public:
     template <typename U>
     atomic_shared_ptr& operator=(const std::shared_ptr<U>& x)
     {
-#if BOOST_COMP_MSVC
+#if ATOMIC_SHARED_PTR_USE_LOCK
         scope_lock(mtx);
         v = x;
 #else
@@ -68,13 +71,18 @@ public:
     template <typename U>
     atomic_shared_ptr& operator=(const atomic_shared_ptr<U>& x)
     {
-#if BOOST_COMP_MSVC
+#if ATOMIC_SHARED_PTR_USE_LOCK
         scope_lock(mtx);
         v = x.v;
 #else
         std::atomic_store_explicit(&v, x.v, std::memory_order_consume);
 #endif
         return *this;
+    }
+
+    atomic_shared_ptr& operator=(const atomic_shared_ptr<T>& x)
+    {
+        return operator=<T>(x);
     }
 
     template <typename U>
@@ -86,11 +94,11 @@ public:
 public:
     operator std::shared_ptr<T>() const
     {
-#if BOOST_COMP_MSVC
+#if ATOMIC_SHARED_PTR_USE_LOCK
         scope_lock(mtx);
         return v;
 #else
-        return std::atomic_load_explicit(v, std::memory_order_consume);
+        return std::atomic_load_explicit(&v, std::memory_order_consume);
 #endif
     }
 
@@ -117,7 +125,7 @@ public:
     template <typename U>
     void swap(std::shared_ptr<U>& i)
     {
-#if BOOST_COMP_MSVC
+#if ATOMIC_SHARED_PTR_USE_LOCK
         scope_lock(mtx);
         v.swap(i);
 #else
@@ -131,39 +139,62 @@ public:
     template <typename U>
     void swap(atomic_shared_ptr<U>& i)
     {
-#if BOOST_COMP_MSVC
+#if ATOMIC_SHARED_PTR_USE_LOCK
         scope_lock(mtx);
-        scope_lock(i.mtx);
+        scope_lock2(i.mtx);
         v.swap(i.v);
 #else
         i.v = std::make_shared<T>(
                   std::atomic_exchange_explicit(&v,
-                      std::atomic_load_explicit(i.v,
+                      std::atomic_load_explicit(&i.v,
                                                 std::memory_order_consume)),
                       std::memory_order_consume);
 #endif
     }
 
     template <typename U>
-    void compare_exchange_weak(std::shared_ptr<T>* expected,
-                               std::shared_ptr<T> desired)
+    bool compare_exchange_weak(std::shared_ptr<U>* expected,
+                               std::shared_ptr<U> desired)
     {
+#if ATOMIC_SHARED_PTR_USE_LOCK
+        if(expected == nullptr) return false;
+        else
+        {
+            scope_lock(mtx);
+            if(v.get() == expected->get())
+            {
+                v = desired;
+                return true;
+            }
+            else
+            {
+                *expected = v;
+                return false;
+            }
+        }
+#else
         return std::atomic_compare_exchange_weak_explicit(
                     &v,
                     expected,
                     desired,
                     std::memory_order_consume);
+#endif
     }
 
     template <typename U>
-    void compare_exchange_strong(std::shared_ptr<T>* expected,
-                                 std::shared_ptr<T> desired)
+    bool compare_exchange_strong(std::shared_ptr<U>* expected,
+                                 std::shared_ptr<U> desired)
     {
+#if ATOMIC_SHARED_PTR_USE_LOCK
+        std_this_thread_wait_until(compare_exchange_weak(expected, desired));
+        return true;
+#else
         return std::atomic_compare_exchange_strong_explicit(
                     &v,
                     expected,
                     desired,
                     std::memory_order_consume);
+#endif
     }
 
     long int used_count() const
@@ -176,4 +207,10 @@ public:
         return v.unique();
     }
 };
+
+template <typename T, typename... Args>
+atomic_shared_ptr<T> make_atomic_shared(Args&&... args)
+{
+    return atomic_shared_ptr<T>(std::make_shared<T>(std::forward<Args>(args)...));
+}
 

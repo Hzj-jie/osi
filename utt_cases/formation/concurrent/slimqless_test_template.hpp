@@ -55,7 +55,7 @@ namespace __slimqless_test_template_private
                        repeat_case_wrapper<
                            slimqless_perf_case<slimqless>,
                            repeat_count>,
-                       thread_count> > { };
+                       thread_count>> { };
 }
 
 template <template <typename T> class slimqless, uint32_t thread_count>

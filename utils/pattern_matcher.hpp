@@ -20,7 +20,7 @@ template <typename CharT,
           CharT add_sign,
           CharT multi_matching_sign,
           CharT single_matching_sign,
-          typename Equal = equal<CharT> >
+          typename Equal = equal<CharT>>
 class pattern_matcher
 {
 public:
@@ -109,7 +109,7 @@ public:
         }
     }
 
-    static bool match_any(const std::vector<std::pair<const CharT*, uint32_t> >& patterns,
+    static bool match_any(const std::vector<std::pair<const CharT*, uint32_t>>& patterns,
                           const CharT* const str,
                           const uint32_t str_start,
                           const uint32_t str_len)
