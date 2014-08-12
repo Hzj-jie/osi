@@ -8,7 +8,7 @@
 #include "../sync/spin_wait.hpp"
 #include <utility>
 
-#define ATOMIC_SHARED_PTR_USE_LOCK (!BOOST_COMP_CLANG)
+#define ATOMIC_SHARED_PTR_USE_LOCK 1
 #if ATOMIC_SHARED_PTR_USE_LOCK
 #include "lock.hpp"
 #include <mutex>
