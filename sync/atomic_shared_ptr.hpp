@@ -56,6 +56,11 @@ public:
 #endif
     }
 
+    void reset()
+    {
+        reset<T>(nullptr);
+    }
+
     template <typename U>
     atomic_shared_ptr& operator=(const std::shared_ptr<U>& x)
     {
@@ -144,11 +149,11 @@ public:
         scope_lock2(i.mtx);
         v.swap(i.v);
 #else
-        i.v = std::make_shared<T>(
-                  std::atomic_exchange_explicit(&v,
-                      std::atomic_load_explicit(&i.v,
-                                                std::memory_order_consume)),
-                      std::memory_order_consume);
+        i.v = std::atomic_exchange_explicit(
+                    &v,
+                    std::atomic_load_explicit(&i.v,
+                                              std::memory_order_consume)),
+                    std::memory_order_consume;
 #endif
     }
 
@@ -197,9 +202,9 @@ public:
 #endif
     }
 
-    long int used_count() const
+    long int use_count() const
     {
-        return v.used_count();
+        return v.use_count();
     }
 
     bool unique() const

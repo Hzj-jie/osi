@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include "../../utils/random.hpp"
 #include "../../app_info/trace.hpp"
+#include "../../envs/os.hpp"
 
 class atomic_shared_ptr_case : public icase
 {
@@ -41,15 +42,15 @@ private:
     std::atomic<uint32_t> times;
 
 public:
-    atomic_shared_ptr_case() : times(0)
-    {
-        root.reset(new cd_object<C>());
-    }
+    atomic_shared_ptr_case() : times(0) { }
 
     bool prepare() override
     {
+        compiler_barrier();
         times = 0;
-        root->ref().reset();
+        root.reset();
+        cd_object<C>::reset();
+        root.reset(new cd_object<C>());
         return icase::prepare();
     }
 
@@ -79,6 +80,8 @@ public:
             t = new atomic_shared_ptr<cd_object<C>>(std::shared_ptr<cd_object<C>>(root));
         }
         assert(t != nullptr);
+        utt_assert.more(t->use_count(), 1);
+        utt_assert.is_false(t->unique());
         t->get()->ref().increment();
         delete t;
         return true;
@@ -108,6 +111,8 @@ public:
                          ", ",
                          cd_object<C>::instance_count(),
                          CODE_POSITION());
+        utt_assert.is_true(root.unique());
+        utt_assert.equal(root.use_count(), 1);
         return icase::cleanup();
     }
 
