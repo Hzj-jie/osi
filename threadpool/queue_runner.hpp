@@ -7,6 +7,7 @@
 #include <functional>
 #include "../envs/processor.hpp"
 #include <algorithm>
+#include <atomic>
 #include <utility>
 #include <vector>
 #include <thread>
@@ -46,16 +47,36 @@ template <template <typename T> class qless>
 class queue_runner_t final
 {
 public:
-    typedef std::function<bool(void)> func_type;
-    typedef func_type* func_pointer;
+    class queuer
+    {
+    public:
+        virtual bool operator()() = 0;
+        virtual ~queuer() { }
+    };
 
 private:
-    qless<func_pointer> q;
+    class func_queuer : public queuer
+    {
+    private:
+        const std::function<bool(void)> f;
+    public:
+        func_queuer(std::function<bool(void)>&& f) :
+            f(std::move(f)) { }
+
+        bool operator()() override
+        {
+            return f();
+        }
+    };
+
+private:
+    qless<queuer*> q;
     auto_reset_event are;
     std::vector<std::thread> threads;
     volatile bool running;
+    std::atomic<uint32_t> working;
 
-    bool check(func_pointer p)
+    bool check(queuer* p)
     {
         assert(p != nullptr);
         bool r = false;
@@ -74,7 +95,12 @@ public:
         return q.empty();
     }
 
-    bool push(func_pointer p)
+    bool idle() const
+    {
+        return empty() && (working.load(std::memory_order_consume) == 0);
+    }
+
+    bool push(queuer* p)
     {
         if(p == nullptr) return false;
         else
@@ -84,12 +110,12 @@ public:
         }
     }
 
-    bool push(func_type&& p)
+    bool push(std::function<bool(void)>&& p)
     {
-        return push(new func_type(std::move(p)));
+        return assert(push(new func_queuer(std::move(p))));
     }
 
-    bool check_push(func_pointer p)
+    bool check_push(queuer* p)
     {
         if(p == nullptr) return false;
         else
@@ -99,9 +125,9 @@ public:
         }
     }
 
-    bool check_push(func_type&& p)
+    bool check_push(std::function<bool(void)>&& p)
     {
-        return check_push(new func_type(std::move(p)));
+        return check_push(new func_queuer(std::move(p)));
     }
     
 private:
@@ -112,11 +138,17 @@ private:
             size_t size = this->size();
             if(queue_runner_config.thread_count > 1)
                 size = ceil((double)size / queue_runner_config.thread_count);
-            func_pointer p = nullptr;
-            while(size > 0 && q.pop(p))
+            if(size > 0)
             {
-                assert(check_push(p));
-                size--;
+                assert(working.fetch_add(1, std::memory_order_release) <=
+                       queue_runner_config.thread_count);
+                queuer* p = nullptr;
+                while(size > 0 && q.pop(p))
+                {
+                    assert(check_push(p));
+                    size--;
+                }
+                assert(working.fetch_sub(1, std::memory_order_release) >= 0);
             }
             if(!queue_runner_config.busy_wait)
                 are.wait(queue_runner_config.interval_ms);
@@ -131,7 +163,8 @@ public:
 
     // public for test purpose
     queue_runner_t() :
-        running(true)
+        running(true),
+        working(0)
     {
         for(uint32_t i = 0; i < queue_runner_config.thread_count; i++)
             threads.push_back(std::thread(&queue_runner_t::work, this, i));
@@ -142,7 +175,7 @@ public:
         running = false;
         for(uint32_t i = 0; i < threads.size(); i++)
             threads[i].join();
-        func_pointer p = nullptr;
+        queuer* p = nullptr;
         while(q.pop(p)) delete p;
     }
 
