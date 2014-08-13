@@ -129,10 +129,9 @@ public:
         scope_lock(mtx);
         v.swap(i);
 #else
-        i = std::make_shared<T>(
-                std::atomic_exchange_explicit(&v,
-                                              i,
-                                              std::memory_order_consume));
+        i = std::atomic_exchange_explicit(&v,
+                                          i,
+                                          std::memory_order_consume);
 #endif
     }
 
@@ -144,11 +143,11 @@ public:
         scope_lock2(i.mtx);
         v.swap(i.v);
 #else
-        i.v = std::make_shared<T>(
-                  std::atomic_exchange_explicit(&v,
-                      std::atomic_load_explicit(&i.v,
-                                                std::memory_order_consume)),
-                      std::memory_order_consume);
+        i.v = std::atomic_exchange_explicit(
+                  &v,
+                  std::atomic_load_explicit(&i.v,
+                                            std::memory_order_consume),
+                  std::memory_order_consume);
 #endif
     }
 

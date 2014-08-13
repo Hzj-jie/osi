@@ -15,6 +15,7 @@
 #include "../const/character.hpp"
 #include "../envs/nowadays.hpp"
 #include <utility>
+#include <exception>
 
 static std::ostream& operator<<(std::ostream& os, const std::ostringstream& v)
 {
@@ -172,4 +173,15 @@ static void raise_error(Args&&... args)
 										  character.null,
 										  std::forward<Args>(args)...);
 }
+
+#undef ERROR_HANDLE_STARTUP_MESSAGE
+
+#include "trace.hpp"
+
+#define catch_exception(x) { \
+        try { x; } \
+        catch(const std::exception& e) { \
+            raise_error(error_type::critical, ", unhandled exception caught, ", e.what(), CODE_POSITION()); } \
+        catch(...) { \
+            raise_error(error_type::critical, ", unhandled exception caught", CODE_POSITION()); } }
 

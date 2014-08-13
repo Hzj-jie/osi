@@ -58,9 +58,11 @@ utt: main.cpp icase.hpp ../sync/lock.hpp utt_assert.hpp \
  ../utt_cases/utt/utt_specific_test.hpp \
  ../utt_cases/utt/utt_failure_test.hpp \
  ../utt_cases/threadpool/queue_runner_test.hpp \
+ ../utt_cases/threadpool/../../app_info/assert.hpp \
  ../utt_cases/threadpool/../../threadpool/queue_runner.hpp \
  ../utt_cases/threadpool/../../threadpool/../envs/preenv.hpp \
  ../utt_cases/threadpool/../../threadpool/../envs/envs.hpp \
+ ../utt_cases/threadpool/../../threadpool/../app_info/assert.hpp \
  ../utt_cases/envs/envs_test.hpp ../utt_cases/utils/str_contains_test.hpp \
  ../utt_cases/utils/../../app_info/assert.hpp \
  ../utt_cases/utils/timing_counter_test.hpp \

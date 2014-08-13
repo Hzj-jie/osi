@@ -15,6 +15,8 @@ public:
     const bool busy_wait;
     const uint32_t queue_runner_thread_count;
     const uint32_t threadpool_thread_count;
+    const uint32_t queue_runner_interval_ms;
+    const uint32_t interval_ms;
 private:
     static void add_combination(std::vector<std::string>& r, const std::vector<std::string>& inputs)
     {
@@ -54,7 +56,9 @@ private:
     preenv_t() :
         busy_wait(envs.has(env_keys({"busy", "wait"}))),
         queue_runner_thread_count(from_str<uint32_t>(string_envs(env_keys({"queue", "runner", "thread", "count"})))),
-        threadpool_thread_count(from_str<uint32_t>(string_envs(env_keys({"threadpool", "thread", "count"}))))
+        threadpool_thread_count(from_str<uint32_t>(string_envs(env_keys({"threadpool", "thread", "count"})))),
+        queue_runner_interval_ms(from_str<uint32_t>(string_envs(env_keys({"queue", "runner", "interval", "ms"})))),
+        interval_ms(from_str<uint32_t>(string_envs(env_keys({"interval", "ms"}))))
     {}
 
     CONST_SINGLETON(preenv_t);

@@ -65,11 +65,7 @@ public:
 };
 
 template <typename T>
-#if BOOST_COMP_MSVC
 using qless = slimqless<T>;
-#else
-using qless = qless_template<slimqless, T>;
-#endif
 
 template <typename T>
 using qless2 = qless_template<slimqless2, T>;
