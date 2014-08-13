@@ -8,7 +8,7 @@
 #include "../sync/spin_wait.hpp"
 #include <utility>
 
-#define ATOMIC_SHARED_PTR_USE_LOCK (!BOOST_COMP_CLANG)
+#define ATOMIC_SHARED_PTR_USE_LOCK 1
 #if ATOMIC_SHARED_PTR_USE_LOCK
 #include "lock.hpp"
 #include <mutex>
@@ -54,6 +54,11 @@ public:
 #else
         std::atomic_store_explicit(&v, std::make_shared<T>(p), std::memory_order_consume);
 #endif
+    }
+
+    void reset()
+    {
+        reset<T>(nullptr);
     }
 
     template <typename U>
@@ -196,9 +201,9 @@ public:
 #endif
     }
 
-    long int used_count() const
+    long int use_count() const
     {
-        return v.used_count();
+        return v.use_count();
     }
 
     bool unique() const
