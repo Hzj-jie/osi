@@ -35,7 +35,7 @@ utt: main.cpp icase.hpp ../sync/lock.hpp utt_assert.hpp \
  ../utt_cases/sync/../../sync/reset_event.hpp \
  ../utt_cases/formation/concurrent/slimqless_single_test.hpp \
  ../utt_cases/formation/concurrent/../../../formation/concurrent/slimqless.hpp \
- ../utt_cases/formation/concurrent/../../../formation/concurrent/qless3.hpp \
+ ../utt_cases/formation/concurrent/../../../formation/concurrent/slimqless2.hpp \
  ../utt_cases/formation/concurrent/slimqless_test.hpp \
  ../utt_cases/formation/concurrent/slimqless_test_template.hpp \
  ../utt_cases/formation/concurrent/../../../app_info/assert.hpp \
@@ -50,7 +50,6 @@ utt: main.cpp icase.hpp ../sync/lock.hpp utt_assert.hpp \
  ../utt_cases/formation/concurrent/../../../utt/case_wrapper/../../utils/pattern_matcher.hpp \
  ../utt_cases/formation/concurrent/../../../utt/case_wrapper/../../utils/strcmp.hpp \
  ../utt_cases/formation/concurrent/slimqless2_test.hpp \
- ../utt_cases/formation/concurrent/../../../formation/concurrent/slimqless2.hpp \
  ../utt_cases/formation/concurrent/qless_test.hpp \
  ../utt_cases/formation/concurrent/../../../formation/concurrent/qless.hpp \
  ../utt_cases/formation/concurrent/../../../formation/concurrent/../../app_info/assert.hpp \
@@ -60,6 +59,7 @@ utt: main.cpp icase.hpp ../sync/lock.hpp utt_assert.hpp \
  ../utt_cases/threadpool/queue_runner_test.hpp \
  ../utt_cases/threadpool/../../app_info/assert.hpp \
  ../utt_cases/threadpool/../../threadpool/queue_runner.hpp \
+ ../utt_cases/threadpool/../../threadpool/../formation/concurrent/qless3.hpp \
  ../utt_cases/threadpool/../../threadpool/../envs/preenv.hpp \
  ../utt_cases/threadpool/../../threadpool/../envs/envs.hpp \
  ../utt_cases/threadpool/../../threadpool/../app_info/assert.hpp \

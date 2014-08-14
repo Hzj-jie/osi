@@ -53,7 +53,8 @@ public:
 
     bool empty() const
     {
-        return size() == 0;
+        scope_lock(mtx);
+        return q.empty();
     }
 
     void clear()

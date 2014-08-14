@@ -19,8 +19,8 @@ const static class queue_runner_repeat_t
 private:
     const static uint32_t NO_TIMEOUT = UINT32_MAX;
 
-    template <template <typename T> class qless>
-    class check_queuer : public queue_runner_t<qless>::queuer
+    template <template <typename T> class Qless>
+    class check_queuer : public queue_runner_t<Qless>::queuer
     {
     protected:
         const std::function<bool(void)> f;
@@ -49,21 +49,21 @@ private:
                  ms_timer.milliseconds() + timeout_ms) { }
     };
 
-    template <template <typename T> class qless>
-    class until_queuer : public check_queuer<qless>
+    template <template <typename T> class Qless>
+    class until_queuer : public check_queuer<Qless>
     {
     private:
-        typedef check_queuer<qless> base;
+        typedef check_queuer<Qless> base;
     public:
         template <typename TIMER>
         until_queuer(uint32_t timeout_ms,
                      std::function<bool(void)>&& f,
                      std::function<void(void)>&& cb,
                      TIMER&& ms_timer) :
-            check_queuer<qless>(timeout_ms,
-                                std::move(f),
-                                std::move(cb),
-                                ms_timer) { }
+            base(timeout_ms,
+                 std::move(f),
+                 std::move(cb),
+                 ms_timer) { }
 
         bool operator()() override
         {
@@ -78,21 +78,21 @@ private:
         }
     };
 
-    template <template <typename T> class qless>
-    class when_queuer : public check_queuer<qless>
+    template <template <typename T> class Qless>
+    class when_queuer : public check_queuer<Qless>
     {
     private:
-        typedef check_queuer<qless> base;
+        typedef check_queuer<Qless> base;
     public:
         template <typename TIMER>
         when_queuer(uint32_t timeout_ms,
                     std::function<bool(void)>&& f,
                     std::function<void(void)>&& cb,
                     TIMER&& ms_timer) :
-            check_queuer<qless>(timeout_ms,
-                                std::move(f),
-                                std::move(cb),
-                                ms_timer) { }
+            base(timeout_ms,
+                 std::move(f),
+                 std::move(cb),
+                 ms_timer) { }
 
         bool operator()() override
         {
@@ -110,14 +110,14 @@ private:
     queue_runner_repeat_t() { }
 
 public:
-    template <template <typename T> class qless, typename TIMER>
-    bool until(queue_runner_t<qless>& q,
+    template <template <typename T> class Qless, typename TIMER>
+    bool until(queue_runner_t<Qless>& q,
                std::function<bool(void)>&& f,
                std::function<void(void)>&& cb,
                uint32_t timeout_ms,
                TIMER&& ms_timer) const
     {
-        return q.check_push(new until_queuer<qless>(timeout_ms,
+        return q.check_push(new until_queuer<Qless>(timeout_ms,
                                                     std::move(f),
                                                     std::move(cb),
                                                     std::forward<TIMER>(ms_timer)));
@@ -136,8 +136,8 @@ public:
                      std::forward<TIMER>(ms_timer));
     }
 
-    template <template <typename T> class qless>
-    bool until(queue_runner_t<qless>& q,
+    template <template <typename T> class Qless>
+    bool until(queue_runner_t<Qless>& q,
                std::function<bool(void)>&& f,
                std::function<void(void)>&& cb,
                uint32_t timeout_ms) const
@@ -159,8 +159,8 @@ public:
                      timeout_ms);
     }
 
-    template <template <typename T> class qless>
-    bool until(queue_runner_t<qless>& q,
+    template <template <typename T> class Qless>
+    bool until(queue_runner_t<Qless>& q,
                std::function<bool(void)>&& f,
                std::function<void(void)>&& cb) const
     {
@@ -178,14 +178,14 @@ public:
                      std::move(cb));
     }
 
-    template <template <typename T> class qless, typename TIMER>
-    bool when(queue_runner_t<qless>& q,
+    template <template <typename T> class Qless, typename TIMER>
+    bool when(queue_runner_t<Qless>& q,
               std::function<bool(void)>&& f,
               std::function<void(void)>&& cb,
               uint32_t timeout_ms,
               TIMER&& ms_timer) const
     {
-        return q.check_push(new when_queuer<qless>(timeout_ms,
+        return q.check_push(new when_queuer<Qless>(timeout_ms,
                                                    std::move(f),
                                                    std::move(cb),
                                                    std::forward<TIMER>(ms_timer)));
@@ -204,8 +204,8 @@ public:
                     std::forward<TIMER>(ms_timer));
     }
 
-    template <template <typename T> class qless>
-    bool when(queue_runner_t<qless>& q,
+    template <template <typename T> class Qless>
+    bool when(queue_runner_t<Qless>& q,
               std::function<bool(void)>&& f,
               std::function<void(void)>&& cb,
               uint32_t timeout_ms) const
@@ -227,8 +227,8 @@ public:
                     timeout_ms);
     }
 
-    template <template <typename T> class qless>
-    bool when(queue_runner_t<qless>& q,
+    template <template <typename T> class Qless>
+    bool when(queue_runner_t<Qless>& q,
               std::function<bool(void)>&& f,
               std::function<void(void)>&& cb) const
     {

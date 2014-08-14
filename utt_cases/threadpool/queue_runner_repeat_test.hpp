@@ -1,5 +1,6 @@
 
 #pragma once
+#include <boost/predef.h>
 #include "../../threadpool/queue_runner_repeat.hpp"
 #include "../../utt/icase.hpp"
 #include "../../utt/utt_assert.hpp"
@@ -7,12 +8,15 @@
 #include "../../utils/timing_counter.hpp"
 #include "../../app_info/assert.hpp"
 #include "../../app_info/trace.hpp"
+#include "../../formation/concurrent/qless.hpp"
+#include "../../formation/concurrent/qless3.hpp"
 #include <functional>
 
+template <template <typename T> class Qless>
 class queue_runner_repeat_case : public icase
 {
 private:
-    queue_runner_t<qless>* q;
+    queue_runner_t<Qless>* q;
 
     void wait_finish()
     {
@@ -132,7 +136,7 @@ public:
 
     bool prepare() override
     {
-        q = new queue_runner_t<qless>();
+        q = new queue_runner_t<Qless>();
         return icase::prepare();
     }
 
@@ -153,12 +157,32 @@ public:
     DEFINE_CASE(queue_runner_repeat_case);
 };
 
+template <template <typename T> class Qless>
 class queue_runner_repeat_test : public
           repeat_case_wrapper<
-              queue_runner_repeat_case,
-              128>
+              queue_runner_repeat_case<Qless>,
+              32>
 {
     DEFINE_CASE(queue_runner_repeat_test);
 };
-REGISTER_CASE(queue_runner_repeat_test);
+
+class queue_runner_qless_repeat_test : public queue_runner_repeat_test<qless>
+{
+    DEFINE_CASE(queue_runner_qless_repeat_test);
+};
+REGISTER_CASE(queue_runner_qless_repeat_test);
+
+#if !BOOST_COMP_MSVC // qless = qless2, but what's wrong?
+class queue_runner_qless2_repeat_test : public queue_runner_repeat_test<qless2>
+{
+    DEFINE_CASE(queue_runner_qless2_repeat_test);
+};
+REGISTER_CASE(queue_runner_qless2_repeat_test);
+#endif
+
+class queue_runner_qless3_repeat_test : public queue_runner_repeat_test<qless3>
+{
+    DEFINE_CASE(queue_runner_qless3_repeat_test);
+};
+REGISTER_CASE(queue_runner_qless3_repeat_test);
 

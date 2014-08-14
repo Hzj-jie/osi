@@ -144,7 +144,7 @@ template <typename... Args>
 std::string strcat(Args&&... args)
 {
     using namespace std;
-	using namespace __strutils_private;
+    using namespace __strutils_private;
     ostringstream os;
     append_to_stream(os, forward<Args>(args)...);
     return os.str();

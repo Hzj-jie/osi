@@ -2,10 +2,10 @@
 #pragma once
 #include <boost/predef.h>
 
-#include "qless3.hpp"
+#include "slimqless2.hpp"
 
 template <typename T>
-using slimqless = qless3<T>;
+using slimqless = slimqless2<T>;
 
 #if 0
 
@@ -124,7 +124,7 @@ public:
     }
 
     template <typename... Args>
-    void emplace_push(Args&&... args)
+    void emplace(Args&&... args)
     {
         insert(std::forward<Args>(args)...);
     }

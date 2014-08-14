@@ -7,18 +7,21 @@
 #include "../../utt/case_wrapper/multithreading_case_wrapper.hpp"
 #include "../../utt/utt_assert.hpp"
 #include "../../sync/spin_wait.hpp"
+#include "../../formation/concurrent/qless.hpp"
+#include "../../formation/concurrent/qless3.hpp"
 #include <atomic>
 #include <array>
 #include <stdint.h>
+#include <boost/predef.h>
 
-template <template <typename T> class qless>
+template <template <typename T> class Qless>
 class queue_runner_case : public icase
 {
 public:
     const static uint32_t thread_count = 8;
     const static uint32_t repeat_count = 1024;
 private:
-    queue_runner_t<qless>* q;
+    queue_runner_t<Qless>* q;
     const static int max_value = 100;
 
     class counter
@@ -51,7 +54,7 @@ private:
 public:
     bool prepare() override
     {
-        q = new queue_runner_t<qless>();
+        q = new queue_runner_t<Qless>();
         index.store(0, std::memory_order_relaxed);
         execs.store(0, std::memory_order_relaxed);
         for(auto it = counters.begin(); it != counters.end(); it++)
@@ -76,7 +79,7 @@ public:
 
     bool cleanup() override
     {
-        std_this_thread_lazy_wait_until(q->empty());
+        std_this_thread_lazy_wait_until(q->idle());
         delete q;
         for(auto it = counters.begin(); it != counters.end(); it++)
             utt_assert.equal((*it).value(), max_value);
@@ -87,14 +90,14 @@ public:
     DEFINE_CASE(queue_runner_case);
 };
 
-template <template <typename T> class qless>
+template <template <typename T> class Qless>
 class queue_runner_test : public
           rinne_case_wrapper<
               multithreading_case_wrapper<
                   repeat_case_wrapper<
-                      queue_runner_case<qless>,
-                      queue_runner_case<qless>::repeat_count + 8>,
-                  queue_runner_case<qless>::thread_count>,
+                      queue_runner_case<Qless>,
+                      queue_runner_case<Qless>::repeat_count + 8>,
+                  queue_runner_case<Qless>::thread_count>,
               8>
 { };
 
@@ -104,13 +107,15 @@ class queue_runner_qless_test : public queue_runner_test<qless>
 };
 REGISTER_CASE(queue_runner_qless_test);
 
-class queue_runner_qless2_test : public queue_runner_test<qless>
+#if !BOOST_COMP_MSVC // qless = qless2, but what's wrong?
+class queue_runner_qless2_test : public queue_runner_test<qless2>
 {
     DEFINE_CASE(queue_runner_qless2_test);
 };
 REGISTER_CASE(queue_runner_qless2_test);
+#endif
 
-class queue_runner_qless3_test : public queue_runner_test<qless>
+class queue_runner_qless3_test : public queue_runner_test<qless3>
 {
     DEFINE_CASE(queue_runner_qless3_test);
 };

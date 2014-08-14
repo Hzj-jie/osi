@@ -29,26 +29,26 @@ public:
     void push(T&& v)
     {
         q.push(std::forward<T>(v));
-        s++;
+        s.fetch_add(1, std::memory_order_release);
     }
 
     template <typename... Args>
-    void emplace_push(Args&&... args)
+    void emplace(Args&&... args)
     {
-        q.push(std::forward<Args>(args)...);
-        s++;
+        q.emplace(std::forward<Args>(args)...);
+        s.fetch_add(1, std::memory_order_release);
     }
 
     bool pop(T& v)
     {
-        if(s.fetch_sub(1) >= 1)
+        if(s.fetch_sub(1, std::memory_order_release) >= 1)
             return assert(q.pop(v));
         else return false;
     }
 
     size_t size() const
     {
-        int ss = s;
+        int ss = s.load(std::memory_order_consume);
         return (ss < 0 ? 0 : ss);
     }
 
@@ -65,7 +65,7 @@ public:
 };
 
 template <typename T>
-using qless = slimqless<T>;
+using qless = qless_template<slimqless, T>;
 
 template <typename T>
 using qless2 = qless_template<slimqless2, T>;

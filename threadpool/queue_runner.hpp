@@ -43,7 +43,7 @@ private:
     CONST_SINGLETON(queue_runner_config_t);
 }& queue_runner_config = queue_runner_config_t::instance();
 
-template <template <typename T> class qless>
+template <template <typename T> class Qless>
 class queue_runner_t final
 {
 public:
@@ -70,7 +70,7 @@ private:
     };
 
 private:
-    qless<queuer*> q;
+    Qless<queuer*> q;
     auto_reset_event are;
     std::vector<std::thread> threads;
     volatile bool running;
@@ -136,10 +136,11 @@ private:
         while(running)
         {
             size_t size = this->size();
-            if(queue_runner_config.thread_count > 1)
-                size = ceil((double)size / queue_runner_config.thread_count);
             if(size > 0)
             {
+                if(queue_runner_config.thread_count > 1)
+                    size = ceil((double)size / queue_runner_config.thread_count);
+                assert(size > 0);
                 assert(working.fetch_add(1, std::memory_order_release) <=
                        queue_runner_config.thread_count);
                 queuer* p = nullptr;
@@ -182,10 +183,10 @@ public:
     SINGLETON(queue_runner_t);
 };
 
-template <template <typename T> class qless>
-static queue_runner_t<qless>& queue_runner()
+template <template <typename T> class Qless>
+static queue_runner_t<Qless>& queue_runner()
 {
-    return queue_runner_t<qless>::instance();
+    return queue_runner_t<Qless>::instance();
 }
 
 static queue_runner_t<qless>& queue_runner()

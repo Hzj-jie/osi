@@ -16,8 +16,6 @@ private:
         case_wrapper<T>::execute();
     }
 
-    inline void thread_execute(uint32_t id) { execute(id); }
-
     virtual uint32_t thread_count() const
     {
         assert(THREAD_COUNT > 0);
@@ -30,7 +28,7 @@ public:
         using namespace std;
         vector<thread> vs;
         for(uint32_t i = 0; i < thread_count() - 1; i++)
-            vs.push_back(thread(&multithreading_case_wrapper::thread_execute, this, i));
+            vs.push_back(thread([&]() { execute(i); }));
         execute(thread_count() - 1);
         for(uint32_t i = 0; i < vs.size(); i++)
             vs[i].join();

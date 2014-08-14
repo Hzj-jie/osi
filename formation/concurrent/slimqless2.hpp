@@ -21,6 +21,9 @@ public:
         boost::lockfree::queue<T>(s, v) { }
     */
 
+    slimqless2(const slimqless2&) = default;
+    slimqless2& operator=(const slimqless2&) = default;
+
     void clear()
     {
         T v;
