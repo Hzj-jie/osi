@@ -45,9 +45,14 @@ public:
 
     virtual ~icase() { }
 
+    virtual void set_case_name(const std::string& name)
+    {
+        utt_assert.set_case_name(name);
+    }
+
     void operator()()
     {
-        utt_assert.set_case_name(name());
+        set_case_name(name());
         utt_assert.is_true(run(), CODE_POSITION());
     }
 };

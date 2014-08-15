@@ -14,7 +14,7 @@ namespace __assert_private
     template <typename... Args>
     static void assert_raise_error(Args&&... args)
     {
-        raise_error(assert_err_type, "ASSERT FAILED: ", std::forward<Args>(args)...);
+        raise_error(assert_err_type, "ASSERTION FAILED: ", std::forward<Args>(args)...);
     }
 
     template <typename... Args>

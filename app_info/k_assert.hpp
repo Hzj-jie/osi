@@ -14,7 +14,7 @@ static bool assert_failed()
 #define k_assert(x) { \
     using namespace std; \
     if(!(x)) { \
-        cout << "ASSERT FAILED: " \
+        cout << "ASSERTION FAILED: " \
              << #x \
              << " @ " \
              << BOOST_CURRENT_FUNCTION \

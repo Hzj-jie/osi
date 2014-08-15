@@ -8,11 +8,11 @@
 #include <boost/predef.h>
 #include "../../app_info/assert.hpp"
 
-template <template <typename T> class slimqless, typename T>
+template <template <typename T> class Slimqless, typename T>
 class qless_template final
 {
 private:
-    slimqless<T> q;
+    Slimqless<T> q;
     std::atomic<int> s;
 
 public:
@@ -29,26 +29,35 @@ public:
     void push(T&& v)
     {
         q.push(std::forward<T>(v));
-        s.fetch_add(1, std::memory_order_release);
+        // s.fetch_add(1, std::memory_order_release);
+        s++;
     }
 
     template <typename... Args>
     void emplace(Args&&... args)
     {
         q.emplace(std::forward<Args>(args)...);
-        s.fetch_add(1, std::memory_order_release);
+        // s.fetch_add(1, std::memory_order_release);
+        s++;
     }
 
     bool pop(T& v)
     {
-        if(s.fetch_sub(1, std::memory_order_release) >= 1)
+        // if(s.fetch_sub(1, std::memory_order_release) >= 1)
+        if((s--) >= 1)
             return assert(q.pop(v));
-        else return false;
+        else
+        {
+            // s.fetch_add(1, std::memory_order_release);
+            s++;
+            return false;
+        }
     }
 
     size_t size() const
     {
-        int ss = s.load(std::memory_order_consume);
+        // int ss = s.load(std::memory_order_acquire);
+        int ss = s.load();
         return (ss < 0 ? 0 : ss);
     }
 

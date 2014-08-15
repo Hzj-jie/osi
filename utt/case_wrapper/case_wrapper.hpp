@@ -44,6 +44,11 @@ public:
     {
         return c.name();
     }
+
+    void set_case_name(const std::string& name) override
+    {
+        c.set_case_name(name);
+    }
 };
 
 template <typename T>
@@ -52,6 +57,7 @@ class case_wrapper : public case_forwarder<T>
 public:
     bool run() override final
     {
+        case_forwarder<T>::set_case_name(this->name());
         return icase::run();
     }
 

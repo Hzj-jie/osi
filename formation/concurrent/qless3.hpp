@@ -14,20 +14,15 @@ private:
     mutable std::mutex mtx;
 
 public:
-    void push(const T& v)
+    template <typename U>
+    void push(U&& v)
     {
         scope_lock(mtx);
-        q.push(v);
-    }
-
-    void push(T&& v)
-    {
-        scope_lock(mtx);
-        q.push(std::forward<T>(v));
+        q.push(std::forward<U>(v));
     }
 
     template <typename... Args>
-    void emplace_push(Args&&... args)
+    void emplace(Args&&... args)
     {
         scope_lock(mtx);
         q.emplace(std::forward<Args>(args)...);

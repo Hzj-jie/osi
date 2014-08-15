@@ -22,7 +22,7 @@ private:
     {
         assert(q != nullptr);
         utt_assert.less_or_equal(q->size(), 1, ", ", q->size(), CODE_POSITION());
-        std_this_thread_wait_until(q->idle());
+        q->wait_for_idle();
     }
 
     bool until_timeout_case()
@@ -35,8 +35,8 @@ private:
         {
             ms_timing_counter counter(std::ref(used_ms));
             utt_assert.is_true(queue_runner_repeat.until(*q,
-                                                         [&]() { c++; return false; },
-                                                         [&]() { cbed = true; },
+                                                         [&c]() { c++; return false; },
+                                                         [&cbed]() { cbed = true; },
                                                          timeout_ms),
                                CODE_POSITION());
             wait_finish();
@@ -50,8 +50,8 @@ private:
         {
             ms_timing_counter counter(std::ref(used_ms));
             utt_assert.is_true(queue_runner_repeat.until(*q,
-                                                         [&]() { c++; return true; },
-                                                         [&]() { cbed = true; },
+                                                         [&c]() { c++; return true; },
+                                                         [&cbed]() { cbed = true; },
                                                          timeout_ms),
                                CODE_POSITION());
             wait_finish();
@@ -72,8 +72,8 @@ private:
         {
             ms_timing_counter counter(std::ref(used_ms));
             utt_assert.is_true(queue_runner_repeat.when(*q,
-                                                        [&]() { c++; return true; },
-                                                        [&]() { cbed = true; },
+                                                        [&c]() { c++; return true; },
+                                                        [&cbed]() { cbed = true; },
                                                         timeout_ms),
                                CODE_POSITION());
             wait_finish();
@@ -87,8 +87,8 @@ private:
         {
             ms_timing_counter counter(std::ref(used_ms));
             utt_assert.is_true(queue_runner_repeat.when(*q,
-                                                        [&]() { c++; return false; },
-                                                        [&]() { cbed = true; },
+                                                        [&c]() { c++; return false; },
+                                                        [&cbed]() { cbed = true; },
                                                         timeout_ms),
                                CODE_POSITION());
             wait_finish();
@@ -105,8 +105,8 @@ private:
         const int64_t count = 1000;
         int64_t c = 0;
         utt_assert.is_true(queue_runner_repeat.until(*q,
-                                                     [&]() { c++; return c == count; },
-                                                     [&]() { c++; }),
+                                                     [&c, count]() { c++; return c == count; },
+                                                     [&c]() { c++; }),
                            CODE_POSITION());
         wait_finish();
         utt_assert.equal(c, count + 1, ", ", c, CODE_POSITION());
@@ -119,8 +119,8 @@ private:
         const int64_t count = 1000;
         int64_t c = 0;
         utt_assert.is_true(queue_runner_repeat.when(*q,
-                                                    [&]() { c++; return c < count; },
-                                                    [&]() { c++; }),
+                                                    [&c, count]() { c++; return c < count; },
+                                                    [&c]() { c++; }),
                            CODE_POSITION());
         wait_finish();
         utt_assert.equal(c, count + 1, ", ", c, CODE_POSITION());
@@ -131,7 +131,7 @@ private:
 public:
     uint32_t preserved_processor_count() const override
     {
-        return 2;
+        return queue_runner_config.thread_count + 1;
     }
 
     bool prepare() override

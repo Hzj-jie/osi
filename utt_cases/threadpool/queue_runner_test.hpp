@@ -52,6 +52,11 @@ private:
     std::atomic<uint32_t> execs;
 
 public:
+    uint32_t preserved_processor_count() const override
+    {
+        return queue_runner_config.thread_count + 1;
+    }
+
     bool prepare() override
     {
         q = new queue_runner_t<Qless>();
@@ -79,7 +84,7 @@ public:
 
     bool cleanup() override
     {
-        std_this_thread_lazy_wait_until(q->idle());
+        q->wait_for_idle();
         delete q;
         for(auto it = counters.begin(); it != counters.end(); it++)
             utt_assert.equal((*it).value(), max_value);

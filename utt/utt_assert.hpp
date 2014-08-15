@@ -23,7 +23,7 @@ namespace utt
             else
             {
                 f()++;
-                utt_raise_error("UTT ", case_name, " ASSERT FAILED: ", std::forward<Args>(args)...);
+                utt_raise_error("UTT ", case_name, " ASSERTION FAILED: ", std::forward<Args>(args)...);
                 return false;
             }
         }
