@@ -12,7 +12,7 @@ private:
 public:
     T* get() const
     {
-        return v.load();
+        return v.load(std::memory_order_consume);
     }
 
     bool has_value() const
@@ -35,7 +35,7 @@ public:
     {
         if(has_value())
         {
-            T* o = v.load();
+            T* o = v.load(std::memory_order_consume);
             if(o == nullptr) return false;
             else
             {
@@ -53,7 +53,7 @@ public:
         if(has_value()) return false;
         else
         {
-            T* o = v.load();
+            T* o = v.load(std::memory_order_consume);
             if(o == nullptr)
             {
                 T* r = new T(std::forward<Args>(args)...);

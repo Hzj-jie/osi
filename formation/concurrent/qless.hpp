@@ -20,44 +20,34 @@ public:
         q(),
         s(0) { }
 
-    void push(const T& v)
-    {
-        q.push(v);
-        s++;
-    }
-
-    void push(T&& v)
+    template <typename U>
+    void push(U&& v)
     {
         q.push(std::forward<T>(v));
-        // s.fetch_add(1, std::memory_order_release);
-        s++;
+        s.fetch_add(1, std::memory_order_release);
     }
 
     template <typename... Args>
     void emplace(Args&&... args)
     {
         q.emplace(std::forward<Args>(args)...);
-        // s.fetch_add(1, std::memory_order_release);
-        s++;
+        s.fetch_add(1, std::memory_order_release);
     }
 
     bool pop(T& v)
     {
-        // if(s.fetch_sub(1, std::memory_order_release) >= 1)
-        if((s--) >= 1)
+        if(s.fetch_sub(1, std::memory_order_release) >= 1)
             return assert(q.pop(v));
         else
         {
-            // s.fetch_add(1, std::memory_order_release);
-            s++;
+            s.fetch_add(1, std::memory_order_release);
             return false;
         }
     }
 
     size_t size() const
     {
-        // int ss = s.load(std::memory_order_acquire);
-        int ss = s.load();
+        int ss = s.load(std::memory_order_consume);
         return (ss < 0 ? 0 : ss);
     }
 

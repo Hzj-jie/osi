@@ -17,12 +17,12 @@ public:
     cd_object(Args&&... args)
     {
         v = new T(std::forward<Args>(args)...);
-        c().fetch_add(1, std::memory_order_consume);
+        c().fetch_add(1, std::memory_order_release);
     }
 
     ~cd_object()
     {
-        d().fetch_add(1, std::memory_order_consume);
+        d().fetch_add(1, std::memory_order_release);
         delete v;
     }
 
@@ -48,12 +48,12 @@ public:
 
     static uint32_t create_times()
     {
-        return c().load();
+        return c().load(std::memory_order_consume);
     }
 
     static uint32_t destruct_times()
     {
-        return d().load();
+        return d().load(std::memory_order_consume);
     }
 
     static uint32_t instance_count()

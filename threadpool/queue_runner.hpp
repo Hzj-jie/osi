@@ -97,9 +97,8 @@ public:
 
     bool idle() const
     {
-        return empty() &&
-               // (working.load(std::memory_order_acquire) == 0);
-               working.load() == 0;
+        return (working.load(std::memory_order_acquire) == 0) &&
+               empty();
     }
 
     bool push(queuer* p)
@@ -140,9 +139,8 @@ private:
             size_t size = this->size();
             if(size > 0)
             {
-                // assert(working.fetch_add(1, std::memory_order_release) <
-                //        queue_runner_config.thread_count);
-                assert((working++) < queue_runner_config.thread_count);
+                assert(working.fetch_add(1, std::memory_order_release) <
+                       queue_runner_config.thread_count);
                 if(queue_runner_config.thread_count > 1)
                     size = ceil((double)size / queue_runner_config.thread_count);
                 assert(size > 0);
@@ -152,8 +150,7 @@ private:
                     assert(check_push(p));
                     size--;
                 }
-                // assert(working.fetch_sub(1, std::memory_order_release) > 0);
-                assert((working--) > 0);
+                assert(working.fetch_sub(1, std::memory_order_release) > 0);
             }
             if(!queue_runner_config.busy_wait)
                 are.wait(queue_runner_config.interval_ms);
@@ -166,6 +163,8 @@ public:
         are.set();
     }
 
+#define QUEUE_RUNNER_USE_IDLE_OR_TRIGGER 1
+#ifdef QUEUE_RUNNER_USE_IDLE_OR_TRIGGER
 private:
     bool idle_or_trigger()
     {
@@ -176,11 +175,16 @@ private:
             return false;
         }
     }
+#endif
 
 public:
     void wait_for_idle()
     {
+#if QUEUE_RUNNER_USE_IDLE_OR_TRIGGER
         std_this_thread_lazy_wait_until(idle_or_trigger());
+#else
+        std_this_thread_lazy_wait_until(idle());
+#endif
     }
 
     // public for test purpose
