@@ -11,7 +11,7 @@
 static const class nowadays_t
 {
 private:
-    nowadays_t() { }
+    nowadays_t() = default;
     template<typename T>
     class retriver
     {
@@ -35,21 +35,21 @@ public:
     {
         CONST_SINGLETON(high_res_t);
     private:
-        high_res_t() { }
+        high_res_t() = default;
     }& high_res = high_res_t::instance();
 
     const class low_res_t : public retriver<std::chrono::steady_clock>
     {
         CONST_SINGLETON(low_res_t);
     private:
-        low_res_t() { }
+        low_res_t() = default;
     }& low_res = low_res_t::instance();
 
     const class sys_res_t : public retriver<std::chrono::system_clock>
     {
         CONST_SINGLETON(sys_res_t);
     private:
-        sys_res_t() { }
+        sys_res_t() = default;
     }& sys_res = sys_res_t::instance();
     CONST_SINGLETON(nowadays_t);
 

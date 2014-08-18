@@ -34,7 +34,7 @@ private:
     }
 
 public:
-    atomic_shared_ptr() { }
+    atomic_shared_ptr() = default;
 
     static bool is_lock_free()
     {

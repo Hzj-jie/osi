@@ -17,7 +17,7 @@ namespace error_handle
     {
     public:
         virtual void write(const std::string& s) = 0;
-        virtual ~ierror_writer() { }
+        virtual ~ierror_writer() = default;
     };
 
     class console_error_writer : public ierror_writer

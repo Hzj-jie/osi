@@ -107,7 +107,7 @@ private:
         }
     };
 
-    queue_runner_repeat_t() { }
+    queue_runner_repeat_t() = default;
 
 public:
     template <template <typename T> class Qless, typename TIMER>
@@ -117,10 +117,10 @@ public:
                uint32_t timeout_ms,
                TIMER&& ms_timer) const
     {
-        return q.check_push(new until_queuer<Qless>(timeout_ms,
-                                                    std::move(f),
-                                                    std::move(cb),
-                                                    std::forward<TIMER>(ms_timer)));
+        return assert(q.check_push(new until_queuer<Qless>(timeout_ms,
+                                                           std::move(f),
+                                                           std::move(cb),
+                                                           std::forward<TIMER>(ms_timer))));
     }
 
     template <typename TIMER>
@@ -244,6 +244,31 @@ public:
         return when(queue_runner(),
                     std::move(f),
                     std::move(cb));
+    }
+
+private:
+    template <template <typename T> class Qless>
+    class inf_queuer : public queue_runner_t<Qless>::queuer
+    {
+    private:
+        const std::function<void(void)> f;
+    public:
+        inf_queuer(std::function<void(void)>&& f) :
+            f(std::move(f)) { }
+
+        bool operator()() override
+        {
+            f();
+            return true;
+        }
+    };
+
+public:
+    template <template <typename T> class Qless>
+    bool infinite(queue_runner_t<Qless>& q,
+                  std::function<void(void)>&& f) const
+    {
+        return assert(q.check_push(new inf_queuer<Qless>(f)));
     }
 
     CONST_SINGLETON(queue_runner_repeat_t);

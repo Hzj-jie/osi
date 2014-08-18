@@ -9,7 +9,7 @@ public:
     CONST_STATIC_STRING(commit, COMMIT_VER);
     CONST_STATIC_STRING_EXP(short_commit, std::string("COMMIT_VER").substr(0, 10));
 private:
-    git_t() { }
+    git_t() = default;
 CONST_SINGLETON(git_t);
 }& git = git_t::instance();
 

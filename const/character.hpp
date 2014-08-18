@@ -27,7 +27,7 @@ public:
 #undef DEFINE_CHARACTER
 
 private:
-    character_t() { }
+    character_t() = default;
     CONST_SINGLETON(character_t);
 }& character = character_t::instance();
 

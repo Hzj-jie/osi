@@ -43,7 +43,7 @@ public:
 
     virtual const std::string& name() const = 0;
 
-    virtual ~icase() { }
+    virtual ~icase() = default;
 
     virtual void set_case_name(const std::string& name)
     {

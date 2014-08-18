@@ -51,7 +51,7 @@ public:
     {
     public:
         virtual bool operator()() = 0;
-        virtual ~queuer() { }
+        virtual ~queuer() = default;
     };
 
 private:
