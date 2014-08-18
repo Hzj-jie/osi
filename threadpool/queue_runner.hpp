@@ -29,9 +29,9 @@ public:
 
 private:
     queue_runner_config_t() :
-        thread_count((preenv.queue_runner_thread_count > 0 ?
-                      preenv.queue_runner_thread_count :
-                      std::max<uint32_t>(processor.count >> 2, 1))),
+        thread_count(preenv.queue_runner_thread_count > 0 ?
+                     preenv.queue_runner_thread_count :
+                     std::max<uint32_t>(processor.count >> 2, 1)),
         busy_wait(preenv.busy_wait),
         interval_ms((preenv.queue_runner_interval_ms > 0 ?
                      preenv.queue_runner_interval_ms :
@@ -69,7 +69,6 @@ private:
         }
     };
 
-private:
     Qless<queuer*> q;
     auto_reset_event are;
     std::vector<std::thread> threads;
