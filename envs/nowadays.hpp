@@ -53,6 +53,21 @@ public:
     }& sys_res = sys_res_t::instance();
     CONST_SINGLETON(nowadays_t);
 
+#define TIMER_TEMPLATE(x, y) \
+    const class x##_res_##y##_t { \
+        CONST_SINGLETON(x##_res_##y##_t); \
+    public: \
+        int64_t operator()() const { \
+            return x##_res_t::instance().y(); } \
+    private:\
+        x##_res_##y##_t() { } }& x##_res_##y = x##_res_##y##_t::instance();
+    TIMER_TEMPLATE(high, milliseconds);
+    TIMER_TEMPLATE(high, nanoseconds);
+    TIMER_TEMPLATE(low, milliseconds);
+    TIMER_TEMPLATE(low, nanoseconds);
+    TIMER_TEMPLATE(sys, milliseconds);
+    TIMER_TEMPLATE(sys, nanoseconds);
+
     const std::string long_time(const boost::posix_time::ptime& t,
                                 const std::string& date_time_separator = character.blank_s(),
                                 const std::string& date_separator = character.minus_sign_s(),

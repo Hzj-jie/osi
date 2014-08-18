@@ -145,7 +145,7 @@ public:
     {
 #if ATOMIC_SHARED_PTR_USE_LOCK
         scope_lock(mtx);
-        scope_lock2(i.mtx);
+        scope_lock(i.mtx);
         v.swap(i.v);
 #else
         i.v = std::atomic_exchange_explicit(

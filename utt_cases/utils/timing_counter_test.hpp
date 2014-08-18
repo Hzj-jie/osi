@@ -15,7 +15,7 @@ public:
         const uint32_t wait_ms = 100;
         int64_t ms;
         {
-            ms_timing_counter counter(std::ref(ms));
+            low_res_ms_timing_counter counter(std::ref(ms));
             std::this_thread::sleep_for(std::chrono::milliseconds(wait_ms));
         }
         utt_assert.more_or_equal(ms, wait_ms, ", ms == ", ms, ", wait_ms == ", wait_ms);

@@ -4,18 +4,19 @@
 #include <utility>
 #include <stdint.h>
 #include "../envs/nowadays.hpp"
+#include "../envs/processor.hpp"
 
 template <typename Now>
 struct timing_counter
 {
 private:
-    const Now now;
+    const Now& now;
     const int64_t s;
     std::reference_wrapper<int64_t> p;
 public:
     template <typename T>
-    timing_counter(T&& p) :
-        now(Now()),
+    timing_counter(T&& p, const Now& now = Now::instance()) :
+        now(now),
         s(now()),
         p(std::forward<T>(p)) { }
 
@@ -25,37 +26,26 @@ public:
     }
 };
 
-namespace __timing_counter_private
-{
-    struct high_res_milliseconds
-    {
-        int64_t operator()() const
-        {
-            return nowadays.high_res.milliseconds();
-        }
-    };
-
-    struct processor_loops
-    {
-        int64_t operator()() const
-        {
-            // TODO: processor times & loops_per_ms
-            return nowadays.high_res.nanoseconds();
-        }
-    };
-}
-
-struct ms_timing_counter : public timing_counter<__timing_counter_private::high_res_milliseconds>
+struct high_res_ms_timing_counter : public timing_counter<nowadays_t::high_res_milliseconds_t>
 {
     template <typename T>
-    ms_timing_counter(T&& p) :
-        timing_counter<__timing_counter_private::high_res_milliseconds>(p) { }
+    high_res_ms_timing_counter(T&& p) :
+        timing_counter<nowadays_t::high_res_milliseconds_t>(p) { }
 };
 
-struct processor_loops_counter : public timing_counter<__timing_counter_private::processor_loops>
+using ms_timing_counter = high_res_ms_timing_counter;
+
+struct low_res_ms_timing_counter : public timing_counter<nowadays_t::low_res_milliseconds_t>
+{
+    template <typename T>
+    low_res_ms_timing_counter(T&& p) :
+        timing_counter<nowadays_t::low_res_milliseconds_t>(p) { }
+};
+
+struct processor_loops_counter : public timing_counter<processor_t::processor_loops_t>
 {
     template <typename T>
     processor_loops_counter(T&& p) :
-        timing_counter<__timing_counter_private::processor_loops>(p) { }
+        timing_counter<processor_t::processor_loops_t>(p) { }
 };
 
