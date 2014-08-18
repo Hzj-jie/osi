@@ -6,8 +6,8 @@
 all: \
  utt
 
-utt: main.cpp icase.hpp ../sync/lock.hpp utt_assert.hpp \
- utt_error_handle.hpp ../app_info/error_type.hpp \
+utt: main.cpp icase.hpp ../sync/lock.hpp ../sync/../utils/macro.hpp \
+ utt_assert.hpp utt_error_handle.hpp ../app_info/error_type.hpp \
  ../app_info/error_handle.hpp ../app_info/error_writer.hpp \
  ../app_info/k_assert.hpp ../app_info/../envs/exeinfo.hpp \
  ../app_info/../envs/os.hpp ../app_info/../envs/../template/singleton.hpp \

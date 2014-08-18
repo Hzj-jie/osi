@@ -9,6 +9,7 @@ all: \
 assert_test: assert_test.cpp ../../../app_info/error_handle.hpp \
  ../../../app_info/error_type.hpp ../../../app_info/error_writer.hpp \
  ../../../app_info/k_assert.hpp ../../../app_info/../sync/lock.hpp \
+ ../../../app_info/../sync/../utils/macro.hpp \
  ../../../app_info/../envs/exeinfo.hpp ../../../app_info/../envs/os.hpp \
  ../../../app_info/../envs/../template/singleton.hpp \
  ../../../app_info/../envs/deploys.hpp \
