@@ -103,24 +103,21 @@ public:
     bool push(queuer* p)
     {
         if(p == nullptr) return false;
-        else
-        {
-            q.push(p);
-            return true;
-        }
+        else return q.push(p);
     }
 
     bool push(std::function<bool(void)>&& p)
     {
-        return assert(push(new func_queuer(std::move(p))));
+        return push(new func_queuer(std::move(p)));
     }
 
     bool check_push(queuer* p)
     {
         if(p == nullptr) return false;
+        else if(check(p)) return push(p);
         else
         {
-            if(check(p)) assert(push(p));
+            delete p;
             return true;
         }
     }
@@ -133,7 +130,7 @@ public:
 private:
     void work(uint32_t id)
     {
-        while(running)
+        while(true)
         {
             size_t size = this->size();
             if(size > 0)
@@ -146,13 +143,17 @@ private:
                 queuer* p = nullptr;
                 while(size > 0 && q.pop(p))
                 {
-                    assert(check_push(p));
+                    while(!check_push(p));
                     size--;
                 }
                 assert(working.fetch_sub(1, std::memory_order_release) > 0);
             }
-            if(!queue_runner_config.busy_wait)
-                are.wait(queue_runner_config.interval_ms);
+            else if(running)
+            {
+                if(!queue_runner_config.busy_wait)
+                    are.wait(queue_runner_config.interval_ms);
+            }
+            else break;
         }
     }
 
@@ -200,8 +201,6 @@ public:
         running = false;
         for(uint32_t i = 0; i < threads.size(); i++)
             threads[i].join();
-        queuer* p = nullptr;
-        while(q.pop(p)) delete p;
     }
 
     SINGLETON(queue_runner_t);

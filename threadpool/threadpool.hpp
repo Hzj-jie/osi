@@ -14,12 +14,19 @@
 #include <chrono>
 #include "../app_info/assert.hpp"
 #include "../app_info/error_handle.hpp"
+#include <utility>
 
-const static threadpool_config_t
+namespace __threadpool_private
+{
+    const static uint32_t stop_wait_ms = 5000;
+}
+
+const static class threadpool_config_t
 {
 public:
     const bool busy_wait;
     const uint32_t thread_count;
+    const uint32_t stop_wait_ms;
 private:
     threadpool_config_t() :
         busy_wait(preenv.busy_wait),
@@ -27,7 +34,10 @@ private:
                      preenv.threadpool_thread_count :
                      (busy_wait ?
                       std::max<uint32_t>(processor.count - queue_runner_config.thread_count, 1) :
-                      processor.count))
+                      processor.count)),
+        stop_wait_ms(preenv.threadpool_stop_wait_ms > 0 ?
+                     preenv.threadpool_stop_wait_ms :
+                     __threadpool_private::stop_wait_ms)
     { }
 
     CONST_SINGLETON(threadpool_config_t);
@@ -45,17 +55,22 @@ private:
 
     void work(uint32_t id)
     {
-        while(running)
+        while(true)
         {
             std::function<void(void)>* f = nullptr;
+            uint32_t i = 0;
+            working.fetch_add(1, std::memory_order_release);
             while(q.pop(f))
             {
+                i++;
                 assert(f != nullptr);
                 catch_exception((*f)());
+                delete f;
             }
-
-            if(!threadpool_config.busy_wait)
-                are.wait();
+            working.fetch_sub(1, std::memory_order_release);
+            if(i == 0 && !running) break;
+            else if(!threadpool_config.busy_wait)
+                are.wait(threadpool_config.stop_wait_ms);
         }
     }
 public:
@@ -73,6 +88,22 @@ public:
         std_this_thread_lazy_wait_until(idle());
     }
 
+    bool push(std::function<void(void)>* p)
+    {
+        if(p == nullptr) return false;
+        else if(q.push(p))
+        {
+            are.set();
+            return true;
+        }
+        else return false;
+    }
+
+    bool push(std::function<void(void)>&& f)
+    {
+        return push(new std::function<void(void)>(std::move(f)));
+    }
+
     //public for test purpose
     threadpool_t() :
         running(true),
@@ -87,8 +118,19 @@ public:
         running = false;
         for(uint32_t i = 0; i < threads.size(); i++)
             threads[i].join();
-        std::function<void(void)>* p = nullptr;
-        while(q.pop(p)) delete p;
     }
+
+    SINGLETON(threadpool_t);
 };
+
+template <template <typename T> class Slimqless>
+static threadpool_t<Slimqless>& threadpool()
+{
+    return threadpool_t<Slimqless>::instance();
+}
+
+static threadpool_t<slimqless>& threadpool()
+{
+    return threadpool<slimqless>();
+}
 

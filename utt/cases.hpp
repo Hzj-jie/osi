@@ -29,4 +29,5 @@
 #include "../utt_cases/utils/cd_object_test.hpp"
 #include "../utt_cases/threadpool/queue_runner_repeat_test.hpp"
 #include "../utt_cases/threadpool/queue_runner_once_test.hpp"
+#include "../utt_cases/threadpool/threadpool_test.hpp"
 

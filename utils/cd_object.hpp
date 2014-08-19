@@ -17,12 +17,12 @@ public:
     cd_object(Args&&... args)
     {
         v = new T(std::forward<Args>(args)...);
-        c().fetch_add(1, std::memory_order_release);
+        c().fetch_add(1, std::memory_order_acq_rel);
     }
 
     ~cd_object()
     {
-        d().fetch_add(1, std::memory_order_release);
+        d().fetch_add(1, std::memory_order_acq_rel);
         delete v;
     }
 

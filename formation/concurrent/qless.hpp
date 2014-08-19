@@ -21,17 +21,25 @@ public:
         s(0) { }
 
     template <typename U>
-    void push(U&& v)
+    bool push(U&& v)
     {
-        q.push(std::forward<T>(v));
-        s.fetch_add(1, std::memory_order_release);
+        if(q.push(std::forward<T>(v)))
+        {
+            s.fetch_add(1, std::memory_order_release);
+            return true;
+        }
+        else return false;
     }
 
     template <typename... Args>
-    void emplace(Args&&... args)
+    bool emplace(Args&&... args)
     {
-        q.emplace(std::forward<Args>(args)...);
-        s.fetch_add(1, std::memory_order_release);
+        if(q.emplace(std::forward<Args>(args)...))
+        {
+            s.fetch_add(1, std::memory_order_release);
+            return true;
+        }
+        else return false;
     }
 
     bool pop(T& v)

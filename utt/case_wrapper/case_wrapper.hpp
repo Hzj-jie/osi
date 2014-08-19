@@ -45,8 +45,9 @@ public:
         return c.name();
     }
 
-    void set_case_name(const std::string& name) override
+    void set_case_name(const std::string& name) override final
     {
+        icase::set_case_name(name);
         c.set_case_name(name);
     }
 };
@@ -57,7 +58,6 @@ class case_wrapper : public case_forwarder<T>
 public:
     bool run() override final
     {
-        case_forwarder<T>::set_case_name(this->name());
         return icase::run();
     }
 

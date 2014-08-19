@@ -52,11 +52,6 @@ private:
     std::atomic<uint32_t> execs;
 
 public:
-    uint32_t preserved_processor_count() const override
-    {
-        return queue_runner_config.thread_count + 1;
-    }
-
     bool prepare() override
     {
         q = new queue_runner_t<Qless>();
@@ -70,12 +65,12 @@ public:
     bool execute() override
     {
         assert(q != nullptr);
-        uint32_t i = index.fetch_add(1, std::memory_order_consume);
+        uint32_t i = index.fetch_add(1, std::memory_order_relaxed);
         if(i < counters.size())
         {
             utt_assert.is_true(q->check_push([&, i]()
                                              {
-                                                 execs.fetch_add(1, std::memory_order_consume);
+                                                 execs.fetch_add(1, std::memory_order_release);
                                                  return counters[i].exec();
                                              }));
         }

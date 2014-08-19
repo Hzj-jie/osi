@@ -15,17 +15,19 @@ private:
 
 public:
     template <typename U>
-    void push(U&& v)
+    bool push(U&& v)
     {
         scope_lock(mtx);
         q.push(std::forward<U>(v));
+        return true;
     }
 
     template <typename... Args>
-    void emplace(Args&&... args)
+    bool emplace(Args&&... args)
     {
         scope_lock(mtx);
         q.emplace(std::forward<Args>(args)...);
+        return true;
     }
 
     bool pop(T& v)

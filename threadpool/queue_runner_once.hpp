@@ -32,7 +32,7 @@ public:
     bool operator()(queue_runner_t<Qless>& q,
                     std::function<void(void)>&& f) const
     {
-        return assert(q.push(new once_queuer<Qless>(std::move(f))));
+        return q.push(new once_queuer<Qless>(std::move(f)));
     }
 
     CONST_SINGLETON(queue_runner_once_t);

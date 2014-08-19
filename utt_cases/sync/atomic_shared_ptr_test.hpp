@@ -24,12 +24,12 @@ private:
 
         uint32_t increment()
         {
-            return a.fetch_add(1, std::memory_order_consume);
+            return a.fetch_add(1, std::memory_order_release);
         }
 
         uint32_t operator*() const
         {
-            return a.load();
+            return a.load(std::memory_order_consume);
         }
 
         void reset()
@@ -57,7 +57,7 @@ public:
     bool execute() override
     {
         atomic_shared_ptr<cd_object<C>>* t = nullptr;
-        times.fetch_add(1, std::memory_order_consume);
+        times.fetch_add(1, std::memory_order_release);
         if(rnd_bool())
         {
             // operator= (const atomic_shared_ptr<cd_object<C>>&)
@@ -89,10 +89,10 @@ public:
 
     bool cleanup() override
     {
-        utt_assert.equal(times.load(),
+        utt_assert.equal(times.load(std::memory_order_consume),
                          *(root->ref()),
                          ", ",
-                         times.load(),
+                         times.load(std::memory_order_consume),
                          ", ",
                          *(root->ref()),
                          CODE_POSITION());

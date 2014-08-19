@@ -117,10 +117,10 @@ public:
                uint32_t timeout_ms,
                TIMER&& ms_timer) const
     {
-        return assert(q.check_push(new until_queuer<Qless>(timeout_ms,
-                                                           std::move(f),
-                                                           std::move(cb),
-                                                           std::forward<TIMER>(ms_timer))));
+        return q.check_push(new until_queuer<Qless>(timeout_ms,
+                                                    std::move(f),
+                                                    std::move(cb),
+                                                    std::forward<TIMER>(ms_timer)));
     }
 
     template <typename TIMER>
@@ -268,7 +268,7 @@ public:
     bool infinite(queue_runner_t<Qless>& q,
                   std::function<void(void)>&& f) const
     {
-        return assert(q.check_push(new inf_queuer<Qless>(f)));
+        return q.check_push(new inf_queuer<Qless>(f));
     }
 
     CONST_SINGLETON(queue_runner_repeat_t);
