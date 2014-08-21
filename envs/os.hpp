@@ -73,9 +73,19 @@ inline void compiler_barrier()
     std::atomic_signal_fence(std::memory_order_seq_cst);
 }
 
+inline void compiler_fence()
+{
+    compiler_barrier();
+}
+
 inline void memory_barrier()
 {
     std::atomic_thread_fence(std::memory_order_seq_cst);
+}
+
+inline void memory_fence()
+{
+    memory_barrier();
 }
 
 inline void full_ordering_barrier()
@@ -83,3 +93,9 @@ inline void full_ordering_barrier()
     compiler_barrier();
     memory_barrier();
 }
+
+inline void full_ordering_fence()
+{
+    full_ordering_barrier();
+}
+
