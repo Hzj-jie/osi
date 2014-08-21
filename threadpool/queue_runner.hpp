@@ -14,7 +14,6 @@
 #include "../envs/preenv.hpp"
 #include "../app_info/assert.hpp"
 #include <math.h>
-#include "../envs/os.hpp"
 
 namespace __queue_runner_private
 {
@@ -97,7 +96,6 @@ public:
 
     bool idle() const
     {
-        full_ordering_barrier();
         return (working.load(std::memory_order_acquire) == 0) &&
                empty();
     }
