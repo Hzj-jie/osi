@@ -66,10 +66,20 @@ static boost::filesystem::path::string_type path_string(T&& v)
 #define ALWAYS_INLINE
 #endif
 
-#include <boost/atomic.hpp>
+#include <atomic>
 
 inline void compiler_barrier()
 {
-    boost::atomic_signal_fence(boost::memory_order_seq_cst);
+    std::atomic_signal_fence(std::memory_order_seq_cst);
 }
 
+inline void memory_barrier()
+{
+    std::atomic_thread_fence(std::memory_order_seq_cst);
+}
+
+inline void full_ordering_barrier()
+{
+    compiler_barrier();
+    memory_barrier();
+}

@@ -59,7 +59,7 @@ private:
         {
             std::function<void(void)>* f = nullptr;
             uint32_t i = 0;
-            working.fetch_add(1, std::memory_order_release);
+            assert(working.fetch_add(1, std::memory_order_release) < threadpool_config.thread_count);
             while(q.pop(f))
             {
                 i++;
@@ -67,7 +67,7 @@ private:
                 catch_exception((*f)());
                 delete f;
             }
-            working.fetch_sub(1, std::memory_order_release);
+            assert(working.fetch_sub(1, std::memory_order_release) > 0);
             if(i == 0 && !running) break;
             else if(!threadpool_config.busy_wait)
                 are.wait(threadpool_config.stop_wait_ms);
