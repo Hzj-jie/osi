@@ -14,7 +14,7 @@ static std::ostream& operator<<(std::ostream&, const code_position&);
 struct code_position
 {
 private:
-    mutable lazier<std::string> formated_str;
+    const lazier<std::string> formated_str;
 
     static void output(std::ostream& os,
                        const char* const file,
@@ -75,7 +75,6 @@ public:
         return str();
     }
 
-private:
     friend std::ostream& operator<<(std::ostream& os, const code_position& cp)
     {
         code_position::output(os, cp.file, cp.line, cp.func);

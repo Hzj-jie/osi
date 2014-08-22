@@ -6,9 +6,9 @@ template <typename T>
 class lazier
 {
 private:
-    volatile bool initialized;
-    T v;
-    std::function<T()> init;
+    mutable volatile bool initialized;
+    mutable T v;
+    const std::function<T()> init;
 
 public:
     lazier(const std::function<T()>& init) :
@@ -19,7 +19,7 @@ public:
         initialized(false),
         init(init) { }
 
-    const T& value()
+    const T& value() const
     {
         if(!initialized)
         {
