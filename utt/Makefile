@@ -84,6 +84,8 @@ utt: main.cpp icase.hpp ../sync/lock.hpp ../sync/../utils/macro.hpp \
  ../utt_cases/threadpool/../../threadpool/queue_runner_once.hpp \
  ../utt_cases/threadpool/threadpool_test.hpp \
  ../utt_cases/threadpool/../../threadpool/threadpool.hpp \
+ ../utt_cases/utils/recursive_deleter_test.hpp \
+ ../utt_cases/utils/../../utils/recursive_deleter.hpp \
  /usr/local/lib/libboost_filesystem.a \
  /usr/local/lib/libboost_system.a
 	g++ main.cpp -o utt -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3 -pthread /usr/local/lib/libboost_filesystem.a /usr/local/lib/libboost_system.a
