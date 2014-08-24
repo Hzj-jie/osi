@@ -13,9 +13,6 @@ namespace __recursive_deleter_private
     static void recursive_delete(T& i);
 
     template <typename T, size_t N>
-    static void recursive_delete(T i[N]);
-
-    template <typename T, size_t N>
     static void recursive_delete(T* i);
 
     // implementation
@@ -36,16 +33,9 @@ namespace __recursive_deleter_private
         {
             // T = U*
             // typeof i = U*
-            recursive_delete(typename std::remove_pointer<T>::type)(i);
+            recursive_delete<typename std::remove_pointer<T>::type>(i);
         }
         else { } // do nothing
-    }
-
-    template <typename T, size_t N>
-    static void recursive_delete(T i[N])
-    {
-        for(size_t j = 0; j < N; j++)
-            recursive_delete(i[j]);
     }
 
     template <typename T, size_t N>
@@ -57,23 +47,13 @@ namespace __recursive_deleter_private
     }
 }
 
-template <typename T>
+template <typename T, size_t N = 0>
 struct recursive_deleter
 {
 public:
     void operator()(T& i) const
     {
         __recursive_deleter_private::recursive_delete(i);
-    }
-};
-
-template <typename T, size_t N>
-struct recursive_deleter
-{
-public:
-    void operator()(T i[N]) const
-    {
-        __recursive_deleter_private::recursive_delete<T, N>(i);
     }
 
     void operator()(T* i) const
