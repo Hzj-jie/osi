@@ -20,6 +20,10 @@ private:
     }
 
 public:
+    fixed_stack() :
+        index(0)
+    { }
+
     bool empty() const
     {
         return index_is(0);
