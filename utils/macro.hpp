@@ -1,4 +1,6 @@
 
+#pragma once
+
 #ifdef __PASTE_RAW
     __PASTE_RAW redefined
 #endif
@@ -13,4 +15,9 @@
     random_variable_name redefined
 #endif
 #define random_variable_name(x) PASTE_RAW(x, __LINE__)
+
+#ifdef COMMA
+    COMMA redefined
+#endif
+#define COMMA ,
 

@@ -95,7 +95,6 @@ namespace converts
         template <typename T1, typename T2>
         static bool copy(const T1& i, T2& o)
         {
-            // has_member_function_convert_to
             typedef typename std::conditional<
                                  has_const_member_function_convert_to<T1, bool, T2&>::value,
                                  copy_convert_to,
