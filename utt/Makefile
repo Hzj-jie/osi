@@ -89,6 +89,9 @@ utt: main.cpp icase.hpp ../sync/lock.hpp ../sync/../utils/macro.hpp \
  ../utt_cases/formation/fixed_stack_test.hpp \
  ../utt_cases/formation/../../formation/fixed_stack.hpp \
  ../utt_cases/formation/../../formation/../app_info/assert.hpp \
+ ../utt_cases/utils/convertor_test.hpp \
+ ../utt_cases/utils/../../utils/convertor.hpp \
+ ../utt_cases/utils/../../utils/../template/type_traits.hpp \
  /usr/local/lib/libboost_filesystem.a \
  /usr/local/lib/libboost_system.a
 	g++ main.cpp -o utt -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3 -pthread /usr/local/lib/libboost_filesystem.a /usr/local/lib/libboost_system.a

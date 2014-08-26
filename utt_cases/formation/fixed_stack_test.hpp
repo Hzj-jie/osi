@@ -26,6 +26,9 @@ private:
         return true;
     }
 
+    template <typename T>
+    bool type_test() const { return true; }
+
 public:
     bool run() override
     {

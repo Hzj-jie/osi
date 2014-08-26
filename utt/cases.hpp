@@ -32,4 +32,5 @@
 #include "../utt_cases/threadpool/threadpool_test.hpp"
 #include "../utt_cases/utils/recursive_deleter_test.hpp"
 #include "../utt_cases/formation/fixed_stack_test.hpp"
+#include "../utt_cases/utils/convertor_test.hpp"
 
