@@ -21,3 +21,7 @@
 #endif
 #define COMMA ,
 
+#ifdef SINGLE_ARG
+    SINGLE_ARG redefined
+#endif
+#define SINGLE_ARG(...) __VA_ARGS__
