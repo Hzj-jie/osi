@@ -1,5 +1,6 @@
 
 #pragma once
+#include <utility>
 #include <stdlib.h>
 #include "../app_info/assert.hpp"
 #include "../template/singleton.hpp"
@@ -16,7 +17,7 @@ class call_stack_t
 private:
     thread_local static fixed_stack<T, MAX_SIZE> c;
 
-    call_stack() = default;
+    call_stack_t() = default;
 
 public:
     static T& current()
@@ -27,7 +28,7 @@ public:
     template <typename U>
     static void push(U&& i)
     {
-        c.push(i);
+        assert(c.push(std::forward<U>(i)));
     }
 
     static void pop()
@@ -40,7 +41,7 @@ public:
 };
 
 template <typename T, size_t MAX_SIZE = __call_stack_private::default_max_size>
-static call_stack_t<T, MAX_SIZE>& call_stack()
+const static call_stack_t<T, MAX_SIZE>& call_stack()
 {
     return call_stack_t<T, MAX_SIZE>::instance();
 }
