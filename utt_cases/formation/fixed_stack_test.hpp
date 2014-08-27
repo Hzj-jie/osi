@@ -6,34 +6,49 @@
 #include <string>
 #include <stdlib.h>
 #include "../../utils/random.hpp"
+#include "../../utils/convertor.hpp"
+#include <stdint.h>
+#include <utility>
 
 class fixed_stack_test : public icase
 {
 private:
-    bool full_test() const
+    template <typename T>
+    bool test_case() const
     {
         const size_t MAX_SIZE = 100;
-        fixed_stack<int, MAX_SIZE> s;
+        fixed_stack<T, MAX_SIZE> s;
         utt_assert.is_true(s.empty());
         for(size_t i = 0; i < MAX_SIZE; i++)
         {
             utt_assert.is_false(s.full());
-            utt_assert.is_true(rnd_bool() ? s.push((int)i) : s.emplace((int)i));
+            utt_assert.is_true(rnd_bool() ?
+                               s.push(convertor.convert<size_t, T>(i)) :
+                               s.emplace(convertor.convert<size_t, T>(i)));
             utt_assert.is_false(s.empty());
         }
         utt_assert.is_true(s.full());
-        utt_assert.is_false(s.push(0));
+        utt_assert.is_false(s.push(convertor.convert<size_t, T>(0)));
+        for(size_t i = MAX_SIZE; i > 0; i--)
+        {
+            utt_assert.is_false(s.empty());
+            utt_assert.equal(convertor.convert<T, size_t>(s.back()), i - 1);
+            T o;
+            utt_assert.is_true(s.pop(o));
+            utt_assert.equal(convertor.convert<T, size_t>(o), i - 1);
+            utt_assert.is_false(s.full());
+        }
+        utt_assert.is_true(s.empty());
+
         return true;
     }
-
-    template <typename T>
-    bool type_test() const { return true; }
 
 public:
     bool run() override
     {
-        // TODO: other fixed_stack tests
-        return full_test();
+        return test_case<int>() &&
+               test_case<std::string>() &&
+               test_case<uint32_t>();
     }
 
     DEFINE_CASE(fixed_stack_test);

@@ -5,13 +5,14 @@
 
 namespace __type_traits_private
 {
-    class Yes_t { };
-    class No_t { };
+    class Yes_t;
+    class No_t;
 
     template <typename T>
     struct yes
     {
-        const static bool value = std::is_same<T, Yes_t>::value;
+        const static bool value = (std::is_same<T, Yes_t&>::value) ||
+                                  (std::is_same<T, Yes_t>::value);
     };
 }
 
@@ -25,9 +26,9 @@ namespace __type_traits_private
                 template <type_check_typenames> \
                 struct type_check; \
                 template <typename U> \
-                static __type_traits_private::Yes_t test(type_check<type_check_parameters>*); \
+                static __type_traits_private::Yes_t& test(type_check<type_check_parameters>*); \
                 template <typename> \
-                static __type_traits_private::No_t test(...); \
+                static __type_traits_private::No_t& test(...); \
                 const static bool value = __type_traits_private::yes<decltype(test<T>(nullptr))>::value; };
 
 #ifdef HAS_TYPEDEF

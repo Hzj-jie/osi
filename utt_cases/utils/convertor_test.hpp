@@ -7,8 +7,9 @@
 #include <stdint.h>
 #include "../../app_info/trace.hpp"
 
-namespace __convertor_test_private
+class convertor_test : public icase
 {
+private:
     class int_constructable_class
     {
     public:
@@ -75,11 +76,7 @@ namespace __convertor_test_private
             return v;
         }
     };
-}
 
-class convertor_test : public icase
-{
-private:
     bool str_int_case() const
     {
         int i = 0;
@@ -156,7 +153,7 @@ private:
 
     bool int_constructable_class_case() const
     {
-        typedef __convertor_test_private::int_constructable_class C;
+        typedef int_constructable_class C;
         C c;
         int i = 0;
 
@@ -171,7 +168,7 @@ private:
 
     bool int_assignable_class_case() const
     {
-        typedef __convertor_test_private::int_assignable_class C;
+        typedef int_assignable_class C;
         C c;
         int i = 0;
 
@@ -186,7 +183,7 @@ private:
 
     bool no_int_class_case() const
     {
-        typedef __convertor_test_private::no_int_class C;
+        typedef no_int_class C;
         C c;
         int i = 0;
         

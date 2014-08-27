@@ -5,6 +5,7 @@
 #include <utility>
 #include <memory>
 #include "../app_info/assert.hpp"
+#include "../utils/mover.hpp"
 
 template <typename T, size_t MAX_SIZE>
 class fixed_stack
@@ -34,7 +35,13 @@ public:
         return index_is(MAX_SIZE);
     }
 
-    T& back() const
+    T& back()
+    {
+        assert(!empty());
+        return q[index - 1];
+    }
+
+    const T& back() const
     {
         assert(!empty());
         return q[index - 1];
@@ -43,24 +50,14 @@ public:
     bool pop(T& o)
     {
         if(empty()) return false;
-        else
-        {
-            index--;
-            new (&o) T(std::move(q[index]));
-            return true;
-        }
+        else return mover(q[--index], o);
     }
 
     template <typename... Args>
     bool emplace(Args&&... args)
     {
         if(full()) return false;
-        else
-        {
-            new (&q[index]) T(std::forward<Args>(args)...);
-            index++;
-            return true;
-        }
+        else return mover(std::forward<Args>(args)..., q[index++]);
     }
 
     template <typename U>

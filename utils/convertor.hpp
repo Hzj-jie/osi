@@ -7,11 +7,24 @@
 #include <type_traits>
 #include <boost/algorithm/string.hpp>
 #include "../template/type_traits.hpp"
+#include "../app_info/assert.hpp"
 
 namespace converts
 {
     const static char* True = "true";
     const static char* False = "false";
+
+    static bool convert(const std::string& i, std::string& o)
+    {
+        o = i;
+        return true;
+    }
+
+    static bool convert(const char* i, std::string& o)
+    {
+        o = i;
+        return true;
+    }
 
     static bool convert(const std::string& i, bool& o)
     {
@@ -88,10 +101,12 @@ namespace converts
         }
     };
 
-    HAS_CONST_MEMBER_FUNCTION(convert_to);
-
     struct class_convertor
     {
+    private:
+        HAS_CONST_MEMBER_FUNCTION(convert_to);
+
+    public:
         template <typename T1, typename T2>
         static bool copy(const T1& i, T2& o)
         {
@@ -134,6 +149,14 @@ public:
     bool operator()(const T1& i, T2& o) const
     {
         return converts::convert(i, o);
+    }
+
+    template <typename T1, typename T2>
+    T2 convert(const T1& i) const
+    {
+        T2 o;
+        assert(operator()(i, o));
+        return o;
     }
 
 private:
