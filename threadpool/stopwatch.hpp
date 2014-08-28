@@ -177,7 +177,7 @@ public:
     
     bool push(const std::shared_ptr<stopwatch_event>& e) const
     {
-        if(e || e->canceled())
+        if(e && !(e->canceled()))
         {
             return assert(queue_runner().check_push([e]()
                                                     {

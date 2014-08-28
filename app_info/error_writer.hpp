@@ -10,6 +10,7 @@
 #include <boost/filesystem/fstream.hpp>
 #include <array>
 #include "../sync/lock.hpp"
+#include <mutex>
 
 namespace error_handle
 {
@@ -35,13 +36,15 @@ namespace error_handle
     private:
         // std::ofstream is not moveable in g++ 4.8.2
         boost::filesystem::ofstream* const writer;
+        std::mutex mtx;
+
     public:
         void write(const std::string& s) override
         {
             k_assert(writer != nullptr);
             if(*writer)
             {
-                static_scope_lock();
+                scope_lock(mtx);
                 ((*writer) << s).flush();
             }
         }

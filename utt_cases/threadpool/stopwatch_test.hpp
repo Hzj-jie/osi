@@ -13,6 +13,15 @@
 class stopwatch_case : public icase
 {
 public:
+    bool prepare() override
+    {
+        // BUGBUG in CL / Microsoft (R) C/C++ Optimizing Compiler Version 18.00.21005.1 for x86
+        // the static variable in function is not initialized thread-safely
+        utt_assert.is_true((bool)(stopwatch.push(0,
+                                                 []() { })));
+        return icase::prepare();
+    }
+
     bool execute() override
     {
         const uint32_t waitms = 100;
