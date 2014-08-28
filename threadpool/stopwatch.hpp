@@ -9,17 +9,20 @@
 #include "../app_info/assert.hpp"
 #include "../app_info/error_handle.hpp"
 
+namespace __stopwatch_private
+{
+    const static auto& default_timer = nowadays.low_res;
+}
+
 const static class stopwatch_t
 {
 private:
     stopwatch_t() = default;
 
 public:
-    class stopwatch_event : std::enable_shared_from_this<stopwatch_event>
+    class stopwatch_event
     {
     private:
-        auto& cs = call_stack<stopwatch_event*>();
-
         const std::function<int64_t(void)> ms_timer;
 
         const static uint32_t IS_CANCELED = 1;
@@ -34,6 +37,12 @@ public:
         const uint32_t waitms;
         const std::function<void(void)> d;
         int64_t lastms;
+
+    private:
+        static auto cs() -> decltype(call_stack<stopwatch_event*>())
+        {
+            return call_stack<stopwatch_event*>();
+        }
 
     public:
         bool canceled() const
@@ -89,7 +98,7 @@ public:
 
         static stopwatch_event& current()
         {
-            return cs.current();
+            return (*cs().current());
         }
 
     private:
@@ -97,24 +106,24 @@ public:
         stopwatch_event(uint32_t waitms,
                         std::function<void(void)>&& d,
                         const TIMER& in_ms_timer) :
-            ms_timer([&in_ms_timer]() { return in_ms_timer.milliseconds(); })
+            ms_timer([&in_ms_timer]() { return in_ms_timer.milliseconds(); }),
             _canceled(IS_NOT_CANCELED),
             _step(IS_NOT_STARTED),
             waitms(waitms),
             d(std::move(d)),
-            lastms(ms_timer()),
+            lastms(ms_timer())
         { }
 
         stopwatch_event(uint32_t waitms, std::function<void(void)>&& d) :
-            stopwatch_event<nowadays_t::low_res_t>(waitms, d, nowadays.low_res)
+            stopwatch_event(waitms, std::move(d), __stopwatch_private::default_timer)
         { }
 
-        friend class stopwatch;
+        friend class stopwatch_t;
 
         void mark_before_callback()
         {
             uint32_t v = IS_NOT_STARTED;
-            assert(_step.compare_exchange_weak(v, IS_BEFOER_CALLBACK) &&
+            assert(_step.compare_exchange_weak(v, IS_BEFORE_CALLBACK) &&
                    assert(v == IS_NOT_STARTED));
         }
 
@@ -130,7 +139,10 @@ public:
             if(canceled()) return false;
             else
             {
-                cs.push(this);
+                {
+                    stopwatch_event* x = this;
+                    cs().push(x);
+                }
                 bool r = false;
                 int64_t diff = ms_timer() - lastms - waitms;
                 if(diff >= 0)
@@ -142,7 +154,7 @@ public:
                     r = false;
                 }
                 else r = true;
-                cs.pop();
+                cs().pop();
                 return r;
             }
         }
@@ -153,21 +165,21 @@ public:
                                                        std::function<void(void)>&& d,
                                                        const TIMER& ms_timer)
         {
-            return (new stopwatch_event(waitms, std::move(d), ms_timer))->shared_from_this();
+            return std::shared_ptr<stopwatch_event>(new stopwatch_event(waitms, std::move(d), ms_timer));
         }
 
         static std::shared_ptr<stopwatch_event> create(uint32_t waitms,
                                                        std::function<void(void)>&& d)
         {
-            return (new stopwatch_event(waitms, std::move(d)))->shared_from_this();
+            return std::shared_ptr<stopwatch_event>(new stopwatch_event(waitms, std::move(d)));
         }
     };
     
-    bool push(const std::shared_ptr<stopwatch_event>& e)
+    bool push(const std::shared_ptr<stopwatch_event>& e) const
     {
         if(e || e->canceled())
         {
-            return assert(queue_runner().check_push([=e]()
+            return assert(queue_runner().check_push([e]()
                                                     {
                                                         return e->execute();
                                                     }));
@@ -178,15 +190,15 @@ public:
     template <typename TIMER>
     std::shared_ptr<stopwatch_event> push(uint32_t waitms,
                                           std::function<void(void)>&& d,
-                                          const TIMER& ms_timer)
+                                          const TIMER& ms_timer) const
     {
         std::shared_ptr<stopwatch_event> e = stopwatch_event::create(waitms, std::move(d), ms_timer);
         assert(push(e));
         return e;
     }
 
-    std::shared_ptr<stopwatch_event> push(uint32_t watims,
-                                          std::function<void(void)>&& d)
+    std::shared_ptr<stopwatch_event> push(uint32_t waitms,
+                                          std::function<void(void)>&& d) const
     {
         std::shared_ptr<stopwatch_event> e = stopwatch_event::create(waitms, std::move(d));
         assert(push(e));

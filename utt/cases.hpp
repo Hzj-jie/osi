@@ -34,4 +34,5 @@
 #include "../utt_cases/formation/fixed_stack_test.hpp"
 #include "../utt_cases/utils/convertor_test.hpp"
 #include "../utt_cases/utils/call_stack_test.hpp"
+#include "../utt_cases/threadpool/stopwatch_test.hpp"
 
