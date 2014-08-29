@@ -86,6 +86,20 @@ utt: main.cpp icase.hpp ../sync/lock.hpp ../sync/../utils/macro.hpp \
  ../utt_cases/threadpool/../../threadpool/threadpool.hpp \
  ../utt_cases/utils/recursive_deleter_test.hpp \
  ../utt_cases/utils/../../utils/recursive_deleter.hpp \
+ ../utt_cases/formation/fixed_stack_test.hpp \
+ ../utt_cases/formation/../../formation/fixed_stack.hpp \
+ ../utt_cases/formation/../../formation/../app_info/assert.hpp \
+ ../utt_cases/formation/../../formation/../utils/mover.hpp \
+ ../utt_cases/formation/../../formation/../utils/convertor.hpp \
+ ../utt_cases/formation/../../formation/../utils/../template/type_traits.hpp \
+ ../utt_cases/formation/../../formation/../utils/../app_info/assert.hpp \
+ ../utt_cases/utils/convertor_test.hpp \
+ ../utt_cases/utils/call_stack_test.hpp \
+ ../utt_cases/utils/../../utils/call_stack.hpp \
+ ../utt_cases/utils/../../utils/../app_info/assert.hpp \
+ ../utt_cases/utils/../../utils/../threadpool/thread_local.hpp \
+ ../utt_cases/threadpool/stopwatch_test.hpp \
+ ../utt_cases/threadpool/../../threadpool/stopwatch.hpp \
  /usr/local/lib/libboost_filesystem.a \
  /usr/local/lib/libboost_system.a
 	g++ main.cpp -o utt -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3 -pthread /usr/local/lib/libboost_filesystem.a /usr/local/lib/libboost_system.a
