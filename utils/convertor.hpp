@@ -154,7 +154,7 @@ public:
     template <typename T1, typename T2>
     T2 convert(const T1& i) const
     {
-        T2 o;
+        T2 o { };
         assert(operator()(i, o));
         return o;
     }

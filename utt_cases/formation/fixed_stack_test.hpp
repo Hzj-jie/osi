@@ -33,7 +33,7 @@ private:
         {
             utt_assert.is_false(s.empty());
             utt_assert.equal(convertor.convert<T, size_t>(s.back()), i - 1);
-            T o;
+            T o { };
             utt_assert.is_true(s.pop(o));
             utt_assert.equal(convertor.convert<T, size_t>(o), i - 1);
             utt_assert.is_false(s.full());
