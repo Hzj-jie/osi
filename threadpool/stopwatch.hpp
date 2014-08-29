@@ -17,7 +17,17 @@ namespace __stopwatch_private
 const static class stopwatch_t
 {
 private:
-    stopwatch_t() = default;
+    static auto qr() -> decltype(queue_runner())
+    {
+        return queue_runner();
+    }
+
+    stopwatch_t()
+    {
+        // BUGBUG in CL / Microsoft (R) C/C++ Optimizing Compiler Version 18.00.21005.1 for x86
+        // the static variable in function is not initialized thread-safely
+        qr();
+    }
 
 public:
     class stopwatch_event
@@ -179,10 +189,10 @@ public:
     {
         if(e && !(e->canceled()))
         {
-            return assert(queue_runner().check_push([e]()
-                                                    {
-                                                        return e->execute();
-                                                    }));
+            return assert(qr().check_push([e]()
+                                          {
+                                              return e->execute();
+                                          }));
         }
         else return false;
     }

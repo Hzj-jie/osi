@@ -13,6 +13,7 @@
 class stopwatch_case : public icase
 {
 public:
+    /*
     bool prepare() override
     {
         // BUGBUG in CL / Microsoft (R) C/C++ Optimizing Compiler Version 18.00.21005.1 for x86
@@ -21,6 +22,7 @@ public:
                                                  []() { })));
         return icase::prepare();
     }
+    */
 
     bool execute() override
     {
