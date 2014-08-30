@@ -218,4 +218,3 @@ static queue_runner_t<qless>& queue_runner()
 {
     return queue_runner<qless>();
 }
-
