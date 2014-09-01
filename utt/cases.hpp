@@ -39,4 +39,5 @@
 #include "../utt_cases/utt/fake/construct_counter_test.hpp"
 #include "../utt_cases/template/type_traits_test.hpp"
 #include "../utt_cases/utils/outputter_test.hpp"
+#include "../utt_cases/formation/movable_initializer_list_test.hpp"
 

@@ -18,6 +18,7 @@ private:
         utt_assert.equal(cc::default_constructed(), 0, CODE_POSITION());
         utt_assert.equal(cc::copy_constructed(), 0, CODE_POSITION());
         utt_assert.equal(cc::move_constructed(), 0, CODE_POSITION());
+        utt_assert.equal(cc::constructed(), 0, CODE_POSITION());
         utt_assert.equal(cc::destructed(), 0, CODE_POSITION());
         utt_assert.equal(cc::instance_count(), 0, CODE_POSITION());
 
@@ -26,12 +27,14 @@ private:
             utt_assert.equal(cc::default_constructed(), 1, CODE_POSITION());
             utt_assert.equal(cc::copy_constructed(), 0, CODE_POSITION());
             utt_assert.equal(cc::move_constructed(), 0, CODE_POSITION());
+            utt_assert.equal(cc::constructed(), 1, CODE_POSITION());
             utt_assert.equal(cc::destructed(), 0, CODE_POSITION());
             utt_assert.equal(cc::instance_count(), 1, CODE_POSITION());
         }
         utt_assert.equal(cc::default_constructed(), 1, CODE_POSITION());
         utt_assert.equal(cc::copy_constructed(), 0, CODE_POSITION());
         utt_assert.equal(cc::move_constructed(), 0, CODE_POSITION());
+        utt_assert.equal(cc::constructed(), 1, CODE_POSITION());
         utt_assert.equal(cc::destructed(), 1, CODE_POSITION());
         utt_assert.equal(cc::instance_count(), 0, CODE_POSITION());
 
@@ -41,12 +44,14 @@ private:
             utt_assert.equal(cc::default_constructed(), 2, CODE_POSITION());
             utt_assert.equal(cc::copy_constructed(), 1, CODE_POSITION());
             utt_assert.equal(cc::move_constructed(), 0, CODE_POSITION());
+            utt_assert.equal(cc::constructed(), 3, CODE_POSITION());
             utt_assert.equal(cc::destructed(), 1, CODE_POSITION());
             utt_assert.equal(cc::instance_count(), 2, CODE_POSITION());
         }
         utt_assert.equal(cc::default_constructed(), 2, CODE_POSITION());
         utt_assert.equal(cc::copy_constructed(), 1, CODE_POSITION());
         utt_assert.equal(cc::move_constructed(), 0, CODE_POSITION());
+        utt_assert.equal(cc::constructed(), 3, CODE_POSITION());
         utt_assert.equal(cc::destructed(), 3, CODE_POSITION());
         utt_assert.equal(cc::instance_count(), 0, CODE_POSITION());
 
@@ -55,12 +60,14 @@ private:
             utt_assert.equal(cc::default_constructed(), 3, CODE_POSITION());
             utt_assert.equal(cc::copy_constructed(), 1, CODE_POSITION());
             utt_assert.equal(cc::move_constructed(), 1, CODE_POSITION());
+            utt_assert.equal(cc::constructed(), 5, CODE_POSITION());
             utt_assert.equal(cc::destructed(), 4, CODE_POSITION());
             utt_assert.equal(cc::instance_count(), 1, CODE_POSITION());
         }
         utt_assert.equal(cc::default_constructed(), 3, CODE_POSITION());
         utt_assert.equal(cc::copy_constructed(), 1, CODE_POSITION());
         utt_assert.equal(cc::move_constructed(), 1, CODE_POSITION());
+        utt_assert.equal(cc::constructed(), 5, CODE_POSITION());
         utt_assert.equal(cc::destructed(), 5, CODE_POSITION());
         utt_assert.equal(cc::instance_count(), 0, CODE_POSITION());
 

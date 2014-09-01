@@ -14,13 +14,13 @@ public:
     typedef T& reference;
     typedef const T& const_reference;
     typedef size_t size_type;
-    typedef vector<T>::iterator iterator;
-    typedef vector<T>::const_iterator const_iterator;
+    typedef typename std::vector<T>::iterator iterator;
+    typedef typename std::vector<T>::const_iterator const_iterator;
 private:
     std::vector<T> v;
 
 public:
-    movable_initializer_list(initializer_list<T*> i)
+    movable_initializer_list(const initializer_list<T*>& i)
     {
         for(auto it = i.begin(); it != i.end(); it++)
         {
