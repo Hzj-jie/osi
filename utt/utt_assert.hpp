@@ -7,6 +7,8 @@
 #include <atomic>
 #include <stdint.h>
 #include "../template/singleton.hpp"
+#include <utility>
+#include "../utils/outputter.hpp"
 
 namespace utt
 {
@@ -41,10 +43,23 @@ namespace utt
 #define UTT_ASSERT_TEMP(n, x, m) \
             template <typename T1, typename T2, typename... Args> \
             bool n(T1&& i, T2&& j, Args&&... args) const { \
-                return utt_assert(x, #x, std::forward<Args>(args)...); } \
+                bool V = x; \
+                return utt_assert(V, \
+                                  #x, \
+                                  " left == ", \
+                                  make_outputter(std::forward<T1>(i)), \
+                                  " right == ", \
+                                  make_outputter(std::forward<T2>(j)), \
+                                  std::forward<Args>(args)...); } \
             template <typename... Args> \
             bool n(const char* i, const char* j, Args&&... args) const { \
-                return utt_assert(strcmp(i, j) m, "strcmp(i, j) "#m, std::forward<Args>(args)...); }
+                return utt_assert(strcmp(i, j) m, \
+                                  "strcmp(i, j) "#m, \
+                                  " left == ", \
+                                  i, \
+                                  " right == ", \
+                                  j, \
+                                  std::forward<Args>(args)...); }
         UTT_ASSERT_TEMP(equal, i == j, == 0);
         UTT_ASSERT_TEMP(not_equal, i != j, != 0);
         UTT_ASSERT_TEMP(less, i < j, < 0);

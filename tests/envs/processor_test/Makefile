@@ -10,8 +10,8 @@ processor_test: processor_test.cpp ../../../envs/processor.hpp \
  ../../../envs/../template/singleton.hpp \
  ../../../envs/../template/../envs/os.hpp \
  ../../../envs/../template/../envs/../app_info/k_assert.hpp \
- ../../../envs/nowadays.hpp ../../../envs/../const/character.hpp \
- ../../../envs/../utils/strutils.hpp
+ ../../../envs/../template/../utils/macro.hpp ../../../envs/nowadays.hpp \
+ ../../../envs/../const/character.hpp ../../../envs/../utils/strutils.hpp
 	g++ processor_test.cpp -o processor_test -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3 -lboost_filesystem -lboost_system
 
 clean:

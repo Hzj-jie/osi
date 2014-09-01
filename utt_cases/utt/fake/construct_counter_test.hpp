@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include "../../../envs/processor.hpp"
 #include "../../../app_info/trace.hpp"
+#include <utility>
 
 class construct_counter_test : public icase
 {
@@ -34,7 +35,6 @@ private:
         utt_assert.equal(cc::destructed(), 1, CODE_POSITION());
         utt_assert.equal(cc::instance_count(), 0, CODE_POSITION());
 
-
         {
             cc x;
             cc y(x);
@@ -51,7 +51,7 @@ private:
         utt_assert.equal(cc::instance_count(), 0, CODE_POSITION());
 
         {
-            cc y(cc());
+            cc y(std::move(cc()));
             utt_assert.equal(cc::default_constructed(), 3, CODE_POSITION());
             utt_assert.equal(cc::copy_constructed(), 1, CODE_POSITION());
             utt_assert.equal(cc::move_constructed(), 1, CODE_POSITION());

@@ -65,113 +65,37 @@ namespace __type_traits_private
                                                           typename U COMMA U, \
                                                           Sign COMMA &U::func);
 
-namespace __type_traits_operator_overloads_private
-{
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator==(const T1&, const T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator==(const T1&, T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator==(T1&, const T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator==(T1&, T2&);
-
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator!=(const T1&, const T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator!=(const T1&, T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator!=(T1&, const T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator!=(T1&, T2&);
-
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator<(const T1&, const T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator<(const T1&, T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator<(T1&, const T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator<(T1&, T2&);
-
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator<=(const T1&, const T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator<=(const T1&, T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator<=(T1&, const T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator<=(T1&, T2&);
-
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator>(const T1&, const T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator>(const T1&, T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator>(T1&, const T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator>(T1&, T2&);
-
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator>=(const T1&, const T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator>=(const T1&, T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator>=(T1&, const T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator>=(T1&, T2&);
-
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator<<(const T1&, const T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator<<(const T1&, T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator<<(T1&, const T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator<<(T1&, T2&);
-
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator>>(const T1&, const T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator>>(const T1&, T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator>>(T1&, const T2&);
-    template <typename T1, typename T2>
-    __type_traits_private::No_t& operator>>(T1&, T2&);
-
-    template <typename T1, typename T2>
-    struct operator_overloads
-    {
-    public:
-#define HAS_OPERATOR_TEMPLATE(name, op) \
-                const static bool has_operator_##name##_const_const = \
-                    !__type_traits_private::no< \
-                        decltype(const_cast<const T1>(*(T1*)(0)) op \
-                                 const_cast<const T2>(*(T2*)(0)))>::value; \
-                const static bool has_operator_##name##_variant_const = \
-                    !__type_traits_private::no< \
-                        decltype(const_cast<const T1>(*(T1*)(0)) op \
-                                 const_cast<const T2>(*(T2*)(0)))>::value; \
-                const static bool has_operator_##name##_const_variant = \
-                    !__type_traits_private::no< \
-                        decltype(const_cast<const T1>(*(T1*)(0)) op \
-                                 const_cast<const T2>(*(T2*)(0)))>::value; \
-                const static bool has_operator_##name##_variant_variant = \
-                    !__type_traits_private::no< \
-                        decltype(const_cast<const T1>(*(T1*)(0)) op \
-                                 const_cast<const T2>(*(T2*)(0)))>::value;
-        HAS_OPERATOR_TEMPLATE(equal, ==);
-        HAS_OPERATOR_TEMPLATE(not_equal, !=);
-        HAS_OPERATOR_TEMPLATE(less, <);
-        HAS_OPERATOR_TEMPLATE(less_or_equal, <=);
-        HAS_OPERATOR_TEMPLATE(more, >);
-        HAS_OPERATOR_TEMPLATE(more_or_equal, >=);
-        HAS_OPERATOR_TEMPLATE(left_shift, <<);
-        HAS_OPERATOR_TEMPLATE(right_shift, >>);
-#undef HAS_OPERATOR_TEMPLATE
-    };
-}
-
 template <typename T1, typename T2 = T1>
-struct operator_overloads : __type_traits_operator_overloads_private::operator_overloads<T1, T2> { };
+struct operator_overloads
+{
+private:
+    template <typename T>
+    struct type_check;
+#define HAS_OPERATOR_TEMPLATE_SINGLE(name, op, CC1, CC2, V1, V2) \
+        private: \
+            template <typename U1, typename U2> \
+            static __type_traits_private::Yes_t& name##_##CC1##_##CC2##_test( \
+                       type_check<decltype(*(V1 U1*)(0) op *(V2 U2*)(0))>*); \
+            template <typename, typename> \
+            static __type_traits_private::No_t& name##_##CC1##_##CC2##_test(...); \
+        public: \
+            const static bool has_operator_##name##_##CC1##_##CC2 = \
+                __type_traits_private::yes< \
+                    decltype(name##_##CC1##_##CC2##_test<T1, T2>(nullptr))>::value;
+#define HAS_OPERATOR_TEMPLATE(name, op) \
+        HAS_OPERATOR_TEMPLATE_SINGLE(name, op, const, const, const, const); \
+        HAS_OPERATOR_TEMPLATE_SINGLE(name, op, const, variant, const,); \
+        HAS_OPERATOR_TEMPLATE_SINGLE(name, op, variant, const, , const); \
+        HAS_OPERATOR_TEMPLATE_SINGLE(name, op, variant, variant, , );
+    HAS_OPERATOR_TEMPLATE(equal, ==);
+    HAS_OPERATOR_TEMPLATE(not_equal, !=);
+    HAS_OPERATOR_TEMPLATE(less, <);
+    HAS_OPERATOR_TEMPLATE(less_or_equal, <=);
+    HAS_OPERATOR_TEMPLATE(more, >);
+    HAS_OPERATOR_TEMPLATE(more_or_equal, >=);
+    HAS_OPERATOR_TEMPLATE(left_shift, <<);
+    HAS_OPERATOR_TEMPLATE(right_shift, >>);
+#undef HAS_OPERATOR_TEMPLATE
+#undef HAS_OPERATOR_TEMPLATE_SINGLE
+};
 
