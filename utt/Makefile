@@ -100,6 +100,12 @@ utt: main.cpp icase.hpp ../sync/lock.hpp ../sync/../utils/macro.hpp \
  ../utt_cases/utils/../../utils/../threadpool/thread_local.hpp \
  ../utt_cases/threadpool/stopwatch_test.hpp \
  ../utt_cases/threadpool/../../threadpool/stopwatch.hpp \
+ ../utt_cases/formation/ternary_test.hpp \
+ ../utt_cases/formation/../../app_info/assert.hpp \
+ ../utt_cases/formation/../../formation/ternary.hpp \
+ ../utt_cases/utt/fake/construct_counter_test.hpp \
+ ../utt_cases/utt/fake/../../../utt/fake/construct_counter.hpp \
+ ../utt_cases/template/type_traits_test.hpp \
  /usr/local/lib/libboost_filesystem.a \
  /usr/local/lib/libboost_system.a
 	g++ main.cpp -o utt -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3 -pthread /usr/local/lib/libboost_filesystem.a /usr/local/lib/libboost_system.a

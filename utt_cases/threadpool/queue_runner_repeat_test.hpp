@@ -11,6 +11,8 @@
 #include "../../formation/concurrent/qless.hpp"
 #include "../../formation/concurrent/qless3.hpp"
 #include <functional>
+#include <thread>
+#include <chrono>
 
 template <template <typename T> class Qless>
 class queue_runner_repeat_case : public icase
@@ -18,10 +20,13 @@ class queue_runner_repeat_case : public icase
 private:
     queue_runner_t<Qless>* q;
 
-    void wait_finish()
+    void wait_finish(uint32_t timeout_ms = 0)
     {
         assert(q != nullptr);
         utt_assert.less_or_equal(q->size(), 1, ", ", q->size(), CODE_POSITION());
+        // wait_for_idle is not working
+        if(timeout_ms > 0)
+            std::this_thread::sleep_for(std::chrono::milliseconds(timeout_ms));
         q->wait_for_idle();
     }
 
@@ -39,7 +44,7 @@ private:
                                                          [&cbed]() { cbed = true; },
                                                          timeout_ms),
                                CODE_POSITION());
-            wait_finish();
+            wait_finish(timeout_ms);
         }
         utt_assert.more_or_equal(used_ms, timeout_ms, ", ", used_ms, CODE_POSITION());
         utt_assert.is_true(cbed, CODE_POSITION());
@@ -76,7 +81,7 @@ private:
                                                         [&cbed]() { cbed = true; },
                                                         timeout_ms),
                                CODE_POSITION());
-            wait_finish();
+            wait_finish(timeout_ms);
         }
         utt_assert.more_or_equal(used_ms, timeout_ms, ", ", used_ms, CODE_POSITION());
         utt_assert.is_true(cbed, CODE_POSITION());

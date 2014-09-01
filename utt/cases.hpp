@@ -35,4 +35,7 @@
 #include "../utt_cases/utils/convertor_test.hpp"
 #include "../utt_cases/utils/call_stack_test.hpp"
 #include "../utt_cases/threadpool/stopwatch_test.hpp"
+#include "../utt_cases/formation/ternary_test.hpp"
+#include "../utt_cases/utt/fake/construct_counter_test.hpp"
+#include "../utt_cases/template/type_traits_test.hpp"
 

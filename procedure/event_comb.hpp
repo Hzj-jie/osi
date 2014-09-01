@@ -7,6 +7,7 @@
 #include <functional>
 #include <vector>
 #include "../app_info/trace.hpp"
+#include "../formation/ternary.hpp"
 
 class event_comb
 {
@@ -16,5 +17,6 @@ private:
     const static int first_step = 0;
     std::vector<std::function<bool(void)>> ds;
     const code_position ctor_position;
+    ternary _end_result;
 };
 
