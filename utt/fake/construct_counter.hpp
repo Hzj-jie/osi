@@ -19,19 +19,19 @@ public:
     const uint32_t index;
 
     construct_counter() BOOST_NOEXCEPT :
-        index(ac().fetch_add(1, std::memory_order_release)
+        index(ac().fetch_add(1, std::memory_order_release))
     {
         dc().fetch_add(1, std::memory_order_release);
     }
 
     construct_counter(const construct_counter&) BOOST_NOEXCEPT :
-        index(ac().fetch_add(1, std::memory_order_release)
+        index(ac().fetch_add(1, std::memory_order_release))
     {
         cc().fetch_add(1, std::memory_order_release);
     }
 
     construct_counter(construct_counter&&) BOOST_NOEXCEPT :
-        index(ac().fetch_add(1, std::memory_order_release)
+        index(ac().fetch_add(1, std::memory_order_release))
     {
         mc().fetch_add(1, std::memory_order_release);
     }
