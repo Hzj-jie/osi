@@ -1,3 +1,3 @@
 
-all-cmd ./git.sh
+first-target ./git.sh
 rm rm git.hpp

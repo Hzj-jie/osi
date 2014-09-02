@@ -4,6 +4,7 @@
 # so change the configuration file or autocompile logic is prefered
 
 all: \
+ first \
  deploys.hpp.pch \
  envs.hpp.pch \
  exeinfo.hpp.pch \
@@ -13,6 +14,8 @@ all: \
  os.hpp.pch \
  preenv.hpp.pch \
  processor.hpp.pch
+
+first:
 	./git.sh
 
 deploys.hpp.pch: deploys.hpp exeinfo.hpp os.hpp ../app_info/k_assert.hpp \

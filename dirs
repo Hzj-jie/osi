@@ -1,6 +1,16 @@
 
 -.git
+utt_cases envs
+app_info envs
+const envs
+delegates envs
+formation envs
+procedure envs
+sync envs
+template envs
 tests envs
+threadpool envs
+utils envs
 utt envs utt_cases
 utt_cases app_info const delegates envs formation procedure sync template threadpool utils
 
