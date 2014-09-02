@@ -7,6 +7,7 @@
 #include <string>
 #include "../utils/str_pattern_matcher.hpp"
 #include "../utils/strcmp.hpp"
+#include "icase.hpp"
 
 class config_t
 {
