@@ -9,7 +9,7 @@
 #include <stdint.h>
 #include <functional>
 
-template <typename T, uint32_t MinLoops = UINT32_MIN, uint32_t MaxLoops = UINT32_MAX, uint32_t RunTimes = 1>
+template <typename T, uint32_t MinLoops = 0, uint32_t MaxLoops = UINT32_MAX, uint32_t RunTimes = 1>
 class performance_case_wrapper : public case_wrapper<T>
 {
 private:
@@ -46,7 +46,7 @@ public:
             if(used_loops < min) min = used_loops;
         }
         
-        if(min_loops() == UINT32_MIN) utt::utt_raise_error("performance case ", name(), " has not provided min_loops");
+        if(min_loops() == 0) utt::utt_raise_error("performance case ", name(), " has not provided min_loops");
         if(max_loops() == UINT32_MAX) utt::utt_raise_error("performance case ", name(), " has not provided max_loops");
         utt_assert.more_or_equal(min, min_loops());
         utt_assert.less_or_equal(min, max_loops());

@@ -3,6 +3,7 @@
 #include "../../sync/exclusive_container.hpp"
 #include "../../utt/icase.hpp"
 #include "../../utt/case_wrapper/multithreading_case_wrapper.hpp"
+#include "../../utt/case_wrapper/repeat_case_wrapper.hpp"
 #include "../../utt/utt_assert.hpp"
 #include <stdint.h>
 

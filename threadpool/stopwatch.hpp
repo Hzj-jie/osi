@@ -8,6 +8,8 @@
 #include "../envs/nowadays.hpp"
 #include "../app_info/assert.hpp"
 #include "../app_info/error_handle.hpp"
+#include "queue_runner.hpp"
+#include "../utils/call_stack.hpp"
 
 namespace __stopwatch_private
 {

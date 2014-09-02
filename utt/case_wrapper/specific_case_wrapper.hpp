@@ -2,6 +2,7 @@
 #pragma once
 #include <utility>
 #include "../config.hpp"
+#include "case_wrapper.hpp"
 
 template <typename T>
 class specific_case_wrapper : public case_wrapper<T>

@@ -9,6 +9,7 @@
 #include <type_traits>
 #include "../utils/macro.hpp"
 #include "../threadpool/thread_local.hpp"
+#include "../formation/fixed_stack.hpp"
 
 namespace __call_stack_private
 {

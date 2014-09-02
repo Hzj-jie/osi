@@ -11,6 +11,7 @@
 #include <array>
 #include "../sync/lock.hpp"
 #include <mutex>
+#include "error_type.hpp"
 
 namespace error_handle
 {
