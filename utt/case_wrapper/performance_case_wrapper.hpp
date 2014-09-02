@@ -46,10 +46,10 @@ public:
             if(used_loops < min) min = used_loops;
         }
         
-        if(min_loops() == 0) utt::utt_raise_error("performance case ", name(), " has not provided min_loops");
-        if(max_loops() == UINT32_MAX) utt::utt_raise_error("performance case ", name(), " has not provided max_loops");
-        utt_assert.more_or_equal(min, min_loops());
-        utt_assert.less_or_equal(min, max_loops());
+        if(min_loops() == 0) utt::utt_raise_error("performance case ", case_wrapper<T>::name(), " has not provided min_loops");
+        if(max_loops() == UINT32_MAX) utt::utt_raise_error("performance case ", case_wrapper<T>::name(), " has not provided max_loops");
+        case_wrapper<T>::utt_assert.more_or_equal(min, min_loops());
+        case_wrapper<T>::utt_assert.less_or_equal(min, max_loops());
         return true;
     }
 };

@@ -10,6 +10,7 @@
 #include "../../app_info/trace.hpp"
 #include "../../formation/concurrent/qless.hpp"
 #include "../../formation/concurrent/qless3.hpp"
+#include "../../utt/case_wrapper/repeat_case_wrapper.hpp"
 #include <functional>
 #include <thread>
 #include <chrono>
