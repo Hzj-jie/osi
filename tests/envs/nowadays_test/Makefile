@@ -11,6 +11,7 @@ nowadays_test: nowadays_test.cpp ../../../envs/nowadays.hpp \
  ../../../envs/../const/../template/singleton.hpp \
  ../../../envs/../const/../template/../envs/os.hpp \
  ../../../envs/../const/../template/../envs/../app_info/k_assert.hpp \
+ ../../../envs/../const/../template/../utils/macro.hpp \
  ../../../envs/../utils/strutils.hpp
 	g++ nowadays_test.cpp -o nowadays_test -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3 -lboost_system
 

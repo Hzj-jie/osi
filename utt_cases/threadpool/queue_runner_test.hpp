@@ -13,6 +13,7 @@
 #include <array>
 #include <stdint.h>
 #include <boost/predef.h>
+#include "../../template/singleton.hpp"
 
 template <template <typename T> class Qless>
 class queue_runner_case : public icase
@@ -22,7 +23,7 @@ public:
     const static uint32_t repeat_count = 1024;
 private:
     queue_runner_t<Qless>* q;
-    const static int max_value = 100;
+    CONST_SINGLETON_FUNC(int, max_value, = 100);
 
     class counter
     {
@@ -38,7 +39,7 @@ private:
         bool exec()
         {
             i++;
-            return i < max_value;
+            return i < max_value();
         }
 
         void reset()
@@ -82,8 +83,8 @@ public:
         q->wait_for_idle();
         delete q;
         for(auto it = counters.begin(); it != counters.end(); it++)
-            utt_assert.equal((*it).value(), max_value);
-        utt_assert.equal<uint32_t>(execs.load(std::memory_order_consume), max_value * counters.size());
+            utt_assert.equal((*it).value(), max_value());
+        utt_assert.equal<uint32_t>(execs.load(std::memory_order_consume), max_value() * counters.size());
         return icase::cleanup();
     }
 

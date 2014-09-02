@@ -11,6 +11,7 @@ spin_wait_test: spin_wait_test.cpp ../../../sync/spin_wait.hpp \
  ../../../sync/../envs/../template/singleton.hpp \
  ../../../sync/../envs/../template/../envs/os.hpp \
  ../../../sync/../envs/../template/../envs/../app_info/k_assert.hpp \
+ ../../../sync/../envs/../template/../utils/macro.hpp \
  ../../../sync/../envs/processor.hpp ../../../sync/../envs/nowadays.hpp \
  ../../../sync/../envs/../const/character.hpp \
  ../../../sync/../envs/../utils/strutils.hpp ../../../sync/yield.hpp \
