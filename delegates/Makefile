@@ -3,18 +3,7 @@
 # with .autocompile configuration file,
 # so change the configuration file or autocompile logic is prefered
 
-all: \
- event.hpp.pch \
- transform.hpp.pch
-
-event.hpp.pch: event.hpp
-	g++ -x c++-header event.hpp -o event.hpp.pch -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3
-
-transform.hpp.pch: transform.hpp
-	g++ -x c++-header transform.hpp -o transform.hpp.pch -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3
-
-clean:
-	-rm event.hpp.pch transform.hpp.pch
+all:
 
 autocompile:
 	autocompile > Makefile

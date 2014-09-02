@@ -3,19 +3,7 @@
 # with .autocompile configuration file,
 # so change the configuration file or autocompile logic is prefered
 
-all: \
- singleton.hpp.pch \
- type_traits.hpp.pch
-
-singleton.hpp.pch: singleton.hpp ../envs/os.hpp \
- ../envs/../app_info/k_assert.hpp ../utils/macro.hpp
-	g++ -x c++-header singleton.hpp -o singleton.hpp.pch -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3
-
-type_traits.hpp.pch: type_traits.hpp ../utils/macro.hpp
-	g++ -x c++-header type_traits.hpp -o type_traits.hpp.pch -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3
-
-clean:
-	-rm singleton.hpp.pch type_traits.hpp.pch
+all:
 
 autocompile:
 	autocompile > Makefile

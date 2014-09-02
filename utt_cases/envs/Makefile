@@ -3,44 +3,7 @@
 # with .autocompile configuration file,
 # so change the configuration file or autocompile logic is prefered
 
-all: \
- envs_test.hpp.pch \
- nowadays_test.hpp.pch
-
-envs_test.hpp.pch: envs_test.hpp ../../envs/envs.hpp ../../envs/os.hpp \
- ../../envs/../app_info/k_assert.hpp ../../envs/../utils/strutils.hpp \
- ../../envs/../const/character.hpp \
- ../../envs/../const/../template/singleton.hpp \
- ../../envs/../const/../template/../utils/macro.hpp ../../utt/icase.hpp \
- ../../utt/../sync/lock.hpp ../../utt/utt_assert.hpp \
- ../../utt/utt_error_handle.hpp ../../utt/../app_info/error_type.hpp \
- ../../utt/../app_info/error_handle.hpp \
- ../../utt/../app_info/error_writer.hpp \
- ../../utt/../app_info/../envs/exeinfo.hpp \
- ../../utt/../app_info/../envs/deploys.hpp \
- ../../utt/../app_info/../envs/../utils/auto_removed_folder.hpp \
- ../../utt/../app_info/../envs/../utils/sweeper.hpp \
- ../../utt/../app_info/../envs/../utils/uuid.hpp \
- ../../utt/../app_info/../envs/git.hpp \
- ../../utt/../app_info/../envs/nowadays.hpp \
- ../../utt/../app_info/trace.hpp \
- ../../utt/../app_info/../utils/lazier.hpp \
- ../../utt/../utils/outputter.hpp \
- ../../utt/../utils/../template/type_traits.hpp \
- ../../utt/../app_info/assert.hpp ../../utils/strcmp.hpp
-	g++ -x c++-header envs_test.hpp -o envs_test.hpp.pch -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3
-
-nowadays_test.hpp.pch: nowadays_test.hpp ../../envs/nowadays.hpp \
- ../../envs/../const/character.hpp \
- ../../envs/../const/../template/singleton.hpp \
- ../../envs/../const/../template/../envs/os.hpp \
- ../../envs/../const/../template/../envs/../app_info/k_assert.hpp \
- ../../envs/../const/../template/../utils/macro.hpp \
- ../../envs/../utils/strutils.hpp
-	g++ -x c++-header nowadays_test.hpp -o nowadays_test.hpp.pch -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3
-
-clean:
-	-rm envs_test.hpp.pch nowadays_test.hpp.pch
+all:
 
 autocompile:
 	autocompile > Makefile

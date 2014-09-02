@@ -3,17 +3,7 @@
 # with .autocompile configuration file,
 # so change the configuration file or autocompile logic is prefered
 
-all: \
- construct_counter.hpp.pch
-
-construct_counter.hpp.pch: construct_counter.hpp ../../template/singleton.hpp \
- ../../template/../envs/os.hpp \
- ../../template/../envs/../app_info/k_assert.hpp \
- ../../template/../utils/macro.hpp
-	g++ -x c++-header construct_counter.hpp -o construct_counter.hpp.pch -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3
-
-clean:
-	-rm construct_counter.hpp.pch
+all:
 
 autocompile:
 	autocompile > Makefile

@@ -3,48 +3,7 @@
 # with .autocompile configuration file,
 # so change the configuration file or autocompile logic is prefered
 
-all: \
- event_comb.hpp.pch
-
-event_comb.hpp.pch: event_comb.hpp ../threadpool/threadpool.hpp \
- ../threadpool/../template/singleton.hpp \
- ../threadpool/../template/../envs/os.hpp \
- ../threadpool/../template/../envs/../app_info/k_assert.hpp \
- ../threadpool/../template/../utils/macro.hpp \
- ../threadpool/../envs/preenv.hpp ../threadpool/../envs/envs.hpp \
- ../threadpool/../envs/../utils/strutils.hpp \
- ../threadpool/../envs/../const/character.hpp \
- ../threadpool/queue_runner.hpp \
- ../threadpool/../formation/concurrent/qless.hpp \
- ../threadpool/../formation/concurrent/slimqless.hpp \
- ../threadpool/../formation/concurrent/slimqless2.hpp \
- ../threadpool/../formation/concurrent/../../app_info/assert.hpp \
- ../threadpool/../formation/concurrent/../../app_info/error_handle.hpp \
- ../threadpool/../formation/concurrent/../../app_info/error_type.hpp \
- ../threadpool/../formation/concurrent/../../app_info/error_writer.hpp \
- ../threadpool/../formation/concurrent/../../app_info/../sync/lock.hpp \
- ../threadpool/../formation/concurrent/../../app_info/../envs/exeinfo.hpp \
- ../threadpool/../formation/concurrent/../../app_info/../envs/deploys.hpp \
- ../threadpool/../formation/concurrent/../../app_info/../envs/../utils/auto_removed_folder.hpp \
- ../threadpool/../formation/concurrent/../../app_info/../envs/../utils/sweeper.hpp \
- ../threadpool/../formation/concurrent/../../app_info/../envs/../utils/uuid.hpp \
- ../threadpool/../formation/concurrent/../../app_info/../envs/git.hpp \
- ../threadpool/../formation/concurrent/../../app_info/../envs/nowadays.hpp \
- ../threadpool/../formation/concurrent/../../app_info/trace.hpp \
- ../threadpool/../formation/concurrent/../../app_info/../utils/lazier.hpp \
- ../threadpool/../formation/concurrent/qless3.hpp \
- ../threadpool/../sync/reset_event.hpp \
- ../threadpool/../sync/../app_info/assert.hpp \
- ../threadpool/../sync/../sync/spin_wait.hpp \
- ../threadpool/../sync/../sync/../envs/loops_per_yield.hpp \
- ../threadpool/../sync/../sync/../envs/processor.hpp \
- ../threadpool/../sync/../sync/yield.hpp \
- ../threadpool/../sync/../sync/../delegates/transform.hpp \
- ../threadpool/../app_info/assert.hpp ../formation/ternary.hpp
-	g++ -x c++-header event_comb.hpp -o event_comb.hpp.pch -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3
-
-clean:
-	-rm event_comb.hpp.pch
+all:
 
 autocompile:
 	autocompile > Makefile

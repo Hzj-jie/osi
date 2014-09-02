@@ -3,39 +3,7 @@
 # with .autocompile configuration file,
 # so change the configuration file or autocompile logic is prefered
 
-all: \
- fixed_stack.hpp.pch \
- movable_initializer_list.hpp.pch \
- ternary.hpp.pch
-
-fixed_stack.hpp.pch: fixed_stack.hpp ../app_info/assert.hpp \
- ../app_info/error_handle.hpp ../app_info/error_type.hpp \
- ../app_info/error_writer.hpp ../app_info/k_assert.hpp \
- ../app_info/../sync/lock.hpp ../app_info/../sync/../utils/macro.hpp \
- ../app_info/../envs/exeinfo.hpp ../app_info/../envs/os.hpp \
- ../app_info/../envs/../template/singleton.hpp \
- ../app_info/../envs/deploys.hpp \
- ../app_info/../envs/../const/character.hpp \
- ../app_info/../envs/../utils/auto_removed_folder.hpp \
- ../app_info/../envs/../utils/sweeper.hpp \
- ../app_info/../envs/../utils/uuid.hpp ../app_info/../envs/git.hpp \
- ../app_info/../envs/nowadays.hpp \
- ../app_info/../envs/../utils/strutils.hpp ../app_info/trace.hpp \
- ../app_info/../utils/lazier.hpp ../utils/mover.hpp \
- ../utils/convertor.hpp ../utils/../template/type_traits.hpp \
- ../utils/../app_info/assert.hpp
-	g++ -x c++-header fixed_stack.hpp -o fixed_stack.hpp.pch -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3
-
-movable_initializer_list.hpp.pch: movable_initializer_list.hpp
-	g++ -x c++-header movable_initializer_list.hpp -o movable_initializer_list.hpp.pch -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3
-
-ternary.hpp.pch: ternary.hpp ../template/singleton.hpp \
- ../template/../envs/os.hpp ../template/../envs/../app_info/k_assert.hpp \
- ../template/../utils/macro.hpp
-	g++ -x c++-header ternary.hpp -o ternary.hpp.pch -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3
-
-clean:
-	-rm fixed_stack.hpp.pch movable_initializer_list.hpp.pch ternary.hpp.pch
+all:
 
 autocompile:
 	autocompile > Makefile

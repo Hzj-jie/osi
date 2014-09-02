@@ -3,50 +3,7 @@
 # with .autocompile configuration file,
 # so change the configuration file or autocompile logic is prefered
 
-all: \
- assert.hpp.pch \
- error_handle.hpp.pch \
- error_type.hpp.pch \
- error_writer.hpp.pch \
- k_assert.hpp.pch \
- trace.hpp.pch
-
-assert.hpp.pch: assert.hpp error_handle.hpp error_type.hpp error_writer.hpp \
- k_assert.hpp ../sync/lock.hpp ../sync/../utils/macro.hpp \
- ../envs/exeinfo.hpp ../envs/os.hpp ../envs/../template/singleton.hpp \
- ../envs/deploys.hpp ../envs/../const/character.hpp \
- ../envs/../utils/auto_removed_folder.hpp ../envs/../utils/sweeper.hpp \
- ../envs/../utils/uuid.hpp ../envs/git.hpp ../envs/nowadays.hpp \
- ../envs/../utils/strutils.hpp trace.hpp ../utils/lazier.hpp
-	g++ -x c++-header assert.hpp -o assert.hpp.pch -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3
-
-error_handle.hpp.pch: error_handle.hpp error_type.hpp error_writer.hpp \
- k_assert.hpp ../sync/lock.hpp ../sync/../utils/macro.hpp \
- ../envs/exeinfo.hpp ../envs/os.hpp ../envs/../template/singleton.hpp \
- ../envs/deploys.hpp ../envs/../const/character.hpp \
- ../envs/../utils/auto_removed_folder.hpp ../envs/../utils/sweeper.hpp \
- ../envs/../utils/uuid.hpp ../envs/git.hpp ../envs/nowadays.hpp \
- ../envs/../utils/strutils.hpp trace.hpp ../utils/lazier.hpp
-	g++ -x c++-header error_handle.hpp -o error_handle.hpp.pch -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3
-
-error_type.hpp.pch: error_type.hpp
-	g++ -x c++-header error_type.hpp -o error_type.hpp.pch -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3
-
-error_writer.hpp.pch: error_writer.hpp k_assert.hpp ../sync/lock.hpp \
- ../sync/../utils/macro.hpp error_type.hpp
-	g++ -x c++-header error_writer.hpp -o error_writer.hpp.pch -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3
-
-k_assert.hpp.pch: k_assert.hpp
-	g++ -x c++-header k_assert.hpp -o k_assert.hpp.pch -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3
-
-trace.hpp.pch: trace.hpp ../utils/strutils.hpp \
- ../utils/../app_info/k_assert.hpp ../const/character.hpp \
- ../const/../template/singleton.hpp ../const/../template/../envs/os.hpp \
- ../const/../template/../utils/macro.hpp ../utils/lazier.hpp
-	g++ -x c++-header trace.hpp -o trace.hpp.pch -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3
-
-clean:
-	-rm assert.hpp.pch error_handle.hpp.pch error_type.hpp.pch error_writer.hpp.pch k_assert.hpp.pch trace.hpp.pch
+all:
 
 autocompile:
 	autocompile > Makefile

@@ -3,38 +3,7 @@
 # with .autocompile configuration file,
 # so change the configuration file or autocompile logic is prefered
 
-all: \
- construct_counter_test.hpp.pch
-
-construct_counter_test.hpp.pch: construct_counter_test.hpp \
- ../../../utt/fake/construct_counter.hpp \
- ../../../utt/fake/../../template/singleton.hpp \
- ../../../utt/fake/../../template/../envs/os.hpp \
- ../../../utt/fake/../../template/../envs/../app_info/k_assert.hpp \
- ../../../utt/fake/../../template/../utils/macro.hpp \
- ../../../utt/icase.hpp ../../../utt/../sync/lock.hpp \
- ../../../utt/utt_assert.hpp ../../../utt/utt_error_handle.hpp \
- ../../../utt/../app_info/error_type.hpp \
- ../../../utt/../app_info/error_handle.hpp \
- ../../../utt/../app_info/error_writer.hpp \
- ../../../utt/../app_info/../envs/exeinfo.hpp \
- ../../../utt/../app_info/../envs/deploys.hpp \
- ../../../utt/../app_info/../envs/../const/character.hpp \
- ../../../utt/../app_info/../envs/../utils/auto_removed_folder.hpp \
- ../../../utt/../app_info/../envs/../utils/sweeper.hpp \
- ../../../utt/../app_info/../envs/../utils/uuid.hpp \
- ../../../utt/../app_info/../envs/git.hpp \
- ../../../utt/../app_info/../envs/nowadays.hpp \
- ../../../utt/../app_info/../envs/../utils/strutils.hpp \
- ../../../utt/../app_info/trace.hpp \
- ../../../utt/../app_info/../utils/lazier.hpp \
- ../../../utt/../utils/outputter.hpp \
- ../../../utt/../utils/../template/type_traits.hpp \
- ../../../utt/../app_info/assert.hpp ../../../envs/processor.hpp
-	g++ -x c++-header construct_counter_test.hpp -o construct_counter_test.hpp.pch -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3
-
-clean:
-	-rm construct_counter_test.hpp.pch
+all:
 
 autocompile:
 	autocompile > Makefile
