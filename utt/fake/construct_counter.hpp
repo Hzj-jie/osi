@@ -41,6 +41,21 @@ public:
         dd().fetch_add(1, std::memory_order_release);
     }
 
+    operator uint32_t() const
+    {
+        return index;
+    }
+
+    uint32_t operator()() const
+    {
+        return index;
+    }
+
+    uint32_t operator*() const
+    {
+        return operator()();
+    }
+
     static uint32_t default_constructed()
     {
         return dc().load(std::memory_order_consume);
