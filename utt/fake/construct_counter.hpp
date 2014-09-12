@@ -90,6 +90,7 @@ public:
 
     static void reset()
     {
+        ac().store(0, std::memory_order_release);
         dc().store(0, std::memory_order_release);
         cc().store(0, std::memory_order_release);
         mc().store(0, std::memory_order_release);

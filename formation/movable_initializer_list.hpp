@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <initializer_list>
 #include <utility>
+#include <boost/predef.h>
 
 namespace std {
 template <typename T>
@@ -20,10 +21,15 @@ private:
     std::vector<T> v;
 
 public:
+#if BOOST_COMP_MSVC
+    movable_initializer_list(initializer_list<T*> i)
+#else
     movable_initializer_list(const initializer_list<T*>& i)
+#endif
     {
         for(auto it = i.begin(); it != i.end(); it++)
         {
+            assert((*it) != nullptr);
             v.push_back(move(**it));
             delete *it;
         }
