@@ -109,6 +109,8 @@ utt: main.cpp icase.hpp ../sync/lock.hpp ../sync/../utils/macro.hpp \
  ../utt_cases/utils/outputter_test.hpp \
  ../utt_cases/formation/movable_initializer_list_test.hpp \
  ../utt_cases/formation/../../formation/movable_initializer_list.hpp \
+ ../utt_cases/delegates/event_test.hpp \
+ ../utt_cases/delegates/../../delegates/event.hpp \
  /usr/local/lib/libboost_filesystem.a \
  /usr/local/lib/libboost_system.a
 	g++ main.cpp -o utt -std=c++11 -Wall -Wno-unused-function -Wno-unused-variable -O3 -pthread /usr/local/lib/libboost_filesystem.a /usr/local/lib/libboost_system.a

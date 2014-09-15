@@ -35,6 +35,16 @@ public:
         }
     }
 
+#if BOOST_COMP_MSVC
+    movable_initializer_list(initializer_list<T> i)
+#else
+    movable_initializer_list(const initializer_list<T>& i)
+#endif
+    {
+        for(auto it = i.begin(); it != i.end(); it++)
+            v.push_back(move(*it));
+    }
+
     movable_initializer_list() = default;
 
     size_type size() const
