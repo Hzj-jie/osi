@@ -26,7 +26,6 @@ public:
 #else
     movable_initializer_list(const initializer_list<T*>& i)
 #endif
-    : v(i.size())
     {
         for(auto it = i.begin(); it != i.end(); it++)
         {
@@ -41,7 +40,6 @@ public:
 #else
     movable_initializer_list(const initializer_list<T>& i)
 #endif
-    : v(i.size())
     {
         for(auto it = i.begin(); it != i.end(); it++)
             v.push_back(move(*it));
