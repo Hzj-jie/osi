@@ -6,6 +6,7 @@
 #include "../../utt/utt_assert.hpp"
 #include "../../utt/fake/construct_counter.hpp"
 #include "../../app_info/assert.hpp"
+#include "../../app_info/trace.hpp"
 
 class movable_initializer_list_test : public icase
 {
@@ -38,19 +39,19 @@ public:
         }
 
         std::movable_initializer_list<cc> mil(il);
-        utt_assert.equal(mil.size(), 3);
+        utt_assert.equal(mil.size(), 3, CODE_POSITION());
         {
             size_t c = 0;
             for(auto it = mil.begin(); it != mil.end(); it++)
             {
-                utt_assert.equal((*it).index, c + 6);
+                utt_assert.equal((*it).index, c + 6, CODE_POSITION());
                 c++;
             }
         }
-        utt_assert.equal(cc::default_constructed(), 3);
-        utt_assert.equal(cc::move_constructed(), 6);
-        utt_assert.equal(cc::destructed(), 6);
-        utt_assert.equal(cc::instance_count(), 3);
+        utt_assert.equal(cc::default_constructed(), 3, CODE_POSITION());
+        utt_assert.equal(cc::move_constructed(), 6, CODE_POSITION());
+        utt_assert.equal(cc::destructed(), 6, CODE_POSITION());
+        utt_assert.equal(cc::instance_count(), 3, CODE_POSITION());
         return true;
     }
 
