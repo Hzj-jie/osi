@@ -5,6 +5,7 @@
 #include <initializer_list>
 #include <utility>
 #include "../formation/movable_initializer_list.hpp"
+#include <boost/predef.h>
 
 template <typename... Args>
 class event
@@ -14,6 +15,13 @@ private:
 
 public:
     event() = default;
+
+#if !BOOST_COMP_MSVC
+    event(std::function<void(Args...)>&& f)
+    {
+        v.push_back(std::forward<std::function<void(Args...)>>(f));
+    }
+#endif
 
     event(const std::movable_initializer_list<std::function<void(Args...)>>& s)
     {
