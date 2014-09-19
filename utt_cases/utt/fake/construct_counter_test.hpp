@@ -25,6 +25,7 @@ private:
         {
             cc x;
             utt_assert.equal(x.index, 0);
+            utt_assert.equal(x.value, 0);
             utt_assert.equal(cc::default_constructed(), 1, CODE_POSITION());
             utt_assert.equal(cc::copy_constructed(), 0, CODE_POSITION());
             utt_assert.equal(cc::move_constructed(), 0, CODE_POSITION());
@@ -43,7 +44,9 @@ private:
             cc x;
             cc y(x);
             utt_assert.equal(x.index, 1);
+            utt_assert.equal(x.value, 1);
             utt_assert.equal(y.index, 2);
+            utt_assert.equal(y.value, 1);
             utt_assert.equal(cc::default_constructed(), 2, CODE_POSITION());
             utt_assert.equal(cc::copy_constructed(), 1, CODE_POSITION());
             utt_assert.equal(cc::move_constructed(), 0, CODE_POSITION());
@@ -61,6 +64,7 @@ private:
         {
             cc y(std::move(cc()));
             utt_assert.equal(y.index, 4);
+            utt_assert.equal(y.value, 2);
             utt_assert.equal(cc::default_constructed(), 3, CODE_POSITION());
             utt_assert.equal(cc::copy_constructed(), 1, CODE_POSITION());
             utt_assert.equal(cc::move_constructed(), 1, CODE_POSITION());

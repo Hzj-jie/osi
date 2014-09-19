@@ -17,21 +17,22 @@ private:
 
 public:
     const uint32_t index;
+    const uint32_t value;
 
     construct_counter() BOOST_NOEXCEPT :
-        index(ac().fetch_add(1, std::memory_order_release))
-    {
-        dc().fetch_add(1, std::memory_order_release);
-    }
+        index(ac().fetch_add(1, std::memory_order_release)),
+        value(dc().fetch_add(1, std::memory_order_release)) { }
 
-    construct_counter(const construct_counter&) BOOST_NOEXCEPT :
-        index(ac().fetch_add(1, std::memory_order_release))
+    construct_counter(const construct_counter& i) BOOST_NOEXCEPT :
+        index(ac().fetch_add(1, std::memory_order_release)),
+        value(i.value)
     {
         cc().fetch_add(1, std::memory_order_release);
     }
 
-    construct_counter(construct_counter&&) BOOST_NOEXCEPT :
-        index(ac().fetch_add(1, std::memory_order_release))
+    construct_counter(construct_counter&& i) BOOST_NOEXCEPT :
+        index(ac().fetch_add(1, std::memory_order_release)),
+        value(i.value)
     {
         mc().fetch_add(1, std::memory_order_release);
     }
@@ -39,21 +40,6 @@ public:
     ~construct_counter() BOOST_NOEXCEPT
     {
         dd().fetch_add(1, std::memory_order_release);
-    }
-
-    operator uint32_t() const
-    {
-        return index;
-    }
-
-    uint32_t operator()() const
-    {
-        return index;
-    }
-
-    uint32_t operator*() const
-    {
-        return operator()();
     }
 
     static uint32_t default_constructed()

@@ -34,6 +34,7 @@ public:
             {
                 assert((*it) != nullptr);
                 assert((*it)->index == c);
+                assert((*it)->value == c);
                 c++;
             }
         }
@@ -44,7 +45,9 @@ public:
             size_t c = 0;
             for(auto it = mil.begin(); it != mil.end(); it++)
             {
-                utt_assert.equal((*it).index, c + 6, CODE_POSITION());
+                // FIXME: g++ may reorder the constructions ?
+                // utt_assert.equal((*it).index, c + 6, CODE_POSITION());
+                utt_assert.equal((*it).value, c, CODE_POSITION());
                 c++;
             }
         }
