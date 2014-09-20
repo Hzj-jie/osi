@@ -17,15 +17,15 @@ public:
         event<int> e2({ new std::function<void(int)>([&](int) { x += 1; }),
                         new std::function<void(int)>([&](int i) { x += i; })});
 #if BOOST_COMP_MSVC
-        event<int> e3({[&](int) { x += 1; }});
+        event<> e3({[&]() { x += 1; }});
 #else
-        event<int> e3([&](int) { x += 1; });
+        event<> e3([&]() { x += 1; });
 #endif
         e.bind([&](int i) { x += (i << 1); });
         utt_assert.equal(&(e += [&](int i) { x += (i << 2); }), &e);
         e.execute(2);
         e2.execute(2);
-        e3.execute(2);
+        e3.execute();
         // x = 1 + 2 + 1 + 2 + (2 << 1) + (2 << 2) + 1
         utt_assert.equal(x, 19);
         return true;

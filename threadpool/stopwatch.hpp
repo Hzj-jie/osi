@@ -127,7 +127,9 @@ public:
         { }
 
         stopwatch_event(uint32_t waitms, std::function<void(void)>&& d) :
-            stopwatch_event(waitms, std::move(d), __stopwatch_private::default_timer)
+            stopwatch_event(waitms,
+                            std::forward<std::function<void(void)>>(d),
+                            __stopwatch_private::default_timer)
         { }
 
         friend class stopwatch_t;
@@ -172,22 +174,19 @@ public:
         }
 
     public:
-        template <typename TIMER>
-        static std::shared_ptr<stopwatch_event> create(uint32_t waitms,
-                                                       std::function<void(void)>&& d,
-                                                       const TIMER& ms_timer)
+        using event_type = std::shared_ptr<stopwatch_event>;
+        template <typename... Args>
+        static event_type create(Args&&... args)
         {
-            return std::shared_ptr<stopwatch_event>(new stopwatch_event(waitms, std::move(d), ms_timer));
-        }
-
-        static std::shared_ptr<stopwatch_event> create(uint32_t waitms,
-                                                       std::function<void(void)>&& d)
-        {
-            return std::shared_ptr<stopwatch_event>(new stopwatch_event(waitms, std::move(d)));
+            // cannot use make_shared, consider the make_shared parameter list
+            return std::shared_ptr<stopwatch_event>(new stopwatch_event(std::forward<Args>(args)...));
         }
     };
-    
-    bool push(const std::shared_ptr<stopwatch_event>& e) const
+
+    using event_type = stopwatch_event::event_type;
+
+public:
+    bool push(const event_type& e) const
     {
         if(e && !(e->canceled()))
         {
@@ -199,24 +198,17 @@ public:
         else return false;
     }
 
-    template <typename TIMER>
-    std::shared_ptr<stopwatch_event> push(uint32_t waitms,
-                                          std::function<void(void)>&& d,
-                                          const TIMER& ms_timer) const
+    // why conflict if not uint32_t as first parameter ?
+    template <typename... Args>
+    event_type push(uint32_t waitms, Args&&... args) const
     {
-        std::shared_ptr<stopwatch_event> e = stopwatch_event::create(waitms, std::move(d), ms_timer);
-        assert(push(e));
-        return e;
-    }
-
-    std::shared_ptr<stopwatch_event> push(uint32_t waitms,
-                                          std::function<void(void)>&& d) const
-    {
-        std::shared_ptr<stopwatch_event> e = stopwatch_event::create(waitms, std::move(d));
+        auto e = stopwatch_event::create(waitms, std::forward<Args>(args)...);
         assert(push(e));
         return e;
     }
 
     CONST_SINGLETON(stopwatch_t);
 }& stopwatch = stopwatch_t::instance();
+
+using stopwatch_event = stopwatch_t::stopwatch_event;
 

@@ -29,12 +29,12 @@ public:
         const uint32_t waitms = 100;
         int64_t n = nowadays.low_res.milliseconds();
         bool executed = false;
-        decltype(stopwatch.push(waitms, std::function<void(void)>())) e =
+        stopwatch_t::event_type e =
             stopwatch.push(waitms,
                            [&]()
                            {
                                std_this_thread_lazy_wait_until(e);
-                               utt_assert.equal(&(stopwatch_t::stopwatch_event::current()), e.get());
+                               utt_assert.equal(&(stopwatch_event::current()), e.get());
                                utt_assert.more_or_equal(nowadays.low_res.milliseconds(), n + waitms);
                                utt_assert.less_or_equal(nowadays.low_res.milliseconds(), n + (waitms << 1));
                                executed = true;
@@ -43,6 +43,16 @@ public:
         std_this_thread_lazy_wait_until(e->after_callback());
         utt_assert.more_or_equal(nowadays.low_res.milliseconds(), n + waitms);
         utt_assert.less_or_equal(nowadays.low_res.milliseconds(), n + (waitms << 1));
+        utt_assert.is_true(executed);
+
+        executed = false;
+        e = stopwatch_event::create(waitms,
+                                    [&]()
+                                    {
+                                        executed = true;
+                                    });
+        utt_assert.is_true(stopwatch.push(e));
+        std_this_thread_lazy_wait_until(e->after_callback());
         utt_assert.is_true(executed);
         return true;
     }
