@@ -98,13 +98,13 @@ utt: main.cpp icase.hpp ../sync/lock.hpp ../sync/../utils/macro.hpp \
  ../utt_cases/utils/../../utils/call_stack.hpp \
  ../utt_cases/utils/../../utils/../app_info/assert.hpp \
  ../utt_cases/utils/../../utils/../threadpool/thread_local.hpp \
+ ../utt_cases/utils/../../utt/fake/construct_counter.hpp \
  ../utt_cases/threadpool/stopwatch_test.hpp \
  ../utt_cases/threadpool/../../threadpool/stopwatch.hpp \
  ../utt_cases/formation/ternary_test.hpp \
  ../utt_cases/formation/../../app_info/assert.hpp \
  ../utt_cases/formation/../../formation/ternary.hpp \
  ../utt_cases/utt/fake/construct_counter_test.hpp \
- ../utt_cases/utt/fake/../../../utt/fake/construct_counter.hpp \
  ../utt_cases/template/type_traits_test.hpp \
  ../utt_cases/utils/outputter_test.hpp \
  ../utt_cases/formation/movable_initializer_list_test.hpp \

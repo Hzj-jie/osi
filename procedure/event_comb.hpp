@@ -10,13 +10,14 @@
 #include "../formation/ternary.hpp"
 #include "../delegates/event.hpp"
 #include "../threadpool/stopwatch.hpp"
+#include "../utils/call_stack.hpp"
 #include <memory>
 #include <mutex>
 
 class event_comb
 {
 public:
-    using event_comb_type = std::shared_ptr<event_comb>;
+    typedef std::shared_ptr<event_comb> event_comb_type;
 
 private:
     const static int end_step = INT_MAX;
@@ -35,5 +36,11 @@ private:
 
 protected:
     event<> suspending;
+
+private:
+    const static call_stack_t<event_comb>& call_stack()
+    {
+        return ::call_stack<event_comb>();
+    }
 };
 

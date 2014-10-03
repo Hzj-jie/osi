@@ -5,7 +5,7 @@
 #include "../../template/singleton.hpp"
 #include <boost/config/suffix.hpp>
 
-template <typename DIFFERENCER>
+template <typename DIFFERENCER = void>
 class construct_counter final
 {
 private:
