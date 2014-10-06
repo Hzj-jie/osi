@@ -174,16 +174,16 @@ public:
         }
 
     public:
-        using event_type = std::shared_ptr<stopwatch_event>;
+        typedef std::shared_ptr<stopwatch_event> event_type;
         template <typename... Args>
         static event_type create(Args&&... args)
         {
             // cannot use make_shared, consider the make_shared parameter list
-            return std::shared_ptr<stopwatch_event>(new stopwatch_event(std::forward<Args>(args)...));
+            return event_type(new stopwatch_event(std::forward<Args>(args)...));
         }
     };
 
-    using event_type = stopwatch_event::event_type;
+    typedef stopwatch_event::event_type event_type;
 
 public:
     bool push(const event_type& e) const
