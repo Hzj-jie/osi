@@ -143,7 +143,7 @@ static std::string to_str(const char& i)
 
 namespace __strutils_private
 {
-    void append_to_stream(std::ostream& s) { }
+    void append_to_stream(std::ostream&) { }
 
     template <typename T, typename... Args>
     void append_to_stream(std::ostream& s, T&& f, Args&&... others)
