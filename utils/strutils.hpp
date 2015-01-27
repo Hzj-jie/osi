@@ -114,11 +114,24 @@ static bool to_str(const T& i, std::string& o)
     else return false;
 }
 
+static bool to_str(const std::string& s, std::string& o)
+{
+    o = s;
+    return true;
+}
+
 static bool to_str(const char& i, std::string& o)
 {
     o.clear();
     o.push_back(i);
     return true;
+}
+
+static std::string to_str(const string& i)
+{
+    std::string o;
+    k_assert(to_str(i, o));
+    return o;
 }
 
 static std::string to_str(const char& i)
