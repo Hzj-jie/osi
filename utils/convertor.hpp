@@ -26,12 +26,17 @@ namespace converts
         return true;
     }
 
-    static bool convert(const std::string& i, bool& o)
+    static bool convert(std::string&& i, bool& o)
     {
-        std::string s(i);
+        std::string s(std::move(i));
         boost::algorithm::to_lower(s);
         o = (s == True);
         return true;
+    }
+
+    static bool convert(const std::string& i, bool& o)
+    {
+        return convert(std::string(i), o);
     }
 
     static bool convert(const char* i, bool& o)
