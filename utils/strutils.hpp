@@ -159,7 +159,7 @@ std::string strcat(Args&&... args)
     using namespace std;
     using namespace __strutils_private;
     ostringstream os;
-    append_to_stream(os, forward<Args>(args)...);
+    append_to_stream(os, std::forward<Args>(args)...);
     return os.str();
 }
 
