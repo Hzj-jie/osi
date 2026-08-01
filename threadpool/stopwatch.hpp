@@ -126,6 +126,8 @@ public:
             lastms(ms_timer())
         { }
 
+        stopwatch_event() = default;
+
         stopwatch_event(uint32_t waitms, std::function<void(void)>&& d) :
             stopwatch_event(waitms,
                             std::forward<std::function<void(void)>>(d),

@@ -23,6 +23,7 @@ namespace __envs_private
     }
 }
 #elif defined(OS_POSIX)
+#include <unistd.h>
 namespace __envs_private
 {
     static std::vector<std::string> getenvs()
