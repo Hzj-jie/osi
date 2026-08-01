@@ -68,7 +68,7 @@ private:
             }
             else
             {
-                _deploys_folder = p.root_path().native();
+                _deploys_folder = std::filesystem::temp_directory_path().native();
             }
         }
 
