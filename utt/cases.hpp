@@ -49,4 +49,7 @@
 #include "../utt_cases/primitive/instruction_test.hpp"
 #include "../utt_cases/primitive/executor_test.hpp"
 #include "../utt_cases/primitive/simulator_test.hpp"
+#include "../utt_cases/primitive/parser_test.hpp"
+#include "../utt_cases/primitive/bytecode_test.hpp"
+#include "../utt_cases/primitive/interrupts_test.hpp"
 

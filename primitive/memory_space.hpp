@@ -5,6 +5,7 @@
 #include <cstddef>
 #include "data_block.hpp"
 #include "data_ref.hpp"
+#include "interrupts.hpp"
 #include "../app_info/assert.hpp"
 
 namespace primitive
@@ -22,9 +23,13 @@ namespace primitive
         std::vector<call_state> call_stack_;
         std::unordered_map<uint64_t, std::vector<data_block>> heap_;
         uint64_t next_heap_id_{1};
+        interrupts intr_;
 
     public:
         memory_space() = default;
+
+        interrupts& intr() { return intr_; }
+        const interrupts& intr() const { return intr_; }
 
         // Stack Operations
         std::vector<data_block>& stack() { return stack_; }
