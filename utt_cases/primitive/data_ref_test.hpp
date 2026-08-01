@@ -84,9 +84,8 @@ namespace primitive_test
 
         DEFINE_CASE(data_ref_hrel_test);
     };
+    REGISTER_CASE(data_ref_abs_test);
+    REGISTER_CASE(data_ref_rel_test);
+    REGISTER_CASE(data_ref_habs_test);
+    REGISTER_CASE(data_ref_hrel_test);
 }
-
-REGISTER_CASE(primitive_test::data_ref_abs_test);
-REGISTER_CASE(primitive_test::data_ref_rel_test);
-REGISTER_CASE(primitive_test::data_ref_habs_test);
-REGISTER_CASE(primitive_test::data_ref_hrel_test);

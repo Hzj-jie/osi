@@ -64,9 +64,8 @@ namespace primitive_test
 
         DEFINE_CASE(data_block_string_test);
     };
+    REGISTER_CASE(data_block_int_test);
+    REGISTER_CASE(data_block_long_test);
+    REGISTER_CASE(data_block_bool_test);
+    REGISTER_CASE(data_block_string_test);
 }
-
-REGISTER_CASE(primitive_test::data_block_int_test);
-REGISTER_CASE(primitive_test::data_block_long_test);
-REGISTER_CASE(primitive_test::data_block_bool_test);
-REGISTER_CASE(primitive_test::data_block_string_test);
