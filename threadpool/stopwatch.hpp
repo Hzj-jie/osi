@@ -126,7 +126,14 @@ public:
             lastms(ms_timer())
         { }
 
-        stopwatch_event() = default;
+        stopwatch_event() :
+            ms_timer([]() { return 0; }),
+            _canceled(IS_CANCELED),
+            _step(IS_NOT_STARTED),
+            waitms(0),
+            d(),
+            lastms(0)
+        { }
 
         stopwatch_event(uint32_t waitms, std::function<void(void)>&& d) :
             stopwatch_event(waitms,
