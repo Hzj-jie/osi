@@ -70,18 +70,19 @@ namespace primitive
         {
             uint64_t id = next_heap_id_++;
             heap_[id].resize(slot_count);
-            return id;
+            return id << 32;
         }
 
-        bool free_heap(uint64_t heap_id)
+        bool free_heap(uint64_t raw_ptr)
         {
+            uint32_t heap_id = static_cast<uint32_t>(raw_ptr >> 32);
             auto it = heap_.find(heap_id);
             if (it == heap_.end()) return false;
             heap_.erase(it);
             return true;
         }
 
-        std::vector<data_block>* get_heap_array(uint64_t heap_id)
+        std::vector<data_block>* get_heap_array(uint32_t heap_id)
         {
             auto it = heap_.find(heap_id);
             if (it == heap_.end()) return nullptr;
@@ -97,17 +98,20 @@ namespace primitive
             }
             else
             {
-                // Heap reference (habs or hrel): first resolve stack ref containing heap ID
+                // Heap reference (habs or hrel): first resolve stack ref containing heap pointer
                 data_ref stack_ref = (ref.type == ref_type::habs) ? data_ref::abs(ref.offset) : data_ref::rel(ref.offset);
                 data_block* heap_id_block = nullptr;
                 if (!get_stack_ref(stack_ref, heap_id_block) || heap_id_block == nullptr)
                     return false;
 
-                uint64_t heap_id = static_cast<uint64_t>(heap_id_block->as_int64());
+                uint64_t raw_ptr = static_cast<uint64_t>(heap_id_block->as_int64());
+                uint32_t heap_id = static_cast<uint32_t>(raw_ptr >> 32);
+                uint32_t slot_idx = static_cast<uint32_t>(raw_ptr & 0xFFFFFFFF);
+
                 auto* heap_arr = get_heap_array(heap_id);
-                if (heap_arr == nullptr || heap_arr->empty())
+                if (heap_arr == nullptr || slot_idx >= heap_arr->size())
                     return false;
-                out = &((*heap_arr)[0]);
+                out = &((*heap_arr)[slot_idx]);
                 return true;
             }
         }

@@ -52,7 +52,8 @@ namespace primitive_test
             uint64_t heap_id = mem.alloc_heap(5);
             utt_assert.is_true(heap_id > 0);
 
-            auto* arr = mem.get_heap_array(heap_id);
+            uint32_t hid = static_cast<uint32_t>(heap_id >> 32);
+            auto* arr = mem.get_heap_array(hid);
             utt_assert.is_true(arr != nullptr);
             utt_assert.equal(arr->size(), static_cast<size_t>(5));
 
@@ -67,7 +68,7 @@ namespace primitive_test
             utt_assert.equal(resolved->as_string(), std::string("heap_value"));
 
             utt_assert.is_true(mem.free_heap(heap_id));
-            utt_assert.is_true(mem.get_heap_array(heap_id) == nullptr);
+            utt_assert.is_true(mem.get_heap_array(hid) == nullptr);
 
             return true;
         }
