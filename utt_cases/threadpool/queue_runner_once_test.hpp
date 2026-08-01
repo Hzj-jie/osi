@@ -9,7 +9,6 @@
 #include "../../formation/concurrent/qless.hpp"
 #include "../../formation/concurrent/qless3.hpp"
 #include <functional>
-#include <boost/predef.h>
 
 template <template <typename T> class Qless>
 class queue_runner_once_case : public icase

@@ -1,33 +1,86 @@
-
 #pragma once
-#include <boost/lockfree/queue.hpp>
+
+#include <queue>
+#include <mutex>
+#include <utility>
+#include <cstddef>
 
 template <typename T>
-class slimqless2 : public boost::lockfree::queue<T>
+class slimqless2
 {
-public:
-    slimqless2() : boost::lockfree::queue<T>(1024) { }
-    /*
-    template<typename U> 
-    explicit slimqless2(typename boost::lockfree::queue<T>::node_allocator::template rebind< U >::other const & v) :
-        boost::lockfree::queue<T>(v) { }
-    explicit slimqless2(boost::lockfree::queue<T>::allocator const & a) :
-        boost::lockfree::queue<T>(a) { }
-    explicit slimqless2(boost::lockfree::queue<T>::size_type s) :
-        boost::lockfree::queue<T>(s) { }
-    template<typename U> 
-    slimqless2(boost::lockfree::queue<T>::size_type s, 
-               typename boost::lockfree::queue<T>::node_allocator::template rebind< U >::other const & v) :
-        boost::lockfree::queue<T>(s, v) { }
-    */
+private:
+    std::queue<T> q;
+    mutable std::mutex mtx;
 
-    slimqless2(const slimqless2&) = default;
-    slimqless2& operator=(const slimqless2&) = default;
+public:
+    slimqless2() = default;
+    explicit slimqless2(std::size_t /* capacity */) {}
+
+    slimqless2(const slimqless2& other)
+    {
+        std::lock_guard<std::mutex> lock(other.mtx);
+        q = other.q;
+    }
+
+    slimqless2& operator=(const slimqless2& other)
+    {
+        if (this != &other)
+        {
+            std::lock_guard<std::mutex> lock1(mtx);
+            std::lock_guard<std::mutex> lock2(other.mtx);
+            q = other.q;
+        }
+        return *this;
+    }
+
+    bool push(const T& val)
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        q.push(val);
+        return true;
+    }
+
+    bool push(T&& val)
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        q.push(std::move(val));
+        return true;
+    }
+
+    template <typename... Args>
+    bool emplace(Args&&... args)
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        q.emplace(std::forward<Args>(args)...);
+        return true;
+    }
+
+    bool pop(T& val)
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        if (q.empty())
+            return false;
+        val = std::move(q.front());
+        q.pop();
+        return true;
+    }
+
+    bool empty() const
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        return q.empty();
+    }
+
+    std::size_t size() const
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        return q.size();
+    }
 
     void clear()
     {
-        T v;
-        while(boost::lockfree::queue<T>::pop(v));
+        std::lock_guard<std::mutex> lock(mtx);
+        std::queue<T> empty_q;
+        std::swap(q, empty_q);
     }
 };
-

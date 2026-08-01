@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <initializer_list>
 #include <utility>
-#include <boost/predef.h>
 
 namespace std {
 template <typename T>

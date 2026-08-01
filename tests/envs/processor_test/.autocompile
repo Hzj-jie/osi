@@ -1,5 +1,2 @@
-
 main processor_test.cpp
 out processor_test
-dlibs boost_filesystem boost_system
-

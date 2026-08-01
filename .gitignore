@@ -1,0 +1,7 @@
+Makefile
+*.pch
+*.o
+*.a
+*.so
+*.exe
+git.hpp

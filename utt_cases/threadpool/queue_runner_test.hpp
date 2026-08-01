@@ -12,7 +12,6 @@
 #include <atomic>
 #include <array>
 #include <stdint.h>
-#include <boost/predef.h>
 #include "../../template/singleton.hpp"
 
 template <template <typename T> class Qless>

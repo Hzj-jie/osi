@@ -6,7 +6,7 @@ using namespace std;
 
 int main()
 {
-#ifdef BOOST_WINDOWS_API
+#ifdef OS_WINDOWS
 #define p(x) wcout << #x << '\t' << deploys.x() << endl;
 #else
 #define p(x) cout << #x << '\t' << deploys.x() << endl;

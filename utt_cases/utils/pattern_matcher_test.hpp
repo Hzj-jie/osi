@@ -4,7 +4,6 @@
 #include "../../utt/icase.hpp"
 #include "../../utt/utt_assert.hpp"
 #include <vector>
-#include <boost/predef.h>
 
 class pattern_matcher_test : public icase
 {

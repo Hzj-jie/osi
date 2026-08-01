@@ -7,7 +7,7 @@
 #include <iostream>
 #include <initializer_list>
 #include "k_assert.hpp"
-#include <boost/filesystem/fstream.hpp>
+#include <fstream>
 #include <array>
 #include "../sync/lock.hpp"
 #include <mutex>
@@ -36,7 +36,7 @@ namespace error_handle
     {
     private:
         // std::ofstream is not moveable in g++ 4.8.2
-        boost::filesystem::ofstream* const writer;
+        std::ofstream* const writer;
         std::mutex mtx;
 
     public:
@@ -52,7 +52,7 @@ namespace error_handle
 
         template <typename T>
         file_error_writer(T&& file) :
-            writer(new boost::filesystem::ofstream(file)) { }
+            writer(new std::ofstream(file)) { }
 
         file_error_writer(file_error_writer&& other) :
             writer(std::move(other.writer)) { }

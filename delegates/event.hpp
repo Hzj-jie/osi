@@ -5,7 +5,6 @@
 #include <initializer_list>
 #include <utility>
 #include "../formation/movable_initializer_list.hpp"
-#include <boost/predef.h>
 
 template <typename... Args>
 class event

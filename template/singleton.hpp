@@ -56,12 +56,12 @@
 #ifdef CONST_STATIC_PATH_STRING
     CONST_STATIC_PATH_STRING redefined
 #endif
-#if defined(BOOST_WINDOWS_API)
-    #define CONST_STATIC_PATH_STRING(name, value) CONST_SINGLETON_FUNC(boost::filesystem::path::string_type, name, (WIDE_STRING(value)))
-#elif defined(BOOST_POSIX_API)
-    #define CONST_STATIC_PATH_STRING(name, value) CONST_SINGLETON_FUNC(boost::filesystem::path::string_type, name, (#value))
+#if defined(OS_WINDOWS)
+    #define CONST_STATIC_PATH_STRING(name, value) CONST_SINGLETON_FUNC(std::filesystem::path::string_type, name, (WIDE_STRING(value)))
+#else
+    #define CONST_STATIC_PATH_STRING(name, value) CONST_SINGLETON_FUNC(std::filesystem::path::string_type, name, (#value))
 #endif
-#define CONST_STATIC_PATH_STRING_EXP(name, value) CONST_SINGLETON_FUNC(boost::filesystem::path::string_type, name, (value))
+#define CONST_STATIC_PATH_STRING_EXP(name, value) CONST_SINGLETON_FUNC(std::filesystem::path::string_type, name, (value))
 
 #ifdef _SINGLETON
     _SINGLETON redefined

@@ -1,0 +1,1 @@
+cc-flag -std=c++17 -Wall -Wno-unused-function -Wno-unused-variable -O3

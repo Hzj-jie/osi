@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 #include <initializer_list>
-#include <boost/algorithm/string.hpp>
+#include <cctype>
 #include "../utils/strutils.hpp"
 #include <stdint.h>
 
@@ -19,9 +19,44 @@ public:
     const uint32_t interval_ms;
     const uint32_t threadpool_stop_wait_ms;
 private:
+    static std::string join(const std::vector<std::string>& vec, const std::string& sep)
+    {
+        std::string res;
+        for (size_t i = 0; i < vec.size(); ++i)
+        {
+            if (i > 0) res += sep;
+            res += vec[i];
+        }
+        return res;
+    }
+
+    static void to_upper(std::vector<std::string>& vec)
+    {
+        for (auto& s : vec)
+            for (char& c : s) c = std::toupper(static_cast<unsigned char>(c));
+    }
+
+    static void to_lower(std::vector<std::string>& vec)
+    {
+        for (auto& s : vec)
+            for (char& c : s) c = std::tolower(static_cast<unsigned char>(c));
+    }
+
+    static void to_initial_upper(std::vector<std::string>& vec)
+    {
+        for (auto& s : vec)
+        {
+            if (!s.empty())
+            {
+                s[0] = std::toupper(static_cast<unsigned char>(s[0]));
+                for (size_t i = 1; i < s.size(); ++i)
+                    s[i] = std::tolower(static_cast<unsigned char>(s[i]));
+            }
+        }
+    }
+
     static void add_combination(std::vector<std::string>& r, const std::vector<std::string>& inputs)
     {
-        using namespace boost::algorithm;
         r.push_back(join(inputs, ""));
         r.push_back(join(inputs, "-"));
         r.push_back(join(inputs, "_"));

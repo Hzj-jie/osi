@@ -1,7 +1,6 @@
-
 #pragma once
 #include <string>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include "exeinfo.hpp"
 #include "../template/singleton.hpp"
 #include "../const/character.hpp"
@@ -14,8 +13,8 @@
 const static class deploys_t
 {
 private:
-    typedef boost::filesystem::path::string_type path_string;
-    typedef boost::filesystem::path::value_type path_char;
+    typedef std::filesystem::path::string_type path_string;
+    typedef std::filesystem::path::value_type path_char;
     path_string _service_name;
     path_string _deploys_folder;
     path_string _apps_folder;
@@ -38,7 +37,7 @@ private:
 
     deploys_t()
     {
-        using namespace boost::filesystem;
+        using std::filesystem::path;
         {
             path p(exeinfo.path());
             if(!p.empty() &&
@@ -73,22 +72,22 @@ private:
             }
         }
 
-#define append(x) { _##x = (path(_deploys_folder) / x##_name()).native(); }
+#define append(x) { _##x = (std::filesystem::path(_deploys_folder) / x##_name()).native(); }
         append(apps_folder);
         append(counter_folder);
         append(data_folder);
         append(log_folder);
         append(temp_folder);
 #undef append
-#define append(x) { _service_##x = (path(_##x) / _service_name).native(); }
+#define append(x) { _service_##x = (std::filesystem::path(_##x) / _service_name).native(); }
         append(temp_folder);
-        _service_temp_folder = (path(_service_temp_folder) / uuid_str()).native();
+        _service_temp_folder = (std::filesystem::path(_service_temp_folder) / uuid_str()).native();
         append(data_folder);
         append(log_folder);
         append(counter_folder);
 #undef append
         {
-            path p(exeinfo.name());
+            std::filesystem::path p(exeinfo.name());
             p += character.underscore;
             p += git.short_commit();
             p += character.underscore;
@@ -116,7 +115,7 @@ public:
 #undef return_value
     const path_string& temp_folder() const
     {
-        boost::filesystem::create_directory(_temp_folder);
+        std::filesystem::create_directory(_temp_folder);
         return _temp_folder;
     }
 
@@ -129,11 +128,9 @@ public:
     template <typename T>
     path_string append_application_info_output_filename(const T& v) const
     {
-        using namespace boost::filesystem;
-        path p(application_info_output_filename());
+        std::filesystem::path p(application_info_output_filename());
         p += v;
         return p.native();
     }
 CONST_SINGLETON(deploys_t);
 }& deploys = deploys_t::instance();
-

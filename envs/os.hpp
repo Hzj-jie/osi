@@ -1,16 +1,12 @@
 
 #pragma once
-#include <boost/predef.h>
-#include <boost/filesystem.hpp>
-#include <boost/system/api_config.hpp>
-// include BOOST_WINDOWS_API and BOOSE_POSIX_API
+#include <filesystem>
+#include <iostream>
 #include "../app_info/k_assert.hpp"
 
-#include <iostream>
-
-#if BOOST_OS_CYGWIN || BOOST_OS_LINUX || BOOST_OS_UNIX
+#if defined(__CYGWIN__) || defined(__linux__) || defined(__unix__) || defined(__APPLE__)
     #define OS_POSIX
-#elif BOOST_OS_WINDOWS
+#elif defined(_WIN32) || defined(_WIN64)
     #define OS_WINDOWS
 #endif
 
@@ -27,7 +23,7 @@
 template <typename RT, typename T>
 static RT& append_path(RT& p, T&& v)
 {
-    using namespace boost::filesystem;
+    using namespace std::filesystem;
     path c(p);
     c /= v;
     p = c.native();
@@ -35,32 +31,31 @@ static RT& append_path(RT& p, T&& v)
 }
 
 template <typename RT, typename T>
-static boost::filesystem::path::string_type append_path(const RT& p, T&& v)
+static std::filesystem::path::string_type append_path(const RT& p, T&& v)
 {
-    using namespace boost::filesystem;
+    using namespace std::filesystem;
     path c(p);
     c /= v;
     return c.native();
 }
 
 template <typename T>
-static boost::filesystem::path::string_type path_string(T&& v)
+static std::filesystem::path::string_type path_string(T&& v)
 {
-    using namespace boost::filesystem;
+    using namespace std::filesystem;
     path c(v);
     return c.native();
 }
 
-#if BOOST_COMP_MSVC
+#if defined(_MSC_VER)
 #define WIDE_STRING(x) L#x
 #define INLINE __forceinline
-#define thread_local __declspec(thread)
 #else
 #define WIDE_STRING(x) L""#x
 #define INLINE inline
 #endif
 
-#if BOOST_COMP_GNUC
+#if defined(__GNUC__)
 #define ALWAYS_INLINE __attribute__((always_inline))
 #else
 #define ALWAYS_INLINE

@@ -3,7 +3,6 @@
 #include <random>
 #include <limits>
 #include "../template/singleton.hpp"
-#include <boost/predef.h>
 
 #undef min
 #undef max

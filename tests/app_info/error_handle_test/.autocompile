@@ -1,5 +1,2 @@
-
 main error_handle_test.cpp
 out error_handle_test
-dlibs boost_filesystem boost_system
-

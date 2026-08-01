@@ -11,7 +11,6 @@
 #include "../../formation/concurrent/qless3.hpp"
 #include <atomic>
 #include <stdint.h>
-#include <boost/predef.h>
 
 template <template <typename T> class Slimqless>
 class threadpool_case : public icase

@@ -1,8 +1,14 @@
-
 #pragma once
 #include <iostream>
-#include <assert.h>
-#include <boost/current_function.hpp>
+#include <cassert>
+
+#if defined(__GNUC__) || defined(__clang__)
+#define OSI_CURRENT_FUNCTION __PRETTY_FUNCTION__
+#elif defined(_MSC_VER)
+#define OSI_CURRENT_FUNCTION __FUNCSIG__
+#else
+#define OSI_CURRENT_FUNCTION __func__
+#endif
 
 static bool assert_failed()
 {
@@ -17,11 +23,10 @@ static bool assert_failed()
         cout << "ASSERTION FAILED: " \
              << #x \
              << " @ " \
-             << BOOST_CURRENT_FUNCTION \
+             << OSI_CURRENT_FUNCTION \
              << " @ " \
              << __FILE__ \
              << ":" \
              << __LINE__ \
              << endl; \
         ::assert_failed(); } }
-

@@ -6,45 +6,60 @@
 #include <cctype>
 #include <locale>
 #include <vector>
-#include <boost/tokenizer.hpp>
 #include <sstream>
+#include <string>
+#include <cstring>
 #include "../app_info/k_assert.hpp"
-#include <vector>
-#include <boost/algorithm/string.hpp>
-#include <ctype.h>
-#include <boost/predef.h>
 
 static void to_upper(std::vector<std::string>& vs)
 {
-    for(size_t i = 0; i < vs.size(); i++)
-        boost::algorithm::to_upper(vs[i]);
+    for(auto& s : vs)
+        for(char& c : s) c = std::toupper(static_cast<unsigned char>(c));
 }
 
 static void to_lower(std::vector<std::string>& vs)
 {
-    for(size_t i = 0; i < vs.size(); i++)
-        boost::algorithm::to_lower(vs[i]);
+    for(auto& s : vs)
+        for(char& c : s) c = std::tolower(static_cast<unsigned char>(c));
 }
 
 static void to_initial_upper(std::vector<std::string>& vs)
 {
-    for(size_t i = 0; i < vs.size(); i++)
+    for(auto& s : vs)
     {
-        if(!vs[i].empty())
+        if(!s.empty())
         {
-            boost::algorithm::to_lower(vs[i]);
-            vs[i][0] = toupper(vs[i][0]);
+            s[0] = std::toupper(static_cast<unsigned char>(s[0]));
+            for(size_t i = 1; i < s.size(); ++i)
+                s[i] = std::tolower(static_cast<unsigned char>(s[i]));
         }
     }
 }
 
 static void split(const std::string& s, std::vector<std::string>& o, const char* delims)
 {
-    using namespace boost;
     o.clear();
-    tokenizer<char_separator<char>> tokens(s, char_separator<char>(delims));
-    for(auto it = tokens.begin(); it != tokens.end(); it++)
-        o.push_back(*it);
+    if(s.empty() || delims == nullptr) return;
+    std::string token;
+    for(char c : s)
+    {
+        if(std::strchr(delims, c) != nullptr)
+        {
+            if(!token.empty())
+            {
+                o.push_back(token);
+                token.clear();
+            }
+        }
+        else
+        {
+            token.push_back(c);
+        }
+    }
+    if(!token.empty())
+    {
+        o.push_back(token);
+    }
 }
 
 static void split(const std::string& s, std::vector<std::string>& o, const std::string& delims)
@@ -94,11 +109,7 @@ static bool from_str(const std::string& s, T& o)
 {
     using namespace std;
     istringstream convert(s);
-#if BOOST_COMP_MSVC
-    return !!(convert >> o);
-#else
-    return (convert >> o);
-#endif
+    return static_cast<bool>(convert >> o);
 }
 
 template <typename T>
@@ -127,7 +138,7 @@ static bool to_str(const char& i, std::string& o)
     return true;
 }
 
-static std::string to_str(const string& i)
+static std::string to_str(const std::string& i)
 {
     std::string o;
     k_assert(to_str(i, o));

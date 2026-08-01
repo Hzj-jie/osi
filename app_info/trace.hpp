@@ -2,11 +2,18 @@
 #pragma once
 #include <iostream>
 #include <string>
-#include <boost/current_function.hpp>
 #include "../utils/strutils.hpp"
 #include "../const/character.hpp"
 #include "../utils/lazier.hpp"
 #include <sstream>
+
+#if defined(__GNUC__) || defined(__clang__)
+#define OSI_CURRENT_FUNCTION __PRETTY_FUNCTION__
+#elif defined(_MSC_VER)
+#define OSI_CURRENT_FUNCTION __FUNCSIG__
+#else
+#define OSI_CURRENT_FUNCTION __func__
+#endif
 
 struct code_position;
 static std::ostream& operator<<(std::ostream&, const code_position&);
@@ -82,6 +89,6 @@ public:
     }
 };
 
-#define CODE_POSITION() code_position(__FILE__, __LINE__, BOOST_CURRENT_FUNCTION)
+#define CODE_POSITION() code_position(__FILE__, __LINE__, OSI_CURRENT_FUNCTION)
 #define CODE_POS CODE_POSITION()
 

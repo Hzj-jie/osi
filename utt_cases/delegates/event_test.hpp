@@ -4,7 +4,6 @@
 #include "../../utt/icase.hpp"
 #include "../../utt/utt_assert.hpp"
 #include <functional>
-#include <boost/predef.h>
 
 class event_test : public icase
 {

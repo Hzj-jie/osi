@@ -5,7 +5,6 @@
 #include <atomic>
 #include <utility>
 #include <stdlib.h>
-#include <boost/predef.h>
 #include "../../app_info/assert.hpp"
 
 template <template <typename T> class Slimqless, typename T>

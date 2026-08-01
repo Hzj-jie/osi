@@ -1,9 +1,8 @@
-
 #pragma once
 #include <stdint.h>
 #include <chrono>
+#include <ctime>
 #include <sstream>
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include "../const/character.hpp"
 #include "../template/singleton.hpp"
 #include "../utils/strutils.hpp"
@@ -67,35 +66,40 @@ public:
     TIMER_TEMPLATE(low, nanoseconds);
     TIMER_TEMPLATE(sys, milliseconds);
     TIMER_TEMPLATE(sys, nanoseconds);
+#undef TIMER_TEMPLATE
 
-    const std::string long_time(const boost::posix_time::ptime& t,
+    typedef high_res_milliseconds_t high_res_ms_t;
+    typedef low_res_milliseconds_t low_res_ms_t;
+
+    const std::string long_time(const std::chrono::system_clock::time_point& tp,
                                 const std::string& date_time_separator = character.blank_s(),
                                 const std::string& date_separator = character.minus_sign_s(),
                                 const std::string& time_separator = character.colon_s()) const
     {
-        using namespace std;
-        ostringstream o;
-        o << (short)(t.date().year())
-          << date_separator;
+        std::time_t tt = std::chrono::system_clock::to_time_t(tp);
+        std::tm t;
+#if defined(_WIN32)
+        localtime_s(&t, &tt);
+#else
+        localtime_r(&tt, &t);
+#endif
+        std::ostringstream o;
+        o << (1900 + t.tm_year) << date_separator;
         o.fill('0');
         o.width(2);
-        o << (short)(t.date().month())
-          << date_separator;
+        o << (1 + t.tm_mon) << date_separator;
         o.fill('0');
         o.width(2);
-        o << (short)(t.date().day())
-          << date_time_separator;
+        o << t.tm_mday << date_time_separator;
         o.fill('0');
         o.width(2);
-        o << t.time_of_day().hours()
-          << time_separator;
+        o << t.tm_hour << time_separator;
         o.fill('0');
         o.width(2);
-        o << t.time_of_day().minutes()
-          << time_separator;
+        o << t.tm_min << time_separator;
         o.fill('0');
         o.width(2);
-        o << t.time_of_day().seconds();
+        o << t.tm_sec;
         return o.str();
     }
 
@@ -103,61 +107,33 @@ public:
                                 const std::string& date_separator = character.minus_sign_s(),
                                 const std::string& time_separator = character.colon_s()) const
     {
-        using namespace boost::posix_time;
-        return long_time(second_clock::local_time(),
+        return long_time(std::chrono::system_clock::now(),
                          date_time_separator,
                          date_separator,
                          time_separator);
     }
 
-    const std::string short_time(const boost::posix_time::ptime& t,
+    const std::string short_time(const std::chrono::system_clock::time_point& tp,
                                  const std::string& date_time_separator = character.blank_s(),
                                  const std::string& date_separator = character.minus_sign_s(),
                                  const std::string& time_separator = character.colon_s()) const
     {
-        using namespace std;
-        ostringstream o;
-        o << (short)(t.date().year())
-          << date_separator;
-        o.fill('0');
-        o.width(2);
-        o << (short)(t.date().month())
-          << date_separator;
-        o.fill('0');
-        o.width(2);
-        o << (short)(t.date().day())
-          << date_time_separator;
-        o.fill('0');
-        o.width(2);
-        o << t.time_of_day().hours()
-          << time_separator;
-        o.fill('0');
-        o.width(2);
-        o << t.time_of_day().minutes()
-          << time_separator;
-        o.fill('0');
-        o.width(2);
-        o << t.time_of_day().seconds();
-        return o.str();
+        return long_time(tp, date_time_separator, date_separator, time_separator);
     }
 
     const std::string short_time(const std::string& date_time_separator = character.blank_s(),
                                  const std::string& date_separator = character.minus_sign_s(),
                                  const std::string& time_separator = character.colon_s()) const
     {
-        using namespace boost::posix_time;
-        return short_time(second_clock::local_time(),
-                          date_time_separator,
-                          date_separator,
-                          time_separator);
+        return long_time(date_time_separator, date_separator, time_separator);
     }
 
-    const std::string short_time(const boost::posix_time::ptime& t,
+    const std::string short_time(const std::chrono::system_clock::time_point& tp,
                                  char date_time_separator,
                                  char date_separator,
                                  char time_separator) const
     {
-        return short_time(t,
+        return short_time(tp,
                           to_str(date_time_separator),
                           to_str(date_separator),
                           to_str(time_separator));
@@ -172,4 +148,3 @@ public:
                           to_str(time_separator));
     }
 }& nowadays = nowadays_t::instance();
-

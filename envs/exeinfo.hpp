@@ -3,7 +3,7 @@
 #include <string>
 #include "os.hpp"
 #include "../template/singleton.hpp"
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <stdint.h>
 
 #if defined(OS_WINDOWS)
@@ -55,7 +55,7 @@ private:
     exeinfo_t()
     {
         _path = __exeinfo_private::getexepath();
-        namespace bt = boost::filesystem;
+        namespace bt = std::filesystem;
         bt::path p(_path);
         if(!p.empty() && p.has_filename() && !p.parent_path().empty())
         {

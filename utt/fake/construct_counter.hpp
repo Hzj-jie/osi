@@ -3,7 +3,6 @@
 #include <atomic>
 #include <stdint.h>
 #include "../../template/singleton.hpp"
-#include <boost/config/suffix.hpp>
 
 template <typename DIFFERENCER = void>
 class construct_counter final
@@ -19,25 +18,25 @@ public:
     const uint32_t index;
     const uint32_t value;
 
-    construct_counter() BOOST_NOEXCEPT :
+    construct_counter() noexcept :
         index(ac().fetch_add(1, std::memory_order_release)),
         value(dc().fetch_add(1, std::memory_order_release)) { }
 
-    construct_counter(const construct_counter& i) BOOST_NOEXCEPT :
+    construct_counter(const construct_counter& i) noexcept :
         index(ac().fetch_add(1, std::memory_order_release)),
         value(i.value)
     {
         cc().fetch_add(1, std::memory_order_release);
     }
 
-    construct_counter(construct_counter&& i) BOOST_NOEXCEPT :
+    construct_counter(construct_counter&& i) noexcept :
         index(ac().fetch_add(1, std::memory_order_release)),
         value(i.value)
     {
         mc().fetch_add(1, std::memory_order_release);
     }
 
-    ~construct_counter() BOOST_NOEXCEPT
+    ~construct_counter() noexcept
     {
         dd().fetch_add(1, std::memory_order_release);
     }

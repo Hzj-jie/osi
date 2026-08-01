@@ -3,8 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include <boost/current_function.hpp>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include "error_type.hpp"
 #include "error_writer.hpp"
 #include "../envs/exeinfo.hpp"
@@ -84,7 +83,7 @@ namespace error_handle
     static void enable_default_file_error_writer()
     {
         using namespace error_handle;
-        using namespace boost::filesystem;
+        using namespace std::filesystem;
     	using namespace __error_handle_private;		
         create_directories(deploys.service_log_folder());
         add_writer(new file_error_writer(

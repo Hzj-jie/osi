@@ -3,9 +3,9 @@
 #include "../template/singleton.hpp"
 #include <stdint.h>
 #include <string>
+#include <cctype>
 #include "strutils.hpp"
 #include <type_traits>
-#include <boost/algorithm/string.hpp>
 #include "../template/type_traits.hpp"
 #include "../app_info/assert.hpp"
 
@@ -29,7 +29,7 @@ namespace converts
     static bool convert(std::string&& i, bool& o)
     {
         std::string s(std::move(i));
-        boost::algorithm::to_lower(s);
+        for(char& c : s) c = std::tolower(static_cast<unsigned char>(c));
         o = (s == True);
         return true;
     }

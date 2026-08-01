@@ -1,6 +1,5 @@
 
 #pragma once
-#include <boost/predef.h>
 #include "../../threadpool/queue_runner_repeat.hpp"
 #include "../../utt/icase.hpp"
 #include "../../utt/utt_assert.hpp"

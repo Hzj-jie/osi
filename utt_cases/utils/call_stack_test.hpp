@@ -3,6 +3,7 @@
 #include "../../utils/call_stack.hpp"
 #include "../../utt/icase.hpp"
 #include "../../utt/utt_assert.hpp"
+#include "../../utt/case_wrapper/multithreading_case_wrapper.hpp"
 #include "../../utt/fake/construct_counter.hpp"
 #include <vector>
 #include <stdint.h>

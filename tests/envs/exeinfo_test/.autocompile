@@ -1,5 +1,2 @@
-
 main exeinfo_test.cpp
 out exeinfo_test
-dlibs boost_system boost_filesystem
-

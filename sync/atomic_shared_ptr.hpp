@@ -1,6 +1,5 @@
 
 #pragma once
-#include <boost/predef.h>
 #include <atomic>
 #include <memory>
 #include <utility>
