@@ -42,10 +42,11 @@ namespace primitive_test
         {
             using namespace primitive;
             simulator sim;
-            // 0: stst, 1: jump 4, 2: cpc abs(0)=100, 3: stop, 4: push 10, 5: rest
+            // 0: push, 1: stst, 2: jump 5, 3: cpc abs(0)=100, 4: stop, 5: push, 6: cpc rel(0)=55, 7: rest
             std::vector<instruction> insts = {
+                instruction(command_type::push),
                 instruction(command_type::stst),
-                instruction(command_type::jump, {data_ref::abs(4)}),
+                instruction(command_type::jump, {data_ref::abs(5)}),
                 instruction(command_type::cpc, data_ref::abs(0), data_block::from_int64(100)),
                 instruction(command_type::stop),
                 instruction(command_type::push),

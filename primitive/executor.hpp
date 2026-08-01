@@ -307,7 +307,7 @@ namespace primitive
                 }
                 case command_type::stst:
                 {
-                    mem.push_call_state(reg.ip + 1, mem.stack_size());
+                    mem.push_call_state(reg.ip + 2, mem.stack_size());
                     break;
                 }
                 case command_type::rest:
