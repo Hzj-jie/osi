@@ -47,4 +47,6 @@
 #include "../utt_cases/primitive/memory_space_test.hpp"
 #include "../utt_cases/primitive/command_type_test.hpp"
 #include "../utt_cases/primitive/instruction_test.hpp"
+#include "../utt_cases/primitive/executor_test.hpp"
+#include "../utt_cases/primitive/simulator_test.hpp"
 
