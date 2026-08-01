@@ -113,6 +113,15 @@ public:
             return (*cs().current());
         }
 
+        stopwatch_event() :
+            ms_timer([]() { return 0; }),
+            _canceled(IS_CANCELED),
+            _step(IS_NOT_STARTED),
+            waitms(0),
+            d(),
+            lastms(0)
+        { }
+
     private:
         template <typename TIMER>
         stopwatch_event(uint32_t waitms,
@@ -124,15 +133,6 @@ public:
             waitms(waitms),
             d(std::move(d)),
             lastms(ms_timer())
-        { }
-
-        stopwatch_event() :
-            ms_timer([]() { return 0; }),
-            _canceled(IS_CANCELED),
-            _step(IS_NOT_STARTED),
-            waitms(0),
-            d(),
-            lastms(0)
         { }
 
         stopwatch_event(uint32_t waitms, std::function<void(void)>&& d) :
