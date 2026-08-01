@@ -45,4 +45,6 @@
 #include "../utt_cases/primitive/data_block_test.hpp"
 #include "../utt_cases/primitive/registers_test.hpp"
 #include "../utt_cases/primitive/memory_space_test.hpp"
+#include "../utt_cases/primitive/command_type_test.hpp"
+#include "../utt_cases/primitive/instruction_test.hpp"
 
