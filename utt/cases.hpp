@@ -43,4 +43,6 @@
 #include "../utt_cases/delegates/event_test.hpp"
 #include "../utt_cases/primitive/data_ref_test.hpp"
 #include "../utt_cases/primitive/data_block_test.hpp"
+#include "../utt_cases/primitive/registers_test.hpp"
+#include "../utt_cases/primitive/memory_space_test.hpp"
 
