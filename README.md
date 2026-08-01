@@ -30,7 +30,7 @@ A modern, high-performance C++17 utility and infrastructure library providing cr
 
 ## 🚀 Building & Testing
 
-`osi` uses [`autocompile`](file:///usr/local/google/home/zijiehe/git/autocompile) and `maketree` for parallel directory-level build orchestration.
+`osi` uses [`autocompile`](https://github.com/hzj-jie/autocompile) and `maketree` for parallel directory-level build orchestration.
 
 ### 1. Bootstrapping a Fresh Checkout
 Initialize `Makefile`s across all target directories:
