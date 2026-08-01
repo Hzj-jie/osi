@@ -155,6 +155,41 @@ namespace primitive
                     }
                     break;
                 }
+                case command_type::ext:
+                {
+                    if (inst.operands.size() < 4) return false;
+                    data_block *quot = nullptr, *rem = nullptr, *b1 = nullptr, *b2 = nullptr;
+                    if (!mem.resolve_ref(inst.operands[0], quot) ||
+                        !mem.resolve_ref(inst.operands[1], rem) ||
+                        !mem.resolve_ref(inst.operands[2], b1) ||
+                        !mem.resolve_ref(inst.operands[3], b2)) return false;
+                    if (!quot || !rem || !b1 || !b2) return false;
+                    int64_t v2 = b2->as_int64();
+                    if (v2 == 0)
+                    {
+                        reg.divided_by_zero = true;
+                    }
+                    else
+                    {
+                        int64_t v1 = b1->as_int64();
+                        *quot = data_block::from_int64(v1 / v2);
+                        *rem = data_block::from_int64(v1 % v2);
+                    }
+                    break;
+                }
+                case command_type::pow:
+                {
+                    if (inst.operands.size() < 3) return false;
+                    data_block *res = nullptr, *b1 = nullptr, *b2 = nullptr;
+                    if (!mem.resolve_ref(inst.operands[0], res) ||
+                        !mem.resolve_ref(inst.operands[1], b1) ||
+                        !mem.resolve_ref(inst.operands[2], b2)) return false;
+                    if (!res || !b1 || !b2) return false;
+                    int64_t base = b1->as_int64();
+                    int64_t exp = b2->as_int64();
+                    *res = data_block::from_int64(static_cast<int64_t>(std::pow(base, exp)));
+                    break;
+                }
                 case command_type::equal:
                 {
                     if (inst.operands.size() < 3) return false;
@@ -240,7 +275,7 @@ namespace primitive
                     *res = data_block::from_bool(b1->as_double() == b2->as_double());
                     break;
                 }
-                case command_type::fless:
+                case command_type::fpow:
                 {
                     if (inst.operands.size() < 3) return false;
                     data_block *res = nullptr, *b1 = nullptr, *b2 = nullptr;
@@ -248,7 +283,78 @@ namespace primitive
                         !mem.resolve_ref(inst.operands[1], b1) ||
                         !mem.resolve_ref(inst.operands[2], b2)) return false;
                     if (!res || !b1 || !b2) return false;
-                    *res = data_block::from_bool(b1->as_double() < b2->as_double());
+                    *res = data_block::from_double(std::pow(b1->as_double(), b2->as_double()));
+                    break;
+                }
+                case command_type::fext:
+                {
+                    if (inst.operands.size() < 3) return false;
+                    data_block *res = nullptr, *b1 = nullptr, *b2 = nullptr;
+                    if (!mem.resolve_ref(inst.operands[0], res) ||
+                        !mem.resolve_ref(inst.operands[1], b1) ||
+                        !mem.resolve_ref(inst.operands[2], b2)) return false;
+                    if (!res || !b1 || !b2) return false;
+                    double v2 = b2->as_double();
+                    if (v2 == 0.0)
+                    {
+                        reg.divided_by_zero = true;
+                    }
+                    else
+                    {
+                        *res = data_block::from_double(std::fmod(b1->as_double(), v2));
+                    }
+                    break;
+                }
+                case command_type::app:
+                {
+                    if (inst.operands.size() < 2) return false;
+                    data_block *dst = nullptr, *src = nullptr;
+                    if (!mem.resolve_ref(inst.operands[0], dst) ||
+                        !mem.resolve_ref(inst.operands[1], src)) return false;
+                    if (!dst || !src) return false;
+                    dst->bytes.insert(dst->bytes.end(), src->bytes.begin(), src->bytes.end());
+                    break;
+                }
+                case command_type::cut:
+                {
+                    if (inst.operands.size() < 3) return false;
+                    data_block *dst = nullptr, *src = nullptr, *offset_block = nullptr;
+                    if (!mem.resolve_ref(inst.operands[0], dst) ||
+                        !mem.resolve_ref(inst.operands[1], src) ||
+                        !mem.resolve_ref(inst.operands[2], offset_block)) return false;
+                    if (!dst || !src || !offset_block) return false;
+                    size_t offset = static_cast<size_t>(offset_block->as_int64());
+                    if (offset >= src->bytes.size())
+                    {
+                        dst->bytes.clear();
+                    }
+                    else
+                    {
+                        dst->bytes.assign(src->bytes.begin() + offset, src->bytes.end());
+                    }
+                    break;
+                }
+                case command_type::cutl:
+                {
+                    if (inst.operands.size() < 4) return false;
+                    data_block *dst = nullptr, *src = nullptr, *offset_block = nullptr, *len_block = nullptr;
+                    if (!mem.resolve_ref(inst.operands[0], dst) ||
+                        !mem.resolve_ref(inst.operands[1], src) ||
+                        !mem.resolve_ref(inst.operands[2], offset_block) ||
+                        !mem.resolve_ref(inst.operands[3], len_block)) return false;
+                    if (!dst || !src || !offset_block || !len_block) return false;
+                    size_t offset = static_cast<size_t>(offset_block->as_int64());
+                    size_t len = static_cast<size_t>(len_block->as_int64());
+                    if (offset >= src->bytes.size() || len == 0)
+                    {
+                        dst->bytes.clear();
+                    }
+                    else
+                    {
+                        size_t available = src->bytes.size() - offset;
+                        size_t count = std::min(available, len);
+                        dst->bytes.assign(src->bytes.begin() + offset, src->bytes.begin() + offset + count);
+                    }
                     break;
                 }
                 case command_type::cmd_and:
