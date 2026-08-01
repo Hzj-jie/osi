@@ -55,6 +55,30 @@ namespace primitive
             return false;
         }
 
+        static std::string unescape_string(std::string_view sv)
+        {
+            std::string res;
+            res.reserve(sv.size());
+            for (size_t i = 0; i < sv.size(); ++i)
+            {
+                if (sv[i] == '\\' && i + 1 < sv.size())
+                {
+                    char next = sv[++i];
+                    if (next == 'n') res += '\n';
+                    else if (next == 'r') res += '\r';
+                    else if (next == 't') res += '\t';
+                    else if (next == '"') res += '"';
+                    else if (next == '\\') res += '\\';
+                    else res += next;
+                }
+                else
+                {
+                    res += sv[i];
+                }
+            }
+            return res;
+        }
+
         static bool parse_data_block(std::string_view s, data_block& out)
         {
             while (!s.empty() && std::isspace(s.front())) s.remove_prefix(1);
@@ -87,14 +111,14 @@ namespace primitive
                     out = data_block::from_bool(b);
                     return true;
                 }
-                else if (prefix == 's')
+                else if (prefix == 's' || prefix == 'E')
                 {
                     if (val.size() >= 2 && val.front() == '"' && val.back() == '"')
                     {
                         val.remove_prefix(1);
                         val.remove_suffix(1);
                     }
-                    out = data_block::from_string(std::string(val));
+                    out = data_block::from_string(unescape_string(val));
                     return true;
                 }
             }
@@ -156,6 +180,46 @@ namespace primitive
             return command_type::unknown;
         }
 
+        static std::vector<std::string> tokenize(std::string_view line)
+        {
+            std::vector<std::string> tokens;
+            size_t i = 0;
+            while (i < line.size())
+            {
+                while (i < line.size() && std::isspace(line[i])) ++i;
+                if (i >= line.size()) break;
+
+                std::string token;
+                size_t start = i;
+                while (i < line.size() && !std::isspace(line[i]))
+                {
+                    if (line[i] == '"')
+                    {
+                        token += line.substr(start, i - start);
+                        token += line[i++];
+                        while (i < line.size() && line[i] != '"')
+                        {
+                            if (line[i] == '\\' && i + 1 < line.size())
+                            {
+                                token += line[i++];
+                            }
+                            token += line[i++];
+                        }
+                        if (i < line.size()) token += line[i++];
+                        start = i;
+                        break;
+                    }
+                    else
+                    {
+                        ++i;
+                    }
+                }
+                if (start < i) token += line.substr(start, i - start);
+                if (!token.empty()) tokens.push_back(token);
+            }
+            return tokens;
+        }
+
         static bool parse_instruction(std::string_view line, instruction& out)
         {
             // Trim comment (#...)
@@ -163,13 +227,7 @@ namespace primitive
             if (hash_pos != std::string_view::npos)
                 line = line.substr(0, hash_pos);
 
-            // Tokenize
-            std::vector<std::string> tokens;
-            std::istringstream iss{std::string(line)};
-            std::string token;
-            while (iss >> token)
-                tokens.push_back(token);
-
+            std::vector<std::string> tokens = tokenize(line);
             if (tokens.empty()) return false;
 
             command_type cmd = parse_command_type(tokens[0]);
