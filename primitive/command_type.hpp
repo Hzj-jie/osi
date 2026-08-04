@@ -32,6 +32,7 @@ namespace primitive
         interrupt_cmd,
         clr,
         scut,
+        scutl,
         sizeof_cmd,
         empty,
         cmd_and,
@@ -85,6 +86,7 @@ namespace primitive
             case command_type::interrupt_cmd: return "int";
             case command_type::clr: return "clr";
             case command_type::scut: return "scut";
+            case command_type::scutl: return "scutl";
             case command_type::sizeof_cmd: return "sizeof";
             case command_type::empty: return "empty";
             case command_type::cmd_and: return "and";

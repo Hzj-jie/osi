@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
     simulator sim;
     sim.load_instructions(std::move(instructions));
 
-    bool ok = sim.run();
+    bool ok = sim.run(SIZE_MAX); // Unlimited steps, matching osi.net execution
     if (!ok && !sim.reg().stop)
     {
         std::cerr << "VM halted with error (ip=" << sim.reg().ip << ")" << std::endl;

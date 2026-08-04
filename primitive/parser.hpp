@@ -121,6 +121,21 @@ namespace primitive
                     out = data_block::from_string(unescape_string(val));
                     return true;
                 }
+                else if (prefix == 'a')
+                {
+                    out.bytes.clear();
+                    if (val.size() % 2 != 0) return false;
+                    out.bytes.reserve(val.size() / 2);
+                    for (size_t i = 0; i < val.size(); i += 2)
+                    {
+                        char hex[3] = { val[i], val[i+1], '\0' };
+                        char* end_ptr = nullptr;
+                        unsigned long b = std::strtoul(hex, &end_ptr, 16);
+                        if (end_ptr != hex + 2) return false;
+                        out.bytes.push_back(static_cast<uint8_t>(b));
+                    }
+                    return true;
+                }
             }
             catch (...)
             {
@@ -157,6 +172,7 @@ namespace primitive
             if (cmd_str == "int") return command_type::interrupt_cmd;
             if (cmd_str == "clr") return command_type::clr;
             if (cmd_str == "scut") return command_type::scut;
+            if (cmd_str == "scutl") return command_type::scutl;
             if (cmd_str == "sizeof") return command_type::sizeof_cmd;
             if (cmd_str == "empty") return command_type::empty;
             if (cmd_str == "and") return command_type::cmd_and;

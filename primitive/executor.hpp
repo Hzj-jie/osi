@@ -305,6 +305,7 @@ namespace primitive
                     }
                     break;
                 }
+                case command_type::sapp:
                 case command_type::app:
                 {
                     if (inst.operands.size() < 2) return false;
@@ -315,6 +316,7 @@ namespace primitive
                     dst->bytes.insert(dst->bytes.end(), src->bytes.begin(), src->bytes.end());
                     break;
                 }
+                case command_type::scut:
                 case command_type::cut:
                 {
                     if (inst.operands.size() < 3) return false;
@@ -334,6 +336,7 @@ namespace primitive
                     }
                     break;
                 }
+                case command_type::scutl:
                 case command_type::cutl:
                 {
                     if (inst.operands.size() < 4) return false;
@@ -479,6 +482,30 @@ namespace primitive
                         !mem.resolve_ref(inst.operands[1], src)) return false;
                     if (!res || !src) return false;
                     *res = data_block::from_bool(src->bytes.empty());
+                    break;
+                }
+                case command_type::cpco:
+                {
+                    if (inst.operands.empty()) return false;
+                    data_block* dst = nullptr;
+                    if (!mem.resolve_ref(inst.operands[0], dst) || !dst) return false;
+                    *dst = data_block::from_bool(reg.carry_over);
+                    break;
+                }
+                case command_type::cpdbz:
+                {
+                    if (inst.operands.empty()) return false;
+                    data_block* dst = nullptr;
+                    if (!mem.resolve_ref(inst.operands[0], dst) || !dst) return false;
+                    *dst = data_block::from_bool(reg.divided_by_zero);
+                    break;
+                }
+                case command_type::cpin:
+                {
+                    if (inst.operands.empty()) return false;
+                    data_block* dst = nullptr;
+                    if (!mem.resolve_ref(inst.operands[0], dst) || !dst) return false;
+                    *dst = data_block::from_bool(reg.imaginary_number);
                     break;
                 }
                 case command_type::stop:
