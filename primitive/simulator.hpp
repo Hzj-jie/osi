@@ -20,6 +20,7 @@ namespace primitive
         void load_instructions(std::vector<instruction> insts)
         {
             instructions_ = std::move(insts);
+            instructions_.push_back(instruction(command_type::stop));
             reset();
         }
 
