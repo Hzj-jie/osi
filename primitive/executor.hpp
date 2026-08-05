@@ -395,10 +395,10 @@ namespace primitive
                 case command_type::interrupt_cmd:
                 {
                     if (inst.operands.size() < 3) return false;
-                    data_block *res = nullptr, *id_block = nullptr, *param_block = nullptr;
-                    if (!mem.resolve_ref(inst.operands[0], res) ||
-                        !mem.resolve_ref(inst.operands[1], id_block) ||
-                        !mem.resolve_ref(inst.operands[2], param_block)) return false;
+                    data_block *id_block = nullptr, *param_block = nullptr, *res = nullptr;
+                    if (!mem.resolve_ref(inst.operands[0], id_block) ||
+                        !mem.resolve_ref(inst.operands[1], param_block) ||
+                        !mem.resolve_ref(inst.operands[2], res)) return false;
                     if (!res || !id_block || !param_block) return false;
                     uint32_t int_id = static_cast<uint32_t>(id_block->as_int64());
                     res->bytes = mem.intr().invoke(int_id, param_block->bytes);
