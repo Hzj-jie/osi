@@ -6,6 +6,7 @@
 #include <iostream>
 #include <chrono>
 #include <cstdint>
+#include "../app_info/assert.hpp"
 #include "data_block.hpp"
 
 namespace primitive
@@ -35,7 +36,10 @@ namespace primitive
         {
             auto it = handlers_.find(id);
             if (it == handlers_.end())
+            {
+                assert(false, "Unsupported interrupt ID: ", id);
                 return {};
+            }
             return it->second(param);
         }
 
@@ -79,12 +83,14 @@ namespace primitive
                 data_block db = data_block::from_int64(static_cast<int64_t>(now));
                 return db.bytes;
             });
-            // 4: load_method (unsupported in C++, empty no-op)
+            // 4: load_method (unsupported in C++)
             register_handler(4, "load_method", [](const std::vector<uint8_t>&) -> std::vector<uint8_t> {
+                assert(false, "load_method interrupt is unsupported in C++ implementation");
                 return {};
             });
-            // 5: execute_loaded_method (unsupported in C++, empty no-op)
+            // 5: execute_loaded_method (unsupported in C++)
             register_handler(5, "execute_loaded_method", [](const std::vector<uint8_t>&) -> std::vector<uint8_t> {
+                assert(false, "execute_loaded_method interrupt is unsupported in C++ implementation");
                 return {};
             });
             // 6: getchar
