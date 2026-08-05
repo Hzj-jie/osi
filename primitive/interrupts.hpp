@@ -62,12 +62,47 @@ namespace primitive
                 std::cerr.flush();
                 return {};
             });
-            // 2: current_ms
-            register_handler(2, "current_ms", [](const std::vector<uint8_t>&) -> std::vector<uint8_t> {
+            // 2: stdin
+            register_handler(2, "stdin", [](const std::vector<uint8_t>&) -> std::vector<uint8_t> {
+                std::vector<uint8_t> out;
+                char c;
+                while (std::cin.get(c))
+                {
+                    out.push_back(static_cast<uint8_t>(c));
+                }
+                return out;
+            });
+            // 3: current_ms
+            register_handler(3, "current_ms", [](const std::vector<uint8_t>&) -> std::vector<uint8_t> {
                 auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
                     std::chrono::system_clock::now().time_since_epoch()).count();
                 data_block db = data_block::from_int64(static_cast<int64_t>(now));
                 return db.bytes;
+            });
+            // 4: load_method (unsupported in C++, empty no-op)
+            register_handler(4, "load_method", [](const std::vector<uint8_t>&) -> std::vector<uint8_t> {
+                return {};
+            });
+            // 5: execute_loaded_method (unsupported in C++, empty no-op)
+            register_handler(5, "execute_loaded_method", [](const std::vector<uint8_t>&) -> std::vector<uint8_t> {
+                return {};
+            });
+            // 6: getchar
+            register_handler(6, "getchar", [](const std::vector<uint8_t>&) -> std::vector<uint8_t> {
+                int c = std::cin.get();
+                int32_t val = (c == EOF) ? -1 : static_cast<int32_t>(c);
+                return data_block::from_int32(val).bytes;
+            });
+            // 7: putchar
+            register_handler(7, "putchar", [](const std::vector<uint8_t>& in) -> std::vector<uint8_t> {
+                if (in.size() >= sizeof(int32_t))
+                {
+                    int32_t val = 0;
+                    std::memcpy(&val, in.data(), sizeof(int32_t));
+                    std::cout.put(static_cast<char>(val));
+                    std::cout.flush();
+                }
+                return {};
             });
         }
     };
