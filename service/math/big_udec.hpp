@@ -9,7 +9,8 @@ private:
     big_uint n_; // Numerator
     big_uint d_; // Denominator
 
-    void reduce() {
+public:
+    void reduce_fraction() {
         if (n_.is_zero()) {
             d_.set_one();
             return;
@@ -22,14 +23,12 @@ private:
         }
     }
 
-public:
     big_udec() : n_(0U), d_(1U) {}
 
     explicit big_udec(uint64_t val) : n_(val), d_(1U) {}
 
     big_udec(big_uint n, big_uint d) : n_(std::move(n)), d_(std::move(d)) {
         assert(!d_.is_zero(), "Denominator cannot be zero");
-        reduce();
     }
 
     const big_uint& numerator() const { return n_; }
@@ -45,7 +44,6 @@ public:
             n_ = n_ * that.d_ + that.n_ * d_;
             d_ = d_ * that.d_;
         }
-        reduce();
         return *this;
     }
 
@@ -63,7 +61,6 @@ public:
             n_ = n_ * that.d_ - that.n_ * d_;
             d_ = d_ * that.d_;
         }
-        reduce();
         return *this;
     }
 
@@ -76,7 +73,6 @@ public:
     big_udec& multiply(const big_udec& that) {
         n_ = n_ * that.n_;
         d_ = d_ * that.d_;
-        reduce();
         return *this;
     }
 
@@ -90,7 +86,6 @@ public:
         assert(!that.is_zero(), "Division by zero");
         n_ = n_ * that.d_;
         d_ = d_ * that.n_;
-        reduce();
         return *this;
     }
 

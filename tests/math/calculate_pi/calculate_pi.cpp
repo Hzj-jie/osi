@@ -7,11 +7,15 @@ using namespace osi::math;
 
 int main(int argc, char* argv[]) {
     uint32_t max_iterations = 500;
+    size_t precision = 150;
     if (argc >= 2) {
         max_iterations = static_cast<uint32_t>(std::stoul(argv[1]));
     }
+    if (argc >= 3) {
+        precision = static_cast<size_t>(std::stoul(argv[2]));
+    }
 
-    std::cout << "Calculating pi (Newton arctangent series) up to " << max_iterations << " iterations..." << std::endl;
+    std::cout << "Calculating pi (Newton arctangent series) up to " << max_iterations << " iterations (precision: " << precision << " digits)..." << std::endl;
 
     big_udec sum(big_uint(2U), big_uint(1U));
     big_udec term(big_uint(2U), big_uint(3U));
@@ -21,11 +25,14 @@ int main(int argc, char* argv[]) {
         big_udec factor(big_uint(i), big_uint(2 * i + 1));
         term = term * factor;
 
-        if (i % 10 == 0 || i == max_iterations) {
-            std::cout << "@ step " << i << " -> " << sum.str(50) << " (fraction: " << sum.fractional_str() << ")" << std::endl;
+        if (i % 100 == 0) {
+            sum.reduce_fraction();
+            term.reduce_fraction();
+            std::cout << "@ step " << i << " -> pi = " << sum.str(precision) << std::endl;
         }
     }
 
-    std::cout << "Final pi (" << max_iterations << " steps): " << sum.str(100) << std::endl;
+    sum.reduce_fraction();
+    std::cout << "\nFinal pi (" << max_iterations << " steps, " << precision << " decimal places):\n" << sum.str(precision) << std::endl;
     return 0;
 }
