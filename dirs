@@ -11,6 +11,8 @@ template envs
 tests envs
 threadpool envs
 service/math envs const utils formation
+tests/math/calculate_e envs service/math
+tests/math/calculate_pi envs service/math
 utt envs utt_cases
 utt_cases app_info const delegates envs formation procedure service/math sync template threadpool utils
 
