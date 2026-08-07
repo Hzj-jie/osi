@@ -8,6 +8,8 @@
 #include <cstdint>
 #include "../app_info/assert.hpp"
 #include "data_block.hpp"
+#include "../service/math/big_uint.hpp"
+#include "../service/math/big_udec.hpp"
 
 namespace primitive {
     using method_handler = std::function<std::vector<uint8_t>(const std::vector<uint8_t>&)>;
@@ -101,12 +103,14 @@ namespace primitive {
             });
 
             register_method("big_uint_to_str", [](const std::vector<uint8_t>& in) -> std::vector<uint8_t> {
-                std::string s = big_bytes_to_decimal_string(in);
+                osi::math::big_uint bu(in);
+                std::string s = bu.str();
                 return data_block::from_string(s).bytes;
             });
 
             register_method("big_udec_to_str", [](const std::vector<uint8_t>& in) -> std::vector<uint8_t> {
-                std::string s = big_bytes_to_decimal_string(in);
+                osi::math::big_uint bu(in);
+                std::string s = bu.str();
                 return data_block::from_string(s).bytes;
             });
 
