@@ -5,3 +5,6 @@ Makefile
 *.so
 *.exe
 git.hpp
+calculate_e
+calculate_pi
+
