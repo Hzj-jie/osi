@@ -10,9 +10,11 @@
 #define OSI_CURRENT_FUNCTION __func__
 #endif
 
+#include <cstdlib>
+
 static bool assert_failed()
 {
-    assert(0);
+    std::abort();
     return false;
 }
 #undef assert
