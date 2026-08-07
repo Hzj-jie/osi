@@ -52,4 +52,5 @@
 #include "../utt_cases/primitive/parser_test.hpp"
 #include "../utt_cases/primitive/bytecode_test.hpp"
 #include "../utt_cases/primitive/interrupts_test.hpp"
+#include "../utt_cases/service/math/math_test.hpp"
 
