@@ -5,6 +5,7 @@ Makefile
 *.so
 *.exe
 git.hpp
-calculate_e
-calculate_pi
+/tests/math/calculate_e/calculate_e
+/tests/math/calculate_pi/calculate_pi
+/tests/primitive/primitive_run/primitive_run
 

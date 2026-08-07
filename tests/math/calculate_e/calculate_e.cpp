@@ -20,8 +20,8 @@ int main(int argc, char* argv[]) {
         cur = cur / big_udec(i);
         sum = sum + cur;
 
-        if (i % 100 == 0 || i == max_iterations) {
-            std::cout << "@ step " << i << " -> e = " << sum.str(50) << std::endl;
+        if (i % 10 == 0 || i == max_iterations) {
+            std::cout << "@ step " << i << " -> " << sum.str(50) << " (fraction: " << sum.fractional_str() << ")" << std::endl;
         }
     }
 

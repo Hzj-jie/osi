@@ -113,6 +113,10 @@ public:
     bool operator>(const big_udec& that) const { return compare(that) > 0; }
     bool operator>=(const big_udec& that) const { return compare(that) >= 0; }
 
+    std::string fractional_str() const {
+        return n_.str() + " / " + d_.str();
+    }
+
     std::string str(size_t max_decimal_places = 10) const {
         big_uint rem;
         big_uint integer_part = n_.divide(d_, rem);

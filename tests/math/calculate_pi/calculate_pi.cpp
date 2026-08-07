@@ -21,8 +21,8 @@ int main(int argc, char* argv[]) {
         big_udec factor(big_uint(i), big_uint(2 * i + 1));
         term = term * factor;
 
-        if (i % 50 == 0 || i == max_iterations) {
-            std::cout << "@ step " << i << " -> pi = " << sum.str(50) << std::endl;
+        if (i % 10 == 0 || i == max_iterations) {
+            std::cout << "@ step " << i << " -> " << sum.str(50) << " (fraction: " << sum.fractional_str() << ")" << std::endl;
         }
     }
 
