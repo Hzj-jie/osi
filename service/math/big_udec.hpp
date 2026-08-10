@@ -112,6 +112,52 @@ public:
         return n_.str() + " / " + d_.str();
     }
 
+    void stream_digits(std::ostream& os, size_t max_decimal_places) const {
+        if (is_zero()) {
+            os << "0";
+            return;
+        }
+        big_uint rem;
+        big_uint integer_part = n_.divide(d_, rem);
+        os << integer_part.str();
+        if (rem.is_zero() || max_decimal_places == 0) return;
+
+        os << '.';
+        big_uint cur_rem = rem;
+        for (size_t i = 0; i < max_decimal_places && !cur_rem.is_zero(); ++i) {
+            cur_rem.multiply(10);
+            big_uint digit = cur_rem.divide(d_, rem);
+            os << digit.str();
+            cur_rem = rem;
+        }
+    }
+
+    static bool parse_fraction(const std::string& str, big_udec& out) {
+        size_t idx = str.find('/');
+        if (idx == std::string::npos) {
+            big_uint n(str);
+            out = big_udec(n, big_uint(1U));
+            return true;
+        }
+        std::string n_str = str.substr(0, idx);
+        std::string d_str = str.substr(idx + 1);
+
+        auto trim = [](std::string& s) {
+            size_t p1 = s.find_first_not_of(" \t\r\n");
+            if (p1 == std::string::npos) { s.clear(); return; }
+            size_t p2 = s.find_last_not_of(" \t\r\n");
+            s = s.substr(p1, p2 - p1 + 1);
+        };
+        trim(n_str);
+        trim(d_str);
+
+        big_uint n(n_str);
+        big_uint d(d_str);
+        if (d.is_zero()) return false;
+        out = big_udec(n, d);
+        return true;
+    }
+
     std::string str(size_t max_decimal_places = 10) const {
         big_uint rem;
         big_uint integer_part = n_.divide(d_, rem);
