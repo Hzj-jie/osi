@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
         if (i % 50 == 0) {
             sum.reduce_fraction();
             cur.reduce_fraction();
-            std::cout << "@ step " << i << " -> e = " << sum.str(50) << std::endl;
+            std::cout << "@ step " << i << " -> e = " << sum.str(50) << " [" << sum.fractional_str() << "]" << std::endl;
         }
     }
 

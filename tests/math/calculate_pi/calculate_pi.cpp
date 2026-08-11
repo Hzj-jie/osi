@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
         if (i % 100 == 0) {
             sum.reduce_fraction();
             term.reduce_fraction();
-            std::cout << "@ step " << i << " -> pi = " << sum.str(50) << std::endl;
+            std::cout << "@ step " << i << " -> pi = " << sum.str(50) << " [" << sum.fractional_str() << "]" << std::endl;
         }
     }
 
