@@ -7,12 +7,12 @@
 using namespace osi::math;
 
 struct checkpoint_e {
-    uint32_t step = 0;
+    uint64_t step = 0;
     big_udec sum{1U};
     big_udec cur{1U};
 };
 
-bool save_checkpoint(const std::string& path, uint32_t step, const big_udec& sum, const big_udec& cur) {
+bool save_checkpoint(const std::string& path, uint64_t step, const big_udec& sum, const big_udec& cur) {
     std::ofstream ofs(path);
     if (!ofs.is_open()) return false;
     ofs << step << "\n";
@@ -26,19 +26,19 @@ bool load_checkpoint(const std::string& path, checkpoint_e& chk) {
     if (!ifs.is_open()) return false;
     std::string line_step, line_sum, line_cur;
     if (!std::getline(ifs, line_step) || !std::getline(ifs, line_sum) || !std::getline(ifs, line_cur)) return false;
-    chk.step = static_cast<uint32_t>(std::stoul(line_step));
+    chk.step = static_cast<uint64_t>(std::stoull(line_step));
     if (!big_udec::parse_fraction(line_sum, chk.sum)) return false;
     if (!big_udec::parse_fraction(line_cur, chk.cur)) return false;
     return true;
 }
 
 int main(int argc, char* argv[]) {
-    uint32_t max_iterations = 200;
+    uint64_t max_iterations = 200;
     std::string checkpoint_file;
     std::string resume_file;
 
     if (argc >= 2) {
-        max_iterations = static_cast<uint32_t>(std::stoul(argv[1]));
+        max_iterations = static_cast<uint64_t>(std::stoull(argv[1]));
     }
     if (argc >= 3) {
         checkpoint_file = argv[2];
@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
     }
 
     checkpoint_e chk;
-    uint32_t start_step = 1;
+    uint64_t start_step = 1;
 
     if (!resume_file.empty()) {
         if (load_checkpoint(resume_file, chk)) {
@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Calculating e from step " << start_step << " up to " << max_iterations << " iterations..." << std::endl;
 
-    for (uint32_t i = start_step; i <= max_iterations; ++i) {
+    for (uint64_t i = start_step; i <= max_iterations; ++i) {
         cur = cur / big_udec(i);
         sum = sum + cur;
 

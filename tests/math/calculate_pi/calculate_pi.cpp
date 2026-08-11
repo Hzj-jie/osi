@@ -7,12 +7,12 @@
 using namespace osi::math;
 
 struct checkpoint_pi {
-    uint32_t step = 1;
+    uint64_t step = 1;
     big_udec sum{big_uint(2U), big_uint(1U)};
     big_udec term{big_uint(2U), big_uint(3U)};
 };
 
-bool save_checkpoint(const std::string& path, uint32_t step, const big_udec& sum, const big_udec& term) {
+bool save_checkpoint(const std::string& path, uint64_t step, const big_udec& sum, const big_udec& term) {
     std::ofstream ofs(path);
     if (!ofs.is_open()) return false;
     ofs << step << "\n";
@@ -26,19 +26,19 @@ bool load_checkpoint(const std::string& path, checkpoint_pi& chk) {
     if (!ifs.is_open()) return false;
     std::string line_step, line_sum, line_term;
     if (!std::getline(ifs, line_step) || !std::getline(ifs, line_sum) || !std::getline(ifs, line_term)) return false;
-    chk.step = static_cast<uint32_t>(std::stoul(line_step));
+    chk.step = static_cast<uint64_t>(std::stoull(line_step));
     if (!big_udec::parse_fraction(line_sum, chk.sum)) return false;
     if (!big_udec::parse_fraction(line_term, chk.term)) return false;
     return true;
 }
 
 int main(int argc, char* argv[]) {
-    uint32_t max_iterations = 500;
+    uint64_t max_iterations = 500;
     std::string checkpoint_file;
     std::string resume_file;
 
     if (argc >= 2) {
-        max_iterations = static_cast<uint32_t>(std::stoul(argv[1]));
+        max_iterations = static_cast<uint64_t>(std::stoull(argv[1]));
     }
     if (argc >= 3) {
         checkpoint_file = argv[2];
@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
     }
 
     checkpoint_pi chk;
-    uint32_t start_step = 2;
+    uint64_t start_step = 2;
 
     if (!resume_file.empty()) {
         if (load_checkpoint(resume_file, chk)) {
@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Calculating pi (Newton arctangent series) from step " << start_step << " up to " << max_iterations << " iterations..." << std::endl;
 
-    for (uint32_t i = start_step; i <= max_iterations; ++i) {
+    for (uint64_t i = start_step; i <= max_iterations; ++i) {
         sum = sum + term;
         big_udec factor(big_uint(i), big_uint(2 * i + 1));
         term = term * factor;
