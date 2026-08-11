@@ -187,6 +187,14 @@ public:
             set_zero();
             return *this;
         }
+        if (factor == 1) return *this;
+        if ((factor & (factor - 1)) == 0) {
+            size_t bits = 0;
+            uint32_t temp = factor;
+            while (temp > 1) { temp >>= 1; bits++; }
+            shift_left_bits(bits);
+            return *this;
+        }
         uint64_t carry = 0;
         for (size_t i = 0; i < limbs_.size(); ++i) {
             uint64_t prod = static_cast<uint64_t>(limbs_[i]) * factor + carry;
@@ -196,6 +204,7 @@ public:
         if (carry > 0) {
             limbs_.push_back(static_cast<uint32_t>(carry));
         }
+        remove_trailing_zeros();
         return *this;
     }
 
@@ -227,6 +236,18 @@ public:
 
     big_uint& divide_uint32(uint32_t divisor, uint32_t& remainder) {
         assert(divisor != 0, "Division by zero");
+        if (divisor == 1) {
+            remainder = 0;
+            return *this;
+        }
+        if ((divisor & (divisor - 1)) == 0) {
+            size_t bits = 0;
+            uint32_t temp = divisor;
+            while (temp > 1) { temp >>= 1; bits++; }
+            remainder = limbs_.empty() ? 0 : (limbs_[0] & (divisor - 1));
+            shift_right(bits);
+            return *this;
+        }
         uint64_t rem = 0;
         for (int i = static_cast<int>(limbs_.size()) - 1; i >= 0; --i) {
             uint64_t cur = (rem << 32) | limbs_[i];
@@ -245,11 +266,7 @@ public:
             if (limb == 0) {
                 count += 32;
             } else {
-                uint32_t v = limb;
-                while ((v & 1) == 0) {
-                    count++;
-                    v >>= 1;
-                }
+                count += static_cast<size_t>(__builtin_ctz(limb));
                 break;
             }
         }
