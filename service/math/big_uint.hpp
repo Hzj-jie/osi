@@ -347,11 +347,75 @@ public:
         limbs_.insert(limbs_.begin(), shift, 0);
     }
 
+    bool fit_uint64() const { return limbs_.size() <= 2; }
+    uint64_t as_uint64() const {
+        if (limbs_.empty()) return 0;
+        if (limbs_.size() == 1) return limbs_[0];
+        return (static_cast<uint64_t>(limbs_[1]) << 32) | limbs_[0];
+    }
+
+    void shift_left_bits(size_t bits) {
+        if (bits == 0 || is_zero()) return;
+        size_t limb_shift = bits / 32;
+        size_t bit_shift = bits % 32;
+
+        if (bit_shift > 0) {
+            uint64_t carry = 0;
+            for (size_t i = 0; i < limbs_.size(); ++i) {
+                uint64_t v = (static_cast<uint64_t>(limbs_[i]) << bit_shift) | carry;
+                limbs_[i] = static_cast<uint32_t>(v & 0xFFFFFFFF);
+                carry = v >> 32;
+            }
+            if (carry > 0) {
+                limbs_.push_back(static_cast<uint32_t>(carry));
+            }
+        }
+        if (limb_shift > 0) {
+            limbs_.insert(limbs_.begin(), limb_shift, 0);
+        }
+    }
+
     static big_uint gcd(big_uint a, big_uint b) {
-        while (!b.is_zero()) {
-            big_uint r = a % b;
-            a = std::move(b);
-            b = std::move(r);
+        if (a.is_zero() || b.is_zero()) return big_uint(0U);
+        if (a.is_one() || b.is_one()) return big_uint(1U);
+        if (a.fit_uint64() && b.fit_uint64()) {
+            return big_uint(std::gcd(a.as_uint64(), b.as_uint64()));
+        }
+        if (a == b) return a;
+
+        size_t shift = std::min(a.trailing_binary_zeros(), b.trailing_binary_zeros());
+        a.shift_right(a.trailing_binary_zeros());
+        b.shift_right(b.trailing_binary_zeros());
+
+        while (!a.is_zero() && !b.is_zero()) {
+            if (a.fit_uint64() && b.fit_uint64()) {
+                uint64_t g = std::gcd(a.as_uint64(), b.as_uint64());
+                a = big_uint(g);
+                break;
+            }
+
+            int cmp = a.compare(b);
+            if (cmp == 0) break;
+            if (cmp < 0) std::swap(a, b);
+
+            if (a.limb_count() >= b.limb_count() + 2 || b.limb_count() <= 2) {
+                big_uint rem;
+                a.divide(b, rem);
+                if (rem.is_zero()) {
+                    a = b;
+                    break;
+                }
+                a = std::move(b);
+                b = std::move(rem);
+            } else {
+                a.sub(b);
+            }
+            a.shift_right(a.trailing_binary_zeros());
+            b.shift_right(b.trailing_binary_zeros());
+        }
+
+        if (shift > 0) {
+            a.shift_left_bits(shift);
         }
         return a;
     }
