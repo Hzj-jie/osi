@@ -81,6 +81,7 @@ int main(int argc, char* argv[]) {
 
         if (i % 1000 == 0 || i == max_iterations) {
             sum.reduce_fraction();
+            c.reduce_fraction();
             std::cout << "@ step " << i << " -> e = " << sum.str(50) << " [" << sum.fractional_str() << "]" << std::endl;
 
             if (!checkpoint_file.empty()) {
