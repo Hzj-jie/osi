@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
         cur = cur / big_udec(i);
         sum = sum + cur;
 
-        if (i % 50 == 0 || i == max_iterations) {
+        if (i % 1000 == 0 || i == max_iterations) {
             sum.reduce_fraction();
             cur.reduce_fraction();
             std::cout << "@ step " << i << " -> e = " << sum.str(50) << std::endl;

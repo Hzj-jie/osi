@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
         big_udec factor(big_uint(i), big_uint(2 * i + 1));
         term = term * factor;
 
-        if (i % 100 == 0 || i == max_iterations) {
+        if (i % 1000 == 0 || i == max_iterations) {
             sum.reduce_fraction();
             term.reduce_fraction();
             std::cout << "@ step " << i << " -> pi = " << sum.str(50) << std::endl;
