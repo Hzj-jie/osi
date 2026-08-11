@@ -8,33 +8,53 @@ class big_udec {
 private:
     big_uint n_; // Numerator
     big_uint d_; // Denominator
+    int32_t fraction_dirty_rate_{0};
+
+    static bool fast_reduce_fraction(big_uint& n, big_uint& d) {
+        if (n.is_zero()) {
+            d.set_one();
+            return true;
+        }
+        if (n.is_one() || d.is_one()) return true;
+        if (n == d) {
+            n.set_one();
+            d.set_one();
+            return true;
+        }
+        size_t m = std::min(n.trailing_binary_zeros(), d.trailing_binary_zeros());
+        if (m > 0) {
+            n.shift_right(m);
+            d.shift_right(m);
+        }
+        return false;
+    }
+
+    bool increase_fraction_dirty_rate() {
+        fraction_dirty_rate_++;
+        if (fraction_dirty_rate_ >= 1000000) {
+            reduce_fraction();
+            return true;
+        }
+        return false;
+    }
 
 public:
+    bool fast_reduce_fraction() {
+        return fast_reduce_fraction(n_, d_);
+    }
+
     void reduce_fraction() {
-        if (n_.is_zero()) {
-            d_.set_one();
+        if (fast_reduce_fraction()) {
+            fraction_dirty_rate_ = 0;
             return;
         }
-        if (n_.is_one() || d_.is_one()) return;
-        if (n_ == d_) {
-            n_.set_one();
-            d_.set_one();
-            return;
-        }
-        size_t tz = std::min(n_.trailing_binary_zeros(), d_.trailing_binary_zeros());
-        if (tz > 0) {
-            n_.shift_right(tz);
-            d_.shift_right(tz);
-        }
-
-        if (n_.is_one() || d_.is_one()) return;
-
         big_uint g = big_uint::gcd(n_, d_);
         if (!g.is_one() && !g.is_zero()) {
             big_uint rem;
             n_ = n_.divide(g, rem);
             d_ = d_.divide(g, rem);
         }
+        fraction_dirty_rate_ = 0;
     }
 
     big_udec() : n_(0U), d_(1U) {}
@@ -43,9 +63,16 @@ public:
 
     big_udec(big_uint n, big_uint d) : n_(std::move(n)), d_(std::move(d)) {
         assert(!d_.is_zero(), "Denominator cannot be zero");
-        reduce_fraction();
     }
 
+    const big_uint& numerator() {
+        reduce_fraction();
+        return n_;
+    }
+    const big_uint& denominator() {
+        reduce_fraction();
+        return d_;
+    }
     const big_uint& numerator() const { return n_; }
     const big_uint& denominator() const { return d_; }
 
@@ -53,13 +80,19 @@ public:
     bool is_one() const { return n_ == d_; }
 
     big_udec& add(const big_udec& that) {
+        if (that.is_zero()) return *this;
+        if (is_zero()) {
+            n_ = that.n_;
+            d_ = that.d_;
+            return *this;
+        }
         if (d_ == that.d_) {
             n_.add(that.n_);
         } else {
-            n_ = n_ * that.d_ + that.n_ * d_;
+            n_ = that.d_ * n_ + that.n_ * d_;
             d_ = d_ * that.d_;
         }
-        reduce_fraction();
+        increase_fraction_dirty_rate();
         return *this;
     }
 
@@ -71,13 +104,14 @@ public:
 
     big_udec& sub(const big_udec& that) {
         assert(*this >= that, "big_udec underflow");
+        if (that.is_zero()) return *this;
         if (d_ == that.d_) {
             n_.sub(that.n_);
         } else {
-            n_ = n_ * that.d_ - that.n_ * d_;
+            n_ = that.d_ * n_ - that.n_ * d_;
             d_ = d_ * that.d_;
         }
-        reduce_fraction();
+        increase_fraction_dirty_rate();
         return *this;
     }
 
@@ -88,9 +122,23 @@ public:
     }
 
     big_udec& multiply(const big_udec& that) {
-        n_ = n_ * that.n_;
-        d_ = d_ * that.d_;
-        reduce_fraction();
+        if (that.is_zero()) {
+            n_.set_zero();
+            d_.set_one();
+            return *this;
+        }
+        if (is_zero()) return *this;
+
+        big_uint n1 = n_;
+        big_uint n2 = that.n_;
+        big_uint d1 = d_;
+        big_uint d2 = that.d_;
+        fast_reduce_fraction(n1, d2);
+        fast_reduce_fraction(n2, d1);
+
+        n_ = n1 * n2;
+        d_ = d1 * d2;
+        increase_fraction_dirty_rate();
         return *this;
     }
 
@@ -102,9 +150,18 @@ public:
 
     big_udec& divide(const big_udec& that) {
         assert(!that.is_zero(), "Division by zero");
-        n_ = n_ * that.d_;
-        d_ = d_ * that.n_;
-        reduce_fraction();
+        if (is_zero()) return *this;
+
+        big_uint n1 = n_;
+        big_uint n2 = that.n_;
+        big_uint d1 = d_;
+        big_uint d2 = that.d_;
+        fast_reduce_fraction(n1, n2);
+        fast_reduce_fraction(d1, d2);
+
+        n_ = n1 * d2;
+        d_ = d1 * n2;
+        increase_fraction_dirty_rate();
         return *this;
     }
 
@@ -144,7 +201,7 @@ public:
         os << '.';
         big_uint cur_rem = rem;
         for (size_t i = 0; i < max_decimal_places && !cur_rem.is_zero(); ++i) {
-            cur_rem.multiply(10);
+            cur_rem.multiply(10U);
             big_uint digit = cur_rem.divide(d_, rem);
             os << digit.str();
             cur_rem = rem;
@@ -186,7 +243,7 @@ public:
         res.push_back('.');
         big_uint cur_rem = rem;
         for (size_t i = 0; i < max_decimal_places && !cur_rem.is_zero(); ++i) {
-            cur_rem.multiply(10);
+            cur_rem.multiply(10U);
             big_uint digit = cur_rem.divide(d_, rem);
             res += digit.str();
             cur_rem = rem;

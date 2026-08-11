@@ -1,10 +1,9 @@
 #pragma once
 #include <vector>
 #include <string>
-#include <cstdint>
 #include <algorithm>
-#include <iostream>
-#include <type_traits>
+#include <cstdint>
+#include <numeric>
 #include "../../app_info/assert.hpp"
 
 namespace osi {
@@ -15,102 +14,96 @@ private:
     std::vector<uint32_t> limbs_;
 
     void remove_trailing_zeros() {
-        while (!limbs_.empty() && limbs_.back() == 0) {
+        while (limbs_.size() > 1 && limbs_.back() == 0) {
             limbs_.pop_back();
         }
     }
 
 public:
-    big_uint() = default;
+    big_uint() : limbs_{0} {}
 
-    template<typename T, typename = std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<T, bool>>>
-    explicit big_uint(T val) {
-        uint64_t v = static_cast<uint64_t>(val);
-        if (v != 0) {
-            limbs_.push_back(static_cast<uint32_t>(v & 0xFFFFFFFF));
-            uint32_t high = static_cast<uint32_t>(v >> 32);
-            if (high != 0) {
+    explicit big_uint(uint64_t val) {
+        if (val == 0) {
+            limbs_ = {0};
+        } else {
+            limbs_.push_back(static_cast<uint32_t>(val & 0xFFFFFFFF));
+            uint32_t high = static_cast<uint32_t>(val >> 32);
+            if (high > 0) {
                 limbs_.push_back(high);
             }
         }
     }
 
-    explicit big_uint(const std::vector<uint8_t>& bytes) {
-        replace_by_bytes(bytes);
-    }
-
-    explicit big_uint(const std::string& decimal_str) {
-        replace_by_string(decimal_str);
-    }
-
-    big_uint(const big_uint&) = default;
-    big_uint& operator=(const big_uint&) = default;
-    big_uint(big_uint&&) noexcept = default;
-    big_uint& operator=(big_uint&&) noexcept = default;
-
-    bool is_zero() const { return limbs_.empty(); }
-    bool is_one() const { return limbs_.size() == 1 && limbs_[0] == 1; }
-    size_t limb_count() const { return limbs_.size(); }
-    const std::vector<uint32_t>& limbs() const { return limbs_; }
-
-    void set_zero() { limbs_.clear(); }
-    void set_one() {
-        limbs_.clear();
-        limbs_.push_back(1);
-    }
-
-    void replace_by_bytes(const std::vector<uint8_t>& bytes) {
-        limbs_.clear();
-        if (bytes.empty()) return;
-        size_t n = (bytes.size() + 3) / 4;
-        limbs_.resize(n, 0);
-        for (size_t i = 0; i < bytes.size(); ++i) {
-            limbs_[i / 4] |= (static_cast<uint32_t>(bytes[i]) << ((i % 4) * 8));
-        }
-        remove_trailing_zeros();
-    }
-
-    std::vector<uint8_t> as_bytes() const {
-        if (limbs_.empty()) return {};
-        std::vector<uint8_t> bytes;
-        bytes.reserve(limbs_.size() * 4);
-        for (uint32_t limb : limbs_) {
-            bytes.push_back(static_cast<uint8_t>(limb & 0xFF));
-            bytes.push_back(static_cast<uint8_t>((limb >> 8) & 0xFF));
-            bytes.push_back(static_cast<uint8_t>((limb >> 16) & 0xFF));
-            bytes.push_back(static_cast<uint8_t>((limb >> 24) & 0xFF));
-        }
-        while (!bytes.empty() && bytes.back() == 0) {
-            bytes.pop_back();
-        }
-        return bytes;
-    }
-
-    void replace_by_string(const std::string& str) {
+    explicit big_uint(const std::string& str) {
         set_zero();
-        for (char c : str) {
-            if (c >= '0' && c <= '9') {
-                multiply(10);
-                add(big_uint(static_cast<uint32_t>(c - '0')));
-            }
+        if (str.empty()) return;
+        size_t start = 0;
+        while (start < str.size() && (str[start] == ' ' || str[start] == '\t' || str[start] == '\r' || str[start] == '\n')) {
+            start++;
+        }
+        for (size_t i = start; i < str.size(); ++i) {
+            char c = str[i];
+            if (c < '0' || c > '9') break;
+            multiply(10U);
+            add(big_uint(static_cast<uint64_t>(c - '0')));
         }
     }
 
-    std::string str() const {
-        if (is_zero()) return "0";
-        big_uint temp = *this;
-        std::vector<char> digits;
-        while (!temp.is_zero()) {
-            uint32_t rem = 0;
-            temp.divide_uint32(10, rem);
-            digits.push_back(static_cast<char>('0' + rem));
-        }
-        std::string res;
-        res.reserve(digits.size());
-        for (int i = static_cast<int>(digits.size()) - 1; i >= 0; --i) {
-            res.push_back(digits[i]);
-        }
-        return res;
+    void set_zero() {
+        limbs_ = {0};
+    }
+
+    void set_one() {
+        limbs_ = {1};
+    }
+
+    bool is_zero() const {
+        return limbs_.size() == 1 && limbs_[0] == 0;
+    }
+
+    bool is_one() const {
+        return limbs_.size() == 1 && limbs_[0] == 1;
+    }
+
+    bool is_zero_or_one() const {
+        return is_zero() || is_one();
+    }
+
+    size_t limb_count() const {
+        return limbs_.size();
+    }
+
+    size_t uint32_size() const {
+        return limbs_.size();
+    }
+
+    bool fit_uint32() const {
+        return limbs_.size() == 1;
+    }
+
+    uint32_t as_uint32() const {
+        return limbs_.empty() ? 0 : limbs_[0];
+    }
+
+    bool fit_uint64() const {
+        return limbs_.size() <= 2;
+    }
+
+    uint64_t as_uint64() const {
+        if (limbs_.empty()) return 0;
+        if (limbs_.size() == 1) return limbs_[0];
+        return (static_cast<uint64_t>(limbs_[1]) << 32) | limbs_[0];
+    }
+
+    uint64_t highest_uint64() const {
+        if (limbs_.empty()) return 0;
+        if (limbs_.size() == 1) return limbs_[0];
+        return (static_cast<uint64_t>(limbs_.back()) << 32) | limbs_[limbs_.size() - 2];
+    }
+
+    uint32_t highest_uint32() const {
+        if (limbs_.empty()) return 0;
+        return limbs_.back();
     }
 
     int compare(const big_uint& that) const {
@@ -121,6 +114,21 @@ public:
             if (limbs_[i] != that.limbs_[i]) {
                 return limbs_[i] < that.limbs_[i] ? -1 : 1;
             }
+        }
+        return 0;
+    }
+
+    int compare_offset(const big_uint& that, size_t offset) const {
+        size_t that_size = that.limbs_.size() + offset;
+        if (limbs_.size() < that_size) return -1;
+        if (limbs_.size() > that_size) return 1;
+        for (int k = static_cast<int>(that.limbs_.size()) - 1; k >= 0; --k) {
+            uint32_t a = limbs_[k + offset];
+            uint32_t b = that.limbs_[k];
+            if (a != b) return (a > b) ? 1 : -1;
+        }
+        for (int k = static_cast<int>(offset) - 1; k >= 0; --k) {
+            if (limbs_[k] != 0) return 1;
         }
         return 0;
     }
@@ -166,19 +174,26 @@ public:
         return res;
     }
 
-    big_uint& sub(const big_uint& that) {
-        assert(*this >= that, "big_uint underflow");
+    big_uint& sub(const big_uint& that, size_t offset = 0) {
+        if (offset == 0) {
+            assert(*this >= that, "big_uint underflow");
+        } else {
+            assert(compare_offset(that, offset) >= 0, "big_uint underflow");
+        }
+        if (limbs_.size() < that.limbs_.size() + offset) {
+            limbs_.resize(that.limbs_.size() + offset, 0);
+        }
         uint64_t borrow = 0;
-        size_t common = that.limbs_.size();
         size_t i = 0;
-        for (; i < common; ++i) {
-            uint64_t diff = static_cast<uint64_t>(limbs_[i]) - that.limbs_[i] - borrow;
-            limbs_[i] = static_cast<uint32_t>(diff & 0xFFFFFFFF);
+        for (; i < that.limbs_.size(); ++i) {
+            size_t idx = i + offset;
+            uint64_t diff = static_cast<uint64_t>(limbs_[idx]) - that.limbs_[i] - borrow;
+            limbs_[idx] = static_cast<uint32_t>(diff & 0xFFFFFFFF);
             borrow = (diff >> 63);
         }
-        for (; borrow > 0 && i < limbs_.size(); ++i) {
-            uint64_t diff = static_cast<uint64_t>(limbs_[i]) - borrow;
-            limbs_[i] = static_cast<uint32_t>(diff & 0xFFFFFFFF);
+        for (size_t idx = i + offset; borrow > 0 && idx < limbs_.size(); ++idx) {
+            uint64_t diff = static_cast<uint64_t>(limbs_[idx]) - borrow;
+            limbs_[idx] = static_cast<uint32_t>(diff & 0xFFFFFFFF);
             borrow = (diff >> 63);
         }
         remove_trailing_zeros();
@@ -247,6 +262,20 @@ public:
         return *this;
     }
 
+    explicit big_uint(const std::vector<uint8_t>& bytes) {
+        set_zero();
+        for (int i = static_cast<int>(bytes.size()) - 1; i >= 0; --i) {
+            multiply(256U);
+            add(big_uint(static_cast<uint64_t>(bytes[i])));
+        }
+    }
+
+    big_uint operator*(uint32_t v) const {
+        big_uint res = *this;
+        res.multiply(v);
+        return res;
+    }
+
     big_uint operator*(const big_uint& that) const {
         big_uint res = *this;
         res.multiply(that);
@@ -312,84 +341,6 @@ public:
         remove_trailing_zeros();
     }
 
-    void shift_left_1_bit() {
-        uint32_t carry = 0;
-        for (size_t i = 0; i < limbs_.size(); ++i) {
-            uint64_t v = (static_cast<uint64_t>(limbs_[i]) << 1) | carry;
-            limbs_[i] = static_cast<uint32_t>(v & 0xFFFFFFFF);
-            carry = static_cast<uint32_t>(v >> 32);
-        }
-        if (carry > 0) {
-            limbs_.push_back(carry);
-        }
-    }
-
-    void set_bit(size_t bit_idx) {
-        size_t limb_idx = bit_idx / 32;
-        if (limb_idx >= limbs_.size()) {
-            limbs_.resize(limb_idx + 1, 0);
-        }
-        limbs_[limb_idx] |= (1U << (bit_idx % 32));
-    }
-
-    big_uint divide(const big_uint& divisor, big_uint& remainder) const {
-        assert(!divisor.is_zero(), "Division by zero");
-        if (*this < divisor) {
-            remainder = *this;
-            return big_uint(0U);
-        }
-        if (divisor.limbs_.size() == 1) {
-            uint32_t rem = 0;
-            big_uint quotient = *this;
-            quotient.divide_uint32(divisor.limbs_[0], rem);
-            remainder = big_uint(rem);
-            return quotient;
-        }
-
-        remainder.set_zero();
-        big_uint quotient;
-        quotient.limbs_.resize(limbs_.size(), 0);
-
-        int total_bits = static_cast<int>(limbs_.size()) * 32;
-        for (int i = total_bits - 1; i >= 0; --i) {
-            remainder.shift_left_1_bit();
-            uint32_t limb = limbs_[i / 32];
-            if ((limb >> (i % 32)) & 1) {
-                if (remainder.limbs_.empty()) remainder.limbs_.resize(1, 0);
-                remainder.limbs_[0] |= 1U;
-            }
-            if (remainder >= divisor) {
-                remainder.sub(divisor);
-                quotient.limbs_[i / 32] |= (1U << (i % 32));
-            }
-        }
-        quotient.remove_trailing_zeros();
-        return quotient;
-    }
-
-    big_uint operator/(const big_uint& that) const {
-        big_uint rem;
-        return divide(that, rem);
-    }
-
-    big_uint operator%(const big_uint& that) const {
-        big_uint rem;
-        divide(that, rem);
-        return rem;
-    }
-
-    void shift_limbs_left(size_t shift) {
-        if (shift == 0 || is_zero()) return;
-        limbs_.insert(limbs_.begin(), shift, 0);
-    }
-
-    bool fit_uint64() const { return limbs_.size() <= 2; }
-    uint64_t as_uint64() const {
-        if (limbs_.empty()) return 0;
-        if (limbs_.size() == 1) return limbs_[0];
-        return (static_cast<uint64_t>(limbs_[1]) << 32) | limbs_[0];
-    }
-
     void shift_left_bits(size_t bits) {
         if (bits == 0 || is_zero()) return;
         size_t limb_shift = bits / 32;
@@ -409,6 +360,112 @@ public:
         if (limb_shift > 0) {
             limbs_.insert(limbs_.begin(), limb_shift, 0);
         }
+    }
+
+    void add_offset(uint32_t val, size_t offset) {
+        if (val == 0) return;
+        if (limbs_.size() <= offset) {
+            limbs_.resize(offset + 1, 0);
+        }
+        uint64_t carry = val;
+        for (size_t idx = offset; carry > 0 && idx < limbs_.size(); ++idx) {
+            uint64_t sum = static_cast<uint64_t>(limbs_[idx]) + carry;
+            limbs_[idx] = static_cast<uint32_t>(sum & 0xFFFFFFFF);
+            carry = sum >> 32;
+        }
+        if (carry > 0) {
+            limbs_.push_back(static_cast<uint32_t>(carry));
+        }
+    }
+
+    big_uint divide(const big_uint& that, big_uint& remainder) const {
+        assert(!that.is_zero(), "Division by zero");
+        if (is_zero() || that.is_one()) {
+            remainder.set_zero();
+            return *this;
+        }
+        if (is_one()) {
+            remainder = big_uint(1U);
+            return big_uint(0U);
+        }
+        if (that.fit_uint32()) {
+            uint32_t rem = 0;
+            big_uint quotient = *this;
+            quotient.divide_uint32(that.limbs_[0], rem);
+            remainder = big_uint(rem);
+            return quotient;
+        }
+        remainder = *this;
+        if (remainder < that) {
+            return big_uint(0U);
+        }
+
+        big_uint quotient;
+        size_t i = remainder.limbs_.size() - that.limbs_.size();
+
+        while (true) {
+            while (true) {
+                if (remainder.limbs_.size() < that.limbs_.size() + i) break;
+
+                uint64_t n = 0, d = 0;
+                if (remainder.limbs_.size() == that.limbs_.size() + i) {
+                    if (remainder.limbs_.size() > 1) {
+                        n = remainder.highest_uint64();
+                        d = that.highest_uint64();
+                    } else {
+                        n = remainder.highest_uint32();
+                        d = that.highest_uint32();
+                    }
+                } else {
+                    n = remainder.highest_uint64();
+                    d = that.highest_uint32();
+                }
+
+                if (n < d) break;
+                if (n == d) {
+                    int cmp = remainder.compare_offset(that, i);
+                    if (cmp >= 0) {
+                        remainder.sub(that, i);
+                        quotient.add_offset(1, i);
+                        if (cmp == 0) {
+                            quotient.remove_trailing_zeros();
+                            return quotient;
+                        }
+                    }
+                    break;
+                }
+
+                uint64_t q = n / (d + 1);
+                if (q == 0) q = 1;
+                if (q > 0xFFFFFFFFULL) q = 0xFFFFFFFFULL;
+                uint32_t q32 = static_cast<uint32_t>(q);
+
+                int cmp = remainder.compare_offset(that * q32, i);
+                if (cmp < 0) {
+                    q32 = 1;
+                    cmp = remainder.compare_offset(that, i);
+                    if (cmp < 0) break;
+                }
+
+                quotient.add_offset(q32, i);
+                remainder.sub(that * q32, i);
+            }
+            if (i == 0) break;
+            --i;
+        }
+        quotient.remove_trailing_zeros();
+        return quotient;
+    }
+
+    big_uint operator/(const big_uint& that) const {
+        big_uint rem;
+        return divide(that, rem);
+    }
+
+    big_uint operator%(const big_uint& that) const {
+        big_uint rem;
+        divide(that, rem);
+        return rem;
     }
 
     static big_uint gcd(big_uint a, big_uint b) {
@@ -436,7 +493,7 @@ public:
 
             if (a.limb_count() >= b.limb_count() + 2 || b.limb_count() <= 2) {
                 big_uint rem;
-                a.divide(b, rem);
+                a = a.divide(b, rem);
                 if (rem.is_zero()) {
                     a = b;
                     break;
@@ -454,6 +511,19 @@ public:
             a.shift_left_bits(shift);
         }
         return a;
+    }
+
+    std::string str() const {
+        if (is_zero()) return "0";
+        big_uint copy = *this;
+        std::string res;
+        while (!copy.is_zero()) {
+            uint32_t rem = 0;
+            copy.divide_uint32(10U, rem);
+            res.push_back(static_cast<char>('0' + rem));
+        }
+        std::reverse(res.begin(), res.end());
+        return res;
     }
 };
 

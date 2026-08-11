@@ -68,15 +68,16 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    big_udec c{1U};
+    for (uint64_t k = 1; k < start_step; ++k) {
+        c.divide(big_udec(k));
+    }
+
     std::cout << "Calculating e from step " << start_step << " up to " << max_iterations << " iterations..." << std::endl;
 
     for (uint64_t i = start_step; i <= max_iterations; ++i) {
-        if (i <= 0xFFFFFFFFULL) {
-            fact.multiply(static_cast<uint32_t>(i));
-        } else {
-            fact = fact * big_uint(i);
-        }
-        sum = sum + big_udec(big_uint(1U), fact);
+        c.divide(big_udec(i));
+        sum.add(c);
 
         if (i % 1000 == 0 || i == max_iterations) {
             sum.reduce_fraction();
