@@ -15,6 +15,20 @@ public:
             d_.set_one();
             return;
         }
+        if (n_.is_one() || d_.is_one()) return;
+        if (n_ == d_) {
+            n_.set_one();
+            d_.set_one();
+            return;
+        }
+        size_t tz = std::min(n_.trailing_binary_zeros(), d_.trailing_binary_zeros());
+        if (tz > 0) {
+            n_.shift_right(tz);
+            d_.shift_right(tz);
+        }
+
+        if (n_.is_one() || d_.is_one()) return;
+
         big_uint g = big_uint::gcd(n_, d_);
         if (!g.is_one() && !g.is_zero()) {
             big_uint rem;
@@ -29,6 +43,7 @@ public:
 
     big_udec(big_uint n, big_uint d) : n_(std::move(n)), d_(std::move(d)) {
         assert(!d_.is_zero(), "Denominator cannot be zero");
+        reduce_fraction();
     }
 
     const big_uint& numerator() const { return n_; }
@@ -44,6 +59,7 @@ public:
             n_ = n_ * that.d_ + that.n_ * d_;
             d_ = d_ * that.d_;
         }
+        reduce_fraction();
         return *this;
     }
 
@@ -61,6 +77,7 @@ public:
             n_ = n_ * that.d_ - that.n_ * d_;
             d_ = d_ * that.d_;
         }
+        reduce_fraction();
         return *this;
     }
 
@@ -73,6 +90,7 @@ public:
     big_udec& multiply(const big_udec& that) {
         n_ = n_ * that.n_;
         d_ = d_ * that.d_;
+        reduce_fraction();
         return *this;
     }
 
@@ -86,6 +104,7 @@ public:
         assert(!that.is_zero(), "Division by zero");
         n_ = n_ * that.d_;
         d_ = d_ * that.n_;
+        reduce_fraction();
         return *this;
     }
 

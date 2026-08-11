@@ -238,38 +238,94 @@ public:
         return *this;
     }
 
+    size_t trailing_binary_zeros() const {
+        if (is_zero()) return 0;
+        size_t count = 0;
+        for (uint32_t limb : limbs_) {
+            if (limb == 0) {
+                count += 32;
+            } else {
+                uint32_t v = limb;
+                while ((v & 1) == 0) {
+                    count++;
+                    v >>= 1;
+                }
+                break;
+            }
+        }
+        return count;
+    }
+
+    void shift_right(size_t bits) {
+        if (bits == 0 || is_zero()) return;
+        size_t limb_shift = bits / 32;
+        size_t bit_shift = bits % 32;
+        if (limb_shift >= limbs_.size()) {
+            set_zero();
+            return;
+        }
+        limbs_.erase(limbs_.begin(), limbs_.begin() + limb_shift);
+        if (bit_shift > 0) {
+            uint64_t carry = 0;
+            for (int i = static_cast<int>(limbs_.size()) - 1; i >= 0; --i) {
+                uint64_t cur = (carry << 32) | limbs_[i];
+                limbs_[i] = static_cast<uint32_t>(cur >> bit_shift);
+                carry = cur & ((1ULL << bit_shift) - 1);
+            }
+        }
+        remove_trailing_zeros();
+    }
+
+    void shift_left_1_bit() {
+        uint32_t carry = 0;
+        for (size_t i = 0; i < limbs_.size(); ++i) {
+            uint64_t v = (static_cast<uint64_t>(limbs_[i]) << 1) | carry;
+            limbs_[i] = static_cast<uint32_t>(v & 0xFFFFFFFF);
+            carry = static_cast<uint32_t>(v >> 32);
+        }
+        if (carry > 0) {
+            limbs_.push_back(carry);
+        }
+    }
+
+    void set_bit(size_t bit_idx) {
+        size_t limb_idx = bit_idx / 32;
+        if (limb_idx >= limbs_.size()) {
+            limbs_.resize(limb_idx + 1, 0);
+        }
+        limbs_[limb_idx] |= (1U << (bit_idx % 32));
+    }
+
     big_uint divide(const big_uint& divisor, big_uint& remainder) const {
         assert(!divisor.is_zero(), "Division by zero");
         if (*this < divisor) {
             remainder = *this;
             return big_uint(0U);
         }
+        if (divisor.limbs_.size() == 1) {
+            uint32_t rem = 0;
+            big_uint quotient = *this;
+            quotient.divide_uint32(divisor.limbs_[0], rem);
+            remainder = big_uint(rem);
+            return quotient;
+        }
+
+        remainder.set_zero();
         big_uint quotient;
         quotient.limbs_.resize(limbs_.size(), 0);
-        remainder.set_zero();
 
-        for (int i = static_cast<int>(limbs_.size()) - 1; i >= 0; --i) {
-            remainder.shift_limbs_left(1);
-            if (!remainder.limbs_.empty() || limbs_[i] != 0) {
+        int total_bits = static_cast<int>(limbs_.size()) * 32;
+        for (int i = total_bits - 1; i >= 0; --i) {
+            remainder.shift_left_1_bit();
+            uint32_t limb = limbs_[i / 32];
+            if ((limb >> (i % 32)) & 1) {
                 if (remainder.limbs_.empty()) remainder.limbs_.resize(1, 0);
-                remainder.limbs_[0] = limbs_[i];
+                remainder.limbs_[0] |= 1U;
             }
-            uint64_t low = 0, high = 0xFFFFFFFFLL, best = 0;
-            while (low <= high) {
-                uint64_t mid = low + (high - low) / 2;
-                big_uint prod = divisor;
-                prod.multiply(static_cast<uint32_t>(mid));
-                if (prod <= remainder) {
-                    best = mid;
-                    low = mid + 1;
-                } else {
-                    high = mid - 1;
-                }
+            if (remainder >= divisor) {
+                remainder.sub(divisor);
+                quotient.limbs_[i / 32] |= (1U << (i % 32));
             }
-            quotient.limbs_[i] = static_cast<uint32_t>(best);
-            big_uint sub_val = divisor;
-            sub_val.multiply(static_cast<uint32_t>(best));
-            remainder.sub(sub_val);
         }
         quotient.remove_trailing_zeros();
         return quotient;
