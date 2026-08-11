@@ -6,29 +6,27 @@
 
 using namespace osi::math;
 
-struct checkpoint_pi {
-    uint64_t step = 1;
-    big_udec sum{big_uint(2U), big_uint(1U)};
-    big_udec term{big_uint(2U), big_uint(3U)};
-};
-
-bool save_checkpoint(const std::string& path, uint64_t step, const big_udec& sum, const big_udec& term) {
+bool save_checkpoint(const std::string& path, uint64_t step, const big_udec& sum) {
     std::ofstream ofs(path);
     if (!ofs.is_open()) return false;
     ofs << step << "\n";
     ofs << sum.fractional_str() << "\n";
-    ofs << term.fractional_str() << "\n";
     return true;
 }
 
-bool load_checkpoint(const std::string& path, checkpoint_pi& chk) {
+bool load_checkpoint(const std::string& path, uint64_t& step, big_udec& sum, big_udec& term) {
     std::ifstream ifs(path);
     if (!ifs.is_open()) return false;
-    std::string line_step, line_sum, line_term;
-    if (!std::getline(ifs, line_step) || !std::getline(ifs, line_sum) || !std::getline(ifs, line_term)) return false;
-    chk.step = static_cast<uint64_t>(std::stoull(line_step));
-    if (!big_udec::parse_fraction(line_sum, chk.sum)) return false;
-    if (!big_udec::parse_fraction(line_term, chk.term)) return false;
+    std::string line_step, line_sum;
+    if (!std::getline(ifs, line_step) || !std::getline(ifs, line_sum)) return false;
+    step = static_cast<uint64_t>(std::stoull(line_step));
+    if (!big_udec::parse_fraction(line_sum, sum)) return false;
+
+    term = big_udec(big_uint(2U), big_uint(3U));
+    for (uint64_t k = 2; k <= step; ++k) {
+        big_udec factor(big_uint(k), big_uint(2 * k + 1));
+        term = term * factor;
+    }
     return true;
 }
 
@@ -47,26 +45,25 @@ int main(int argc, char* argv[]) {
         resume_file = argv[3];
     }
 
-    checkpoint_pi chk;
+    uint64_t step = 1;
+    big_udec sum{big_uint(2U), big_uint(1U)};
+    big_udec term{big_uint(2U), big_uint(3U)};
     uint64_t start_step = 2;
 
     if (!resume_file.empty()) {
-        if (load_checkpoint(resume_file, chk)) {
-            start_step = chk.step + 1;
-            std::cout << "Resumed pi calculation from checkpoint step " << chk.step << std::endl;
+        if (load_checkpoint(resume_file, step, sum, term)) {
+            start_step = step + 1;
+            std::cout << "Resumed pi calculation from checkpoint step " << step << std::endl;
         } else {
             std::cerr << "Error: Failed to load resume checkpoint from " << resume_file << std::endl;
             return 1;
         }
     } else if (!checkpoint_file.empty()) {
-        if (load_checkpoint(checkpoint_file, chk)) {
-            start_step = chk.step + 1;
-            std::cout << "Auto-resuming pi calculation from existing checkpoint step " << chk.step << std::endl;
+        if (load_checkpoint(checkpoint_file, step, sum, term)) {
+            start_step = step + 1;
+            std::cout << "Auto-resuming pi calculation from existing checkpoint step " << step << std::endl;
         }
     }
-
-    big_udec sum = chk.sum;
-    big_udec term = chk.term;
 
     std::cout << "Calculating pi (Newton arctangent series) from step " << start_step << " up to " << max_iterations << " iterations..." << std::endl;
 
@@ -78,10 +75,10 @@ int main(int argc, char* argv[]) {
         if (i % 1000 == 0 || i == max_iterations) {
             sum.reduce_fraction();
             term.reduce_fraction();
-            std::cout << "@ step " << i << " -> pi = " << sum.str(50) << std::endl;
+            std::cout << "@ step " << i << " -> pi = " << sum.str(50) << " [" << sum.fractional_str() << "]" << std::endl;
 
             if (!checkpoint_file.empty()) {
-                save_checkpoint(checkpoint_file, i, sum, term);
+                save_checkpoint(checkpoint_file, i, sum);
             }
         }
     }

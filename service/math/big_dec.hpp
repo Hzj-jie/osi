@@ -87,6 +87,8 @@ public:
     bool operator>(const big_dec& that) const { return compare(that) > 0; }
     bool operator>=(const big_dec& that) const { return compare(that) >= 0; }
 
+    const big_udec& unsigned_ref() const { return abs_val_; }
+
     std::string str(size_t max_decimal_places = 10) const {
         if (is_zero()) return "0";
         return (is_negative() ? "-" : "") + abs_val_.str(max_decimal_places);
