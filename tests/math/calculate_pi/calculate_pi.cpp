@@ -25,7 +25,10 @@ bool load_checkpoint(const std::string& path, uint64_t& step, big_udec& sum, big
     term = big_udec(big_uint(2U), big_uint(3U));
     for (uint64_t k = 2; k <= step; ++k) {
         big_udec factor(big_uint(k), big_uint(2 * k + 1));
-        term = term * factor;
+        term.multiply(factor);
+        if (k % 1000 == 0) {
+            term.reduce_fraction();
+        }
     }
     return true;
 }
@@ -68,9 +71,9 @@ int main(int argc, char* argv[]) {
     std::cout << "Calculating pi (Newton arctangent series) from step " << start_step << " up to " << max_iterations << " iterations..." << std::endl;
 
     for (uint64_t i = start_step; i <= max_iterations; ++i) {
-        sum = sum + term;
+        sum.add(term);
         big_udec factor(big_uint(i), big_uint(2 * i + 1));
-        term = term * factor;
+        term.multiply(factor);
 
         if (i % 1000 == 0 || i == max_iterations) {
             sum.reduce_fraction();
