@@ -133,14 +133,24 @@ public:
     bool operator>=(const big_uint& that) const { return compare(that) >= 0; }
 
     big_uint& add(const big_uint& that) {
-        size_t n = std::max(limbs_.size(), that.limbs_.size());
-        limbs_.resize(n, 0);
+        if (that.is_zero()) return *this;
+        if (is_zero()) {
+            limbs_ = that.limbs_;
+            return *this;
+        }
+        size_t common = std::min(limbs_.size(), that.limbs_.size());
+        if (limbs_.size() < that.limbs_.size()) {
+            limbs_.resize(that.limbs_.size(), 0);
+        }
         uint64_t carry = 0;
-        for (size_t i = 0; i < n; ++i) {
-            uint64_t sum = carry + limbs_[i];
-            if (i < that.limbs_.size()) {
-                sum += that.limbs_[i];
-            }
+        size_t i = 0;
+        for (; i < common; ++i) {
+            uint64_t sum = static_cast<uint64_t>(limbs_[i]) + that.limbs_[i] + carry;
+            limbs_[i] = static_cast<uint32_t>(sum & 0xFFFFFFFF);
+            carry = sum >> 32;
+        }
+        for (; carry > 0 && i < limbs_.size(); ++i) {
+            uint64_t sum = static_cast<uint64_t>(limbs_[i]) + carry;
             limbs_[i] = static_cast<uint32_t>(sum & 0xFFFFFFFF);
             carry = sum >> 32;
         }
@@ -158,19 +168,18 @@ public:
 
     big_uint& sub(const big_uint& that) {
         assert(*this >= that, "big_uint underflow");
-        int64_t borrow = 0;
-        for (size_t i = 0; i < limbs_.size(); ++i) {
-            int64_t diff = static_cast<int64_t>(limbs_[i]) - borrow;
-            if (i < that.limbs_.size()) {
-                diff -= that.limbs_[i];
-            }
-            if (diff < 0) {
-                diff += 0x100000000LL;
-                borrow = 1;
-            } else {
-                borrow = 0;
-            }
-            limbs_[i] = static_cast<uint32_t>(diff);
+        uint64_t borrow = 0;
+        size_t common = that.limbs_.size();
+        size_t i = 0;
+        for (; i < common; ++i) {
+            uint64_t diff = static_cast<uint64_t>(limbs_[i]) - that.limbs_[i] - borrow;
+            limbs_[i] = static_cast<uint32_t>(diff & 0xFFFFFFFF);
+            borrow = (diff >> 63);
+        }
+        for (; borrow > 0 && i < limbs_.size(); ++i) {
+            uint64_t diff = static_cast<uint64_t>(limbs_[i]) - borrow;
+            limbs_[i] = static_cast<uint32_t>(diff & 0xFFFFFFFF);
+            borrow = (diff >> 63);
         }
         remove_trailing_zeros();
         return *this;
@@ -213,11 +222,21 @@ public:
             set_zero();
             return *this;
         }
+        if (that.limbs_.size() == 1) {
+            return multiply(that.limbs_[0]);
+        }
+        if (limbs_.size() == 1) {
+            uint32_t factor = limbs_[0];
+            limbs_ = that.limbs_;
+            return multiply(factor);
+        }
         std::vector<uint32_t> res(limbs_.size() + that.limbs_.size(), 0);
         for (size_t i = 0; i < limbs_.size(); ++i) {
+            uint64_t a_limb = limbs_[i];
+            if (a_limb == 0) continue;
             uint64_t carry = 0;
             for (size_t j = 0; j < that.limbs_.size(); ++j) {
-                uint64_t cur = res[i + j] + static_cast<uint64_t>(limbs_[i]) * that.limbs_[j] + carry;
+                uint64_t cur = res[i + j] + a_limb * that.limbs_[j] + carry;
                 res[i + j] = static_cast<uint32_t>(cur & 0xFFFFFFFF);
                 carry = cur >> 32;
             }
