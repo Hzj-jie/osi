@@ -171,6 +171,20 @@ public:
         return res;
     }
 
+    big_udec& power(uint32_t exp) {
+        if (exp == 0) {
+            n_.set_one();
+            d_.set_one();
+            return *this;
+        }
+        if (is_zero() || is_one() || exp == 1) {
+            return *this;
+        }
+        n_.power(exp);
+        d_.power(exp);
+        return *this;
+    }
+
     int compare(const big_udec& that) const {
         big_uint lhs = n_ * that.d_;
         big_uint rhs = that.n_ * d_;

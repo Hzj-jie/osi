@@ -270,6 +270,28 @@ public:
         }
     }
 
+    big_uint& power(uint32_t exp) {
+        if (exp == 0) {
+            set_one();
+            return *this;
+        }
+        if (is_zero() || is_one() || exp == 1) {
+            return *this;
+        }
+        big_uint base = *this;
+        set_one();
+        while (exp > 0) {
+            if (exp & 1) {
+                multiply(base);
+            }
+            if (exp > 1) {
+                base = base * base;
+            }
+            exp >>= 1;
+        }
+        return *this;
+    }
+
     big_uint operator*(uint32_t v) const {
         big_uint res = *this;
         res.multiply(v);
