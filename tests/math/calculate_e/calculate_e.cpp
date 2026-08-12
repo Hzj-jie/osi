@@ -6,28 +6,30 @@
 
 using namespace osi::math;
 
-bool save_checkpoint(const std::string& path, uint64_t step, const big_udec& sum) {
+bool save_checkpoint(const std::string& path, uint64_t step, const big_udec& sum, const big_udec& c) {
     std::ofstream ofs(path);
     if (!ofs.is_open()) return false;
     ofs << step << "\n";
     ofs << sum.fractional_str() << "\n";
+    ofs << c.fractional_str() << "\n";
     return true;
 }
 
-bool load_checkpoint(const std::string& path, uint64_t& step, big_udec& sum, big_uint& fact) {
+bool load_checkpoint(const std::string& path, uint64_t& step, big_udec& sum, big_udec& c) {
     std::ifstream ifs(path);
     if (!ifs.is_open()) return false;
-    std::string line_step, line_sum;
+    std::string line_step, line_sum, line_c;
     if (!std::getline(ifs, line_step) || !std::getline(ifs, line_sum)) return false;
     step = static_cast<uint64_t>(std::stoull(line_step));
     if (!big_udec::parse_fraction(line_sum, sum)) return false;
 
-    fact.set_one();
-    for (uint64_t k = 1; k <= step; ++k) {
-        if (k <= 0xFFFFFFFFULL) {
-            fact.multiply(static_cast<uint32_t>(k));
-        } else {
-            fact = fact * big_uint(k);
+    if (std::getline(ifs, line_c) && !line_c.empty()) {
+        if (!big_udec::parse_fraction(line_c, c)) return false;
+    } else {
+        c = big_udec(1U);
+        for (uint64_t k = 1; k <= step; ++k) {
+            c.divide(big_udec(k));
+            if (k % 1000 == 0) c.reduce_fraction();
         }
     }
     return true;
@@ -50,11 +52,11 @@ int main(int argc, char* argv[]) {
 
     uint64_t step = 0;
     big_udec sum{1U};
-    big_uint fact{1U};
+    big_udec c{1U};
     uint64_t start_step = 1;
 
     if (!resume_file.empty()) {
-        if (load_checkpoint(resume_file, step, sum, fact)) {
+        if (load_checkpoint(resume_file, step, sum, c)) {
             start_step = step + 1;
             std::cout << "Resumed e calculation from checkpoint step " << step << std::endl;
         } else {
@@ -62,15 +64,10 @@ int main(int argc, char* argv[]) {
             return 1;
         }
     } else if (!checkpoint_file.empty()) {
-        if (load_checkpoint(checkpoint_file, step, sum, fact)) {
+        if (load_checkpoint(checkpoint_file, step, sum, c)) {
             start_step = step + 1;
             std::cout << "Auto-resuming e calculation from existing checkpoint step " << step << std::endl;
         }
-    }
-
-    big_udec c{1U};
-    for (uint64_t k = 1; k < start_step; ++k) {
-        c.divide(big_udec(k));
     }
 
     std::cout << "Calculating e from step " << start_step << " up to " << max_iterations << " iterations..." << std::endl;
@@ -85,7 +82,7 @@ int main(int argc, char* argv[]) {
             std::cout << "@ step " << i << " -> e = " << sum.str(50) << " [" << sum.fractional_str() << "]" << std::endl;
 
             if (!checkpoint_file.empty()) {
-                save_checkpoint(checkpoint_file, i, sum);
+                save_checkpoint(checkpoint_file, i, sum, c);
             }
         }
     }
