@@ -6,32 +6,23 @@
 
 using namespace osi::math;
 
-bool save_checkpoint(const std::string& path, uint64_t step, const big_udec& sum, const big_udec& c) {
+bool save_checkpoint(const std::string& path, uint64_t step, const big_udec& sum) {
     std::ofstream ofs(path);
     if (!ofs.is_open()) return false;
     ofs << step << "\n";
     ofs << sum.fractional_str() << "\n";
-    ofs << c.fractional_str() << "\n";
     return true;
 }
 
 bool load_checkpoint(const std::string& path, uint64_t& step, big_udec& sum, big_udec& c) {
     std::ifstream ifs(path);
     if (!ifs.is_open()) return false;
-    std::string line_step, line_sum, line_c;
+    std::string line_step, line_sum;
     if (!std::getline(ifs, line_step) || !std::getline(ifs, line_sum)) return false;
     step = static_cast<uint64_t>(std::stoull(line_step));
     if (!big_udec::parse_fraction(line_sum, sum)) return false;
 
-    if (std::getline(ifs, line_c) && !line_c.empty()) {
-        if (!big_udec::parse_fraction(line_c, c)) return false;
-    } else {
-        c = big_udec(1U);
-        for (uint64_t k = 1; k <= step; ++k) {
-            c.divide(big_udec(k));
-            if (k % 1000 == 0) c.reduce_fraction();
-        }
-    }
+    c = big_udec(big_uint(1U), sum.denominator());
     return true;
 }
 
@@ -82,7 +73,7 @@ int main(int argc, char* argv[]) {
             std::cout << "@ step " << i << " -> e = " << sum.str(50) << " [" << sum.fractional_str() << "]" << std::endl;
 
             if (!checkpoint_file.empty()) {
-                save_checkpoint(checkpoint_file, i, sum, c);
+                save_checkpoint(checkpoint_file, i, sum);
             }
         }
     }
