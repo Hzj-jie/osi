@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <numeric>
+#include <iostream>
 #include "../../app_info/assert.hpp"
 
 namespace osi {
@@ -49,6 +50,14 @@ public:
         }
     }
 
+    explicit big_uint(const std::vector<uint8_t>& bytes) {
+        set_zero();
+        for (int i = static_cast<int>(bytes.size()) - 1; i >= 0; --i) {
+            multiply(256U);
+            add(big_uint(static_cast<uint64_t>(bytes[i])));
+        }
+    }
+
     void set_zero() {
         limbs_ = {0};
     }
@@ -69,12 +78,28 @@ public:
         return is_zero() || is_one();
     }
 
+    bool is_even() const {
+        return limbs_.empty() || (limbs_[0] & 1) == 0;
+    }
+
+    bool is_odd() const {
+        return !is_even();
+    }
+
     size_t limb_count() const {
         return limbs_.size();
     }
 
     size_t uint32_size() const {
         return limbs_.size();
+    }
+
+    size_t bit_count() const {
+        if (is_zero()) return 0;
+        size_t full = (limbs_.size() - 1) * 32;
+        uint32_t top = limbs_.back();
+        size_t top_bits = top == 0 ? 0 : static_cast<size_t>(32 - __builtin_clz(top));
+        return full + top_bits;
     }
 
     bool fit_uint32() const {
@@ -262,12 +287,8 @@ public:
         return *this;
     }
 
-    explicit big_uint(const std::vector<uint8_t>& bytes) {
-        set_zero();
-        for (int i = static_cast<int>(bytes.size()) - 1; i >= 0; --i) {
-            multiply(256U);
-            add(big_uint(static_cast<uint64_t>(bytes[i])));
-        }
+    big_uint& power_2() {
+        return multiply(*this);
     }
 
     big_uint& power(uint32_t exp) {
@@ -285,7 +306,7 @@ public:
                 multiply(base);
             }
             if (exp > 1) {
-                base = base * base;
+                base.power_2();
             }
             exp >>= 1;
         }
@@ -382,6 +403,51 @@ public:
         if (limb_shift > 0) {
             limbs_.insert(limbs_.begin(), limb_shift, 0);
         }
+    }
+
+    big_uint operator<<(size_t bits) const {
+        big_uint res = *this;
+        res.shift_left_bits(bits);
+        return res;
+    }
+
+    big_uint operator>>(size_t bits) const {
+        big_uint res = *this;
+        res.shift_right(bits);
+        return res;
+    }
+
+    big_uint operator&(const big_uint& that) const {
+        big_uint res;
+        size_t n = std::min(limbs_.size(), that.limbs_.size());
+        res.limbs_.resize(n);
+        for (size_t i = 0; i < n; ++i) {
+            res.limbs_[i] = limbs_[i] & that.limbs_[i];
+        }
+        res.remove_trailing_zeros();
+        return res;
+    }
+
+    big_uint operator|(const big_uint& that) const {
+        big_uint res = *this;
+        size_t n = std::max(limbs_.size(), that.limbs_.size());
+        res.limbs_.resize(n, 0);
+        for (size_t i = 0; i < that.limbs_.size(); ++i) {
+            res.limbs_[i] |= that.limbs_[i];
+        }
+        res.remove_trailing_zeros();
+        return res;
+    }
+
+    big_uint operator^(const big_uint& that) const {
+        big_uint res = *this;
+        size_t n = std::max(limbs_.size(), that.limbs_.size());
+        res.limbs_.resize(n, 0);
+        for (size_t i = 0; i < that.limbs_.size(); ++i) {
+            res.limbs_[i] ^= that.limbs_[i];
+        }
+        res.remove_trailing_zeros();
+        return res;
     }
 
     void add_offset(uint32_t val, size_t offset) {
@@ -535,6 +601,14 @@ public:
         return a;
     }
 
+    static big_uint factorial(uint32_t n) {
+        big_uint res(1U);
+        for (uint32_t i = 2; i <= n; ++i) {
+            res.multiply(i);
+        }
+        return res;
+    }
+
     std::string str() const {
         if (is_zero()) return "0";
         big_uint copy = *this;
@@ -546,6 +620,10 @@ public:
         }
         std::reverse(res.begin(), res.end());
         return res;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const big_uint& v) {
+        return os << v.str();
     }
 };
 

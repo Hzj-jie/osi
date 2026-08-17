@@ -65,6 +65,13 @@ public:
         assert(!d_.is_zero(), "Denominator cannot be zero");
     }
 
+    static big_udec fraction(uint64_t n, uint64_t d) {
+        return big_udec(big_uint(n), big_uint(d));
+    }
+
+    static big_udec zero() { return big_udec(0U); }
+    static big_udec one() { return big_udec(1U); }
+
     const big_uint& numerator() {
         reduce_fraction();
         return n_;
@@ -78,6 +85,11 @@ public:
 
     bool is_zero() const { return n_.is_zero(); }
     bool is_one() const { return n_ == d_; }
+
+    big_udec reciprocal() const {
+        assert(!n_.is_zero(), "Division by zero in reciprocal");
+        return big_udec(d_, n_);
+    }
 
     big_udec& add(const big_udec& that) {
         if (that.is_zero()) return *this;
@@ -140,6 +152,10 @@ public:
         d_ = d1 * d2;
         increase_fraction_dirty_rate();
         return *this;
+    }
+
+    big_udec& power_2() {
+        return multiply(*this);
     }
 
     big_udec operator*(const big_udec& that) const {
@@ -263,6 +279,10 @@ public:
             cur_rem = rem;
         }
         return res;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const big_udec& v) {
+        return os << v.str();
     }
 };
 
