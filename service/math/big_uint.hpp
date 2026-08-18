@@ -676,6 +676,8 @@ public:
         return res;
     }
 
+    // TODO: For very large numbers (e.g. > 5000 digits), consider implementing recursive
+    // divide-and-conquer base conversion (dividing by 10^(D/2)) to achieve O(N log^2 N) formatting.
     std::string str() const {
         if (is_zero()) return "0";
         big_uint copy = *this;
