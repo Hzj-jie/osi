@@ -615,8 +615,17 @@ public:
         std::string res;
         while (!copy.is_zero()) {
             uint32_t rem = 0;
-            copy.divide_uint32(10U, rem);
-            res.push_back(static_cast<char>('0' + rem));
+            copy.divide_uint32(1000000000U, rem);
+            for (int i = 0; i < 9; ++i) {
+                res.push_back(static_cast<char>('0' + (rem % 10)));
+                rem /= 10;
+                if (rem == 0) {
+                    if (!copy.is_zero()) {
+                        res.append(9 - i - 1, '0');
+                    }
+                    break;
+                }
+            }
         }
         std::reverse(res.begin(), res.end());
         return res;

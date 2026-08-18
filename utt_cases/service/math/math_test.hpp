@@ -48,6 +48,27 @@ public:
         utt_assert.equal(big_uint(255U).bit_count(), 8UL);
         utt_assert.equal(big_uint::factorial(5).str(), std::string("120"));
 
+        // Multi-chunk, boundary, and embedded zero string formatting tests
+        std::vector<std::string> test_strings = {
+            "0",
+            "1",
+            "9",
+            "10",
+            "999999999",
+            "1000000000",
+            "1000000001",
+            "1000000000000000000",
+            "1000000000000000005",
+            "1000000000000000000000000001",
+            "12345678901234567890987654321",
+            "340282366920938463463374607431768211456", // 2^128
+            "265252859812191058636308480000000"         // 30!
+        };
+        for (const auto& s : test_strings) {
+            big_uint parsed(s);
+            utt_assert.equal(parsed.str(), s);
+        }
+
         return true;
     }
 
