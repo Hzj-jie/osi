@@ -182,6 +182,11 @@ public:
             limbs_[i] = static_cast<uint32_t>(sum & 0xFFFFFFFF);
             carry = sum >> 32;
         }
+        for (; i < that.limbs_.size(); ++i) {
+            uint64_t sum = static_cast<uint64_t>(that.limbs_[i]) + carry;
+            limbs_[i] = static_cast<uint32_t>(sum & 0xFFFFFFFF);
+            carry = sum >> 32;
+        }
         for (; carry > 0 && i < limbs_.size(); ++i) {
             uint64_t sum = static_cast<uint64_t>(limbs_[i]) + carry;
             limbs_[i] = static_cast<uint32_t>(sum & 0xFFFFFFFF);
@@ -257,6 +262,81 @@ public:
         return *this;
     }
 
+    static big_uint multiply_schoolbook(const big_uint& a, const big_uint& b) {
+        if (a.is_zero() || b.is_zero()) return big_uint(0U);
+        if (a.limbs_.size() == 1) {
+            big_uint res = b;
+            res.multiply(a.limbs_[0]);
+            return res;
+        }
+        if (b.limbs_.size() == 1) {
+            big_uint res = a;
+            res.multiply(b.limbs_[0]);
+            return res;
+        }
+        std::vector<uint32_t> res(a.limbs_.size() + b.limbs_.size(), 0);
+        for (size_t i = 0; i < a.limbs_.size(); ++i) {
+            uint64_t a_limb = a.limbs_[i];
+            if (a_limb == 0) continue;
+            uint64_t carry = 0;
+            for (size_t j = 0; j < b.limbs_.size(); ++j) {
+                uint64_t cur = res[i + j] + a_limb * b.limbs_[j] + carry;
+                res[i + j] = static_cast<uint32_t>(cur & 0xFFFFFFFF);
+                carry = cur >> 32;
+            }
+            res[i + b.limbs_.size()] += static_cast<uint32_t>(carry);
+        }
+        big_uint ans;
+        ans.limbs_ = std::move(res);
+        ans.remove_trailing_zeros();
+        return ans;
+    }
+
+    static big_uint multiply_karatsuba(const big_uint& a, const big_uint& b) {
+        size_t n = std::max(a.limbs_.size(), b.limbs_.size());
+        if (n <= 32 || a.limbs_.size() <= 4 || b.limbs_.size() <= 4) {
+            return multiply_schoolbook(a, b);
+        }
+
+        size_t m = (n + 1) / 2;
+
+        big_uint a0, a1, b0, b1;
+        if (a.limbs_.size() <= m) {
+            a0 = a;
+        } else {
+            a0.limbs_.assign(a.limbs_.begin(), a.limbs_.begin() + m);
+            a0.remove_trailing_zeros();
+            a1.limbs_.assign(a.limbs_.begin() + m, a.limbs_.end());
+            a1.remove_trailing_zeros();
+        }
+
+        if (b.limbs_.size() <= m) {
+            b0 = b;
+        } else {
+            b0.limbs_.assign(b.limbs_.begin(), b.limbs_.begin() + m);
+            b0.remove_trailing_zeros();
+            b1.limbs_.assign(b.limbs_.begin() + m, b.limbs_.end());
+            b1.remove_trailing_zeros();
+        }
+
+        big_uint z0 = multiply_karatsuba(a0, b0);
+        big_uint z2 = multiply_karatsuba(a1, b1);
+
+        big_uint sum_a = a0 + a1;
+        big_uint sum_b = b0 + b1;
+        big_uint z1 = multiply_karatsuba(sum_a, sum_b);
+
+        big_uint mid = z1 - z2 - z0;
+
+        z2.shift_left_bits(2 * m * 32);
+        mid.shift_left_bits(m * 32);
+
+        big_uint res = std::move(z0);
+        res.add(mid);
+        res.add(z2);
+        return res;
+    }
+
     big_uint& multiply(const big_uint& that) {
         if (is_zero() || that.is_zero()) {
             set_zero();
@@ -270,20 +350,7 @@ public:
             limbs_ = that.limbs_;
             return multiply(factor);
         }
-        std::vector<uint32_t> res(limbs_.size() + that.limbs_.size(), 0);
-        for (size_t i = 0; i < limbs_.size(); ++i) {
-            uint64_t a_limb = limbs_[i];
-            if (a_limb == 0) continue;
-            uint64_t carry = 0;
-            for (size_t j = 0; j < that.limbs_.size(); ++j) {
-                uint64_t cur = res[i + j] + a_limb * that.limbs_[j] + carry;
-                res[i + j] = static_cast<uint32_t>(cur & 0xFFFFFFFF);
-                carry = cur >> 32;
-            }
-            res[i + that.limbs_.size()] += static_cast<uint32_t>(carry);
-        }
-        limbs_ = std::move(res);
-        remove_trailing_zeros();
+        *this = multiply_karatsuba(*this, that);
         return *this;
     }
 
