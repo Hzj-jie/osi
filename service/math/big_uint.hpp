@@ -4,15 +4,18 @@
 #include <algorithm>
 #include <cstdint>
 #include <numeric>
+#include <type_traits>
 #include <iostream>
 #include "../../app_info/assert.hpp"
 
 namespace osi {
 namespace math {
 
+using uint128_t = unsigned __int128;
+
 class big_uint {
 private:
-    std::vector<uint32_t> limbs_;
+    std::vector<uint64_t> limbs_;
 
     void remove_trailing_zeros() {
         while (limbs_.size() > 1 && limbs_.back() == 0) {
@@ -23,15 +26,12 @@ private:
 public:
     big_uint() : limbs_{0} {}
 
-    explicit big_uint(uint64_t val) {
+    template <typename T, typename std::enable_if<std::is_integral<T>::value && !std::is_same<T, bool>::value, int>::type = 0>
+    explicit big_uint(T val) {
         if (val == 0) {
             limbs_ = {0};
         } else {
-            limbs_.push_back(static_cast<uint32_t>(val & 0xFFFFFFFF));
-            uint32_t high = static_cast<uint32_t>(val >> 32);
-            if (high > 0) {
-                limbs_.push_back(high);
-            }
+            limbs_ = {static_cast<uint64_t>(val)};
         }
     }
 
@@ -45,7 +45,7 @@ public:
         for (size_t i = start; i < str.size(); ++i) {
             char c = str[i];
             if (c < '0' || c > '9') break;
-            multiply(10U);
+            multiply(10ULL);
             add(big_uint(static_cast<uint64_t>(c - '0')));
         }
     }
@@ -53,7 +53,7 @@ public:
     explicit big_uint(const std::vector<uint8_t>& bytes) {
         set_zero();
         for (int i = static_cast<int>(bytes.size()) - 1; i >= 0; --i) {
-            multiply(256U);
+            multiply(256ULL);
             add(big_uint(static_cast<uint64_t>(bytes[i])));
         }
     }
@@ -91,44 +91,41 @@ public:
     }
 
     size_t uint32_size() const {
-        return limbs_.size();
+        return limbs_.size() * 2;
     }
 
     size_t bit_count() const {
         if (is_zero()) return 0;
-        size_t full = (limbs_.size() - 1) * 32;
-        uint32_t top = limbs_.back();
-        size_t top_bits = top == 0 ? 0 : static_cast<size_t>(32 - __builtin_clz(top));
+        size_t full = (limbs_.size() - 1) * 64;
+        uint64_t top = limbs_.back();
+        size_t top_bits = top == 0 ? 0 : static_cast<size_t>(64 - __builtin_clzll(top));
         return full + top_bits;
     }
 
     bool fit_uint32() const {
-        return limbs_.size() == 1;
+        return limbs_.size() == 1 && limbs_[0] <= 0xFFFFFFFFULL;
     }
 
     uint32_t as_uint32() const {
-        return limbs_.empty() ? 0 : limbs_[0];
+        return limbs_.empty() ? 0 : static_cast<uint32_t>(limbs_[0]);
     }
 
     bool fit_uint64() const {
-        return limbs_.size() <= 2;
+        return limbs_.size() == 1;
     }
 
     uint64_t as_uint64() const {
-        if (limbs_.empty()) return 0;
-        if (limbs_.size() == 1) return limbs_[0];
-        return (static_cast<uint64_t>(limbs_[1]) << 32) | limbs_[0];
+        return limbs_.empty() ? 0 : limbs_[0];
     }
 
     uint64_t highest_uint64() const {
-        if (limbs_.empty()) return 0;
-        if (limbs_.size() == 1) return limbs_[0];
-        return (static_cast<uint64_t>(limbs_.back()) << 32) | limbs_[limbs_.size() - 2];
+        return limbs_.empty() ? 0 : limbs_.back();
     }
 
     uint32_t highest_uint32() const {
         if (limbs_.empty()) return 0;
-        return limbs_.back();
+        uint64_t top = limbs_.back();
+        return (top >> 32) != 0 ? static_cast<uint32_t>(top >> 32) : static_cast<uint32_t>(top);
     }
 
     int compare(const big_uint& that) const {
@@ -148,8 +145,8 @@ public:
         if (limbs_.size() < that_size) return -1;
         if (limbs_.size() > that_size) return 1;
         for (int k = static_cast<int>(that.limbs_.size()) - 1; k >= 0; --k) {
-            uint32_t a = limbs_[k + offset];
-            uint32_t b = that.limbs_[k];
+            uint64_t a = limbs_[k + offset];
+            uint64_t b = that.limbs_[k];
             if (a != b) return (a > b) ? 1 : -1;
         }
         for (int k = static_cast<int>(offset) - 1; k >= 0; --k) {
@@ -175,25 +172,25 @@ public:
         if (limbs_.size() < that.limbs_.size()) {
             limbs_.resize(that.limbs_.size(), 0);
         }
-        uint64_t carry = 0;
+        uint128_t carry = 0;
         size_t i = 0;
         for (; i < common; ++i) {
-            uint64_t sum = static_cast<uint64_t>(limbs_[i]) + that.limbs_[i] + carry;
-            limbs_[i] = static_cast<uint32_t>(sum & 0xFFFFFFFF);
-            carry = sum >> 32;
+            uint128_t sum = static_cast<uint128_t>(limbs_[i]) + that.limbs_[i] + carry;
+            limbs_[i] = static_cast<uint64_t>(sum);
+            carry = sum >> 64;
         }
         for (; i < that.limbs_.size(); ++i) {
-            uint64_t sum = static_cast<uint64_t>(that.limbs_[i]) + carry;
-            limbs_[i] = static_cast<uint32_t>(sum & 0xFFFFFFFF);
-            carry = sum >> 32;
+            uint128_t sum = static_cast<uint128_t>(that.limbs_[i]) + carry;
+            limbs_[i] = static_cast<uint64_t>(sum);
+            carry = sum >> 64;
         }
         for (; carry > 0 && i < limbs_.size(); ++i) {
-            uint64_t sum = static_cast<uint64_t>(limbs_[i]) + carry;
-            limbs_[i] = static_cast<uint32_t>(sum & 0xFFFFFFFF);
-            carry = sum >> 32;
+            uint128_t sum = static_cast<uint128_t>(limbs_[i]) + carry;
+            limbs_[i] = static_cast<uint64_t>(sum);
+            carry = sum >> 64;
         }
         if (carry > 0) {
-            limbs_.push_back(static_cast<uint32_t>(carry));
+            limbs_.push_back(static_cast<uint64_t>(carry));
         }
         return *this;
     }
@@ -213,18 +210,18 @@ public:
         if (limbs_.size() < that.limbs_.size() + offset) {
             limbs_.resize(that.limbs_.size() + offset, 0);
         }
-        uint64_t borrow = 0;
+        uint128_t borrow = 0;
         size_t i = 0;
         for (; i < that.limbs_.size(); ++i) {
             size_t idx = i + offset;
-            uint64_t diff = static_cast<uint64_t>(limbs_[idx]) - that.limbs_[i] - borrow;
-            limbs_[idx] = static_cast<uint32_t>(diff & 0xFFFFFFFF);
-            borrow = (diff >> 63);
+            uint128_t diff = static_cast<uint128_t>(limbs_[idx]) - that.limbs_[i] - borrow;
+            limbs_[idx] = static_cast<uint64_t>(diff);
+            borrow = (diff >> 127);
         }
         for (size_t idx = i + offset; borrow > 0 && idx < limbs_.size(); ++idx) {
-            uint64_t diff = static_cast<uint64_t>(limbs_[idx]) - borrow;
-            limbs_[idx] = static_cast<uint32_t>(diff & 0xFFFFFFFF);
-            borrow = (diff >> 63);
+            uint128_t diff = static_cast<uint128_t>(limbs_[idx]) - borrow;
+            limbs_[idx] = static_cast<uint64_t>(diff);
+            borrow = (diff >> 127);
         }
         remove_trailing_zeros();
         return *this;
@@ -236,34 +233,32 @@ public:
         return res;
     }
 
-    big_uint& multiply(uint32_t factor) {
+    big_uint& multiply(uint64_t factor) {
         if (factor == 0 || is_zero()) {
             set_zero();
             return *this;
         }
         if (factor == 1) return *this;
         if ((factor & (factor - 1)) == 0) {
-            size_t bits = 0;
-            uint32_t temp = factor;
-            while (temp > 1) { temp >>= 1; bits++; }
+            size_t bits = static_cast<size_t>(__builtin_ctzll(factor));
             shift_left_bits(bits);
             return *this;
         }
-        uint64_t carry = 0;
+        uint128_t carry = 0;
         for (size_t i = 0; i < limbs_.size(); ++i) {
-            uint64_t prod = static_cast<uint64_t>(limbs_[i]) * factor + carry;
-            limbs_[i] = static_cast<uint32_t>(prod & 0xFFFFFFFF);
-            carry = prod >> 32;
+            uint128_t prod = static_cast<uint128_t>(limbs_[i]) * factor + carry;
+            limbs_[i] = static_cast<uint64_t>(prod);
+            carry = prod >> 64;
         }
         if (carry > 0) {
-            limbs_.push_back(static_cast<uint32_t>(carry));
+            limbs_.push_back(static_cast<uint64_t>(carry));
         }
         remove_trailing_zeros();
         return *this;
     }
 
     static big_uint multiply_schoolbook(const big_uint& a, const big_uint& b) {
-        if (a.is_zero() || b.is_zero()) return big_uint(0U);
+        if (a.is_zero() || b.is_zero()) return big_uint(0ULL);
         if (a.limbs_.size() == 1) {
             big_uint res = b;
             res.multiply(a.limbs_[0]);
@@ -274,17 +269,17 @@ public:
             res.multiply(b.limbs_[0]);
             return res;
         }
-        std::vector<uint32_t> res(a.limbs_.size() + b.limbs_.size(), 0);
+        std::vector<uint64_t> res(a.limbs_.size() + b.limbs_.size(), 0);
         for (size_t i = 0; i < a.limbs_.size(); ++i) {
-            uint64_t a_limb = a.limbs_[i];
+            uint128_t a_limb = a.limbs_[i];
             if (a_limb == 0) continue;
-            uint64_t carry = 0;
+            uint128_t carry = 0;
             for (size_t j = 0; j < b.limbs_.size(); ++j) {
-                uint64_t cur = res[i + j] + a_limb * b.limbs_[j] + carry;
-                res[i + j] = static_cast<uint32_t>(cur & 0xFFFFFFFF);
-                carry = cur >> 32;
+                uint128_t cur = res[i + j] + a_limb * b.limbs_[j] + carry;
+                res[i + j] = static_cast<uint64_t>(cur);
+                carry = cur >> 64;
             }
-            res[i + b.limbs_.size()] += static_cast<uint32_t>(carry);
+            res[i + b.limbs_.size()] += static_cast<uint64_t>(carry);
         }
         big_uint ans;
         ans.limbs_ = std::move(res);
@@ -294,7 +289,7 @@ public:
 
     static big_uint multiply_karatsuba(const big_uint& a, const big_uint& b) {
         size_t n = std::max(a.limbs_.size(), b.limbs_.size());
-        if (n <= 32 || a.limbs_.size() <= 4 || b.limbs_.size() <= 4) {
+        if (n <= 16 || a.limbs_.size() <= 2 || b.limbs_.size() <= 2) {
             return multiply_schoolbook(a, b);
         }
 
@@ -328,8 +323,8 @@ public:
 
         big_uint mid = z1 - z2 - z0;
 
-        z2.shift_left_bits(2 * m * 32);
-        mid.shift_left_bits(m * 32);
+        z2.shift_left_bits(2 * m * 64);
+        mid.shift_left_bits(m * 64);
 
         big_uint res = std::move(z0);
         res.add(mid);
@@ -346,7 +341,7 @@ public:
             return multiply(that.limbs_[0]);
         }
         if (limbs_.size() == 1) {
-            uint32_t factor = limbs_[0];
+            uint64_t factor = limbs_[0];
             limbs_ = that.limbs_;
             return multiply(factor);
         }
@@ -380,7 +375,7 @@ public:
         return *this;
     }
 
-    big_uint operator*(uint32_t v) const {
+    big_uint operator*(uint64_t v) const {
         big_uint res = *this;
         res.multiply(v);
         return res;
@@ -392,39 +387,44 @@ public:
         return res;
     }
 
-    big_uint& divide_uint32(uint32_t divisor, uint32_t& remainder) {
+    big_uint& divide_uint64(uint64_t divisor, uint64_t& remainder) {
         assert(divisor != 0, "Division by zero");
         if (divisor == 1) {
             remainder = 0;
             return *this;
         }
         if ((divisor & (divisor - 1)) == 0) {
-            size_t bits = 0;
-            uint32_t temp = divisor;
-            while (temp > 1) { temp >>= 1; bits++; }
+            size_t bits = static_cast<size_t>(__builtin_ctzll(divisor));
             remainder = limbs_.empty() ? 0 : (limbs_[0] & (divisor - 1));
             shift_right(bits);
             return *this;
         }
-        uint64_t rem = 0;
+        uint128_t rem = 0;
         for (int i = static_cast<int>(limbs_.size()) - 1; i >= 0; --i) {
-            uint64_t cur = (rem << 32) | limbs_[i];
-            limbs_[i] = static_cast<uint32_t>(cur / divisor);
+            uint128_t cur = (rem << 64) | limbs_[i];
+            limbs_[i] = static_cast<uint64_t>(cur / divisor);
             rem = cur % divisor;
         }
-        remainder = static_cast<uint32_t>(rem);
+        remainder = static_cast<uint64_t>(rem);
         remove_trailing_zeros();
+        return *this;
+    }
+
+    big_uint& divide_uint32(uint32_t divisor, uint32_t& remainder) {
+        uint64_t rem64 = 0;
+        divide_uint64(divisor, rem64);
+        remainder = static_cast<uint32_t>(rem64);
         return *this;
     }
 
     size_t trailing_binary_zeros() const {
         if (is_zero()) return 0;
         size_t count = 0;
-        for (uint32_t limb : limbs_) {
+        for (uint64_t limb : limbs_) {
             if (limb == 0) {
-                count += 32;
+                count += 64;
             } else {
-                count += static_cast<size_t>(__builtin_ctz(limb));
+                count += static_cast<size_t>(__builtin_ctzll(limb));
                 break;
             }
         }
@@ -433,19 +433,19 @@ public:
 
     void shift_right(size_t bits) {
         if (bits == 0 || is_zero()) return;
-        size_t limb_shift = bits / 32;
-        size_t bit_shift = bits % 32;
+        size_t limb_shift = bits / 64;
+        size_t bit_shift = bits % 64;
         if (limb_shift >= limbs_.size()) {
             set_zero();
             return;
         }
         limbs_.erase(limbs_.begin(), limbs_.begin() + limb_shift);
         if (bit_shift > 0) {
-            uint64_t carry = 0;
+            uint128_t carry = 0;
             for (int i = static_cast<int>(limbs_.size()) - 1; i >= 0; --i) {
-                uint64_t cur = (carry << 32) | limbs_[i];
-                limbs_[i] = static_cast<uint32_t>(cur >> bit_shift);
-                carry = cur & ((1ULL << bit_shift) - 1);
+                uint128_t cur = (carry << 64) | limbs_[i];
+                limbs_[i] = static_cast<uint64_t>(cur >> bit_shift);
+                carry = cur & ((static_cast<uint128_t>(1) << bit_shift) - 1);
             }
         }
         remove_trailing_zeros();
@@ -453,18 +453,18 @@ public:
 
     void shift_left_bits(size_t bits) {
         if (bits == 0 || is_zero()) return;
-        size_t limb_shift = bits / 32;
-        size_t bit_shift = bits % 32;
+        size_t limb_shift = bits / 64;
+        size_t bit_shift = bits % 64;
 
         if (bit_shift > 0) {
-            uint64_t carry = 0;
+            uint128_t carry = 0;
             for (size_t i = 0; i < limbs_.size(); ++i) {
-                uint64_t v = (static_cast<uint64_t>(limbs_[i]) << bit_shift) | carry;
-                limbs_[i] = static_cast<uint32_t>(v & 0xFFFFFFFF);
-                carry = v >> 32;
+                uint128_t v = (static_cast<uint128_t>(limbs_[i]) << bit_shift) | carry;
+                limbs_[i] = static_cast<uint64_t>(v);
+                carry = v >> 64;
             }
             if (carry > 0) {
-                limbs_.push_back(static_cast<uint32_t>(carry));
+                limbs_.push_back(static_cast<uint64_t>(carry));
             }
         }
         if (limb_shift > 0) {
@@ -517,19 +517,19 @@ public:
         return res;
     }
 
-    void add_offset(uint32_t val, size_t offset) {
+    void add_offset(uint64_t val, size_t offset) {
         if (val == 0) return;
         if (limbs_.size() <= offset) {
             limbs_.resize(offset + 1, 0);
         }
-        uint64_t carry = val;
+        uint128_t carry = val;
         for (size_t idx = offset; carry > 0 && idx < limbs_.size(); ++idx) {
-            uint64_t sum = static_cast<uint64_t>(limbs_[idx]) + carry;
-            limbs_[idx] = static_cast<uint32_t>(sum & 0xFFFFFFFF);
-            carry = sum >> 32;
+            uint128_t sum = static_cast<uint128_t>(limbs_[idx]) + carry;
+            limbs_[idx] = static_cast<uint64_t>(sum);
+            carry = sum >> 64;
         }
         if (carry > 0) {
-            limbs_.push_back(static_cast<uint32_t>(carry));
+            limbs_.push_back(static_cast<uint64_t>(carry));
         }
     }
 
@@ -540,19 +540,19 @@ public:
             return *this;
         }
         if (is_one()) {
-            remainder = big_uint(1U);
-            return big_uint(0U);
+            remainder = big_uint(1ULL);
+            return big_uint(0ULL);
         }
-        if (that.fit_uint32()) {
-            uint32_t rem = 0;
+        if (that.fit_uint64()) {
+            uint64_t rem = 0;
             big_uint quotient = *this;
-            quotient.divide_uint32(that.limbs_[0], rem);
+            quotient.divide_uint64(that.limbs_[0], rem);
             remainder = big_uint(rem);
             return quotient;
         }
         remainder = *this;
         if (remainder < that) {
-            return big_uint(0U);
+            return big_uint(0ULL);
         }
 
         big_uint quotient;
@@ -562,18 +562,18 @@ public:
             while (true) {
                 if (remainder.limbs_.size() < that.limbs_.size() + i) break;
 
-                uint64_t n = 0, d = 0;
+                uint128_t n = 0, d = 0;
                 if (remainder.limbs_.size() == that.limbs_.size() + i) {
                     if (remainder.limbs_.size() > 1) {
-                        n = remainder.highest_uint64();
-                        d = that.highest_uint64();
+                        n = (static_cast<uint128_t>(remainder.limbs_.back()) << 64) | remainder.limbs_[remainder.limbs_.size() - 2];
+                        d = (static_cast<uint128_t>(that.limbs_.back()) << 64) | that.limbs_[that.limbs_.size() - 2];
                     } else {
-                        n = remainder.highest_uint32();
-                        d = that.highest_uint32();
+                        n = remainder.limbs_.back();
+                        d = that.limbs_.back();
                     }
                 } else {
-                    n = remainder.highest_uint64();
-                    d = that.highest_uint32();
+                    n = (static_cast<uint128_t>(remainder.limbs_.back()) << 64) | remainder.limbs_[remainder.limbs_.size() - 2];
+                    d = that.limbs_.back();
                 }
 
                 if (n < d) break;
@@ -581,7 +581,7 @@ public:
                     int cmp = remainder.compare_offset(that, i);
                     if (cmp >= 0) {
                         remainder.sub(that, i);
-                        quotient.add_offset(1, i);
+                        quotient.add_offset(1ULL, i);
                         if (cmp == 0) {
                             quotient.remove_trailing_zeros();
                             return quotient;
@@ -590,20 +590,20 @@ public:
                     break;
                 }
 
-                uint64_t q = n / (d + 1);
+                uint128_t q = n / (d + 1);
                 if (q == 0) q = 1;
-                if (q > 0xFFFFFFFFULL) q = 0xFFFFFFFFULL;
-                uint32_t q32 = static_cast<uint32_t>(q);
+                if (q > 0xFFFFFFFFFFFFFFFFULL) q = 0xFFFFFFFFFFFFFFFFULL;
+                uint64_t q64 = static_cast<uint64_t>(q);
 
-                int cmp = remainder.compare_offset(that * q32, i);
+                int cmp = remainder.compare_offset(that * q64, i);
                 if (cmp < 0) {
-                    q32 = 1;
+                    q64 = 1;
                     cmp = remainder.compare_offset(that, i);
                     if (cmp < 0) break;
                 }
 
-                quotient.add_offset(q32, i);
-                remainder.sub(that * q32, i);
+                quotient.add_offset(q64, i);
+                remainder.sub(that * q64, i);
             }
             if (i == 0) break;
             --i;
@@ -624,8 +624,8 @@ public:
     }
 
     static big_uint gcd(big_uint a, big_uint b) {
-        if (a.is_zero() || b.is_zero()) return big_uint(0U);
-        if (a.is_one() || b.is_one()) return big_uint(1U);
+        if (a.is_zero() || b.is_zero()) return big_uint(0ULL);
+        if (a.is_one() || b.is_one()) return big_uint(1ULL);
         if (a.fit_uint64() && b.fit_uint64()) {
             return big_uint(std::gcd(a.as_uint64(), b.as_uint64()));
         }
@@ -669,9 +669,9 @@ public:
     }
 
     static big_uint factorial(uint32_t n) {
-        big_uint res(1U);
+        big_uint res(1ULL);
         for (uint32_t i = 2; i <= n; ++i) {
-            res.multiply(i);
+            res.multiply(static_cast<uint64_t>(i));
         }
         return res;
     }
@@ -682,15 +682,16 @@ public:
         if (is_zero()) return "0";
         big_uint copy = *this;
         std::string res;
+        constexpr uint64_t base18 = 1000000000000000000ULL;
         while (!copy.is_zero()) {
-            uint32_t rem = 0;
-            copy.divide_uint32(1000000000U, rem);
-            for (int i = 0; i < 9; ++i) {
+            uint64_t rem = 0;
+            copy.divide_uint64(base18, rem);
+            for (int i = 0; i < 18; ++i) {
                 res.push_back(static_cast<char>('0' + (rem % 10)));
                 rem /= 10;
                 if (rem == 0) {
                     if (!copy.is_zero()) {
-                        res.append(9 - i - 1, '0');
+                        res.append(18 - i - 1, '0');
                     }
                     break;
                 }
