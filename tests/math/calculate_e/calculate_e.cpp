@@ -2,6 +2,8 @@
 #include <fstream>
 #include <string>
 #include <cstdint>
+#include <chrono>
+#include <iomanip>
 #include "../../../service/math/big_udec.hpp"
 
 using namespace osi::math;
@@ -63,6 +65,10 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Calculating e from step " << start_step << " up to " << max_iterations << " iterations..." << std::endl;
 
+    auto start_time = std::chrono::steady_clock::now();
+    auto last_time = start_time;
+    uint64_t last_step = start_step - 1;
+
     for (uint64_t i = start_step; i <= max_iterations; ++i) {
         c.divide(big_udec(i));
         sum.add(c);
@@ -70,15 +76,44 @@ int main(int argc, char* argv[]) {
         if (i % 1000 == 0 || i == max_iterations) {
             sum.reduce_fraction();
             c.reduce_fraction();
-            std::cout << "@ step " << i << " -> e = " << sum.str(50) << " [" << sum.fractional_str() << "]" << std::endl;
+
+            auto now = std::chrono::steady_clock::now();
+            double interval_sec = std::chrono::duration<double>(now - last_time).count();
+            double total_sec = std::chrono::duration<double>(now - start_time).count();
+            uint64_t interval_steps = i - last_step;
+            double current_speed = interval_sec > 0.0 ? (interval_steps / interval_sec) : 0.0;
+            double avg_speed = total_sec > 0.0 ? ((i - start_step + 1) / total_sec) : 0.0;
+            double progress_pct = (max_iterations > 0) ? (static_cast<double>(i) / max_iterations * 100.0) : 100.0;
+
+            std::cout << "@ step " << i << " / " << max_iterations
+                      << " (" << std::fixed << std::setprecision(1) << progress_pct << "%)"
+                      << " | Speed: " << std::setprecision(2) << current_speed << " steps/s"
+                      << " (avg: " << avg_speed << " steps/s)"
+                      << " | Elapsed: " << std::setprecision(2) << total_sec << "s";
 
             if (!checkpoint_file.empty()) {
-                save_checkpoint(checkpoint_file, i, sum);
+                if (save_checkpoint(checkpoint_file, i, sum)) {
+                    std::cout << " [Saved: " << checkpoint_file << "]";
+                } else {
+                    std::cout << " [Failed to save checkpoint]";
+                }
             }
+            std::cout << std::endl;
+
+            last_time = now;
+            last_step = i;
         }
     }
 
-    sum.reduce_fraction();
-    std::cout << "\nFinal e (" << max_iterations << " steps):\n" << sum.fractional_str() << std::endl;
+    auto end_time = std::chrono::steady_clock::now();
+    double total_sec = std::chrono::duration<double>(end_time - start_time).count();
+    double avg_speed = total_sec > 0.0 ? ((max_iterations - start_step + 1) / total_sec) : 0.0;
+
+    std::cout << "\nFinished calculation of e (" << (max_iterations - start_step + 1)
+              << " steps completed in " << std::fixed << std::setprecision(2) << total_sec
+              << "s, avg " << avg_speed << " steps/s)." << std::endl;
+    if (!checkpoint_file.empty()) {
+        std::cout << "Full result saved to checkpoint file: " << checkpoint_file << std::endl;
+    }
     return 0;
 }
