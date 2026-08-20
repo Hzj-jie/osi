@@ -55,7 +55,7 @@ namespace primitive
         static data_block from_bool(bool v)
         {
             data_block b;
-            b.bytes.push_back(v ? 1 : 0);
+            b.bytes.push_back(v ? 0xFF : 0x00);
             return b;
         }
 

@@ -331,7 +331,6 @@ namespace primitive
                     res->bytes = v1.as_bytes();
                     break;
                 }
-                case command_type::sapp:
                 case command_type::app:
                 {
                     if (inst.operands.size() < 2) return false;
@@ -342,7 +341,27 @@ namespace primitive
                     dst->bytes.insert(dst->bytes.end(), src->bytes.begin(), src->bytes.end());
                     break;
                 }
-                case command_type::scut:
+                case command_type::sapp:
+                {
+                    if (inst.operands.size() < 2) return false;
+                    data_block *dst = nullptr, *src = nullptr;
+                    if (!mem.resolve_ref(inst.operands[0], dst) ||
+                        !mem.resolve_ref(inst.operands[1], src)) return false;
+                    if (!dst || !src) return false;
+                    constexpr uint32_t chunk_checksum_mask = 0x00480048;
+                    uint32_t len = static_cast<uint32_t>(src->bytes.size());
+                    uint32_t chk = len ^ chunk_checksum_mask;
+                    dst->bytes.push_back(static_cast<uint8_t>(len & 0xFF));
+                    dst->bytes.push_back(static_cast<uint8_t>((len >> 8) & 0xFF));
+                    dst->bytes.push_back(static_cast<uint8_t>((len >> 16) & 0xFF));
+                    dst->bytes.push_back(static_cast<uint8_t>((len >> 24) & 0xFF));
+                    dst->bytes.push_back(static_cast<uint8_t>(chk & 0xFF));
+                    dst->bytes.push_back(static_cast<uint8_t>((chk >> 8) & 0xFF));
+                    dst->bytes.push_back(static_cast<uint8_t>((chk >> 16) & 0xFF));
+                    dst->bytes.push_back(static_cast<uint8_t>((chk >> 24) & 0xFF));
+                    dst->bytes.insert(dst->bytes.end(), src->bytes.begin(), src->bytes.end());
+                    break;
+                }
                 case command_type::cut:
                 {
                     if (inst.operands.size() < 3) return false;
@@ -362,7 +381,47 @@ namespace primitive
                     }
                     break;
                 }
-                case command_type::scutl:
+                case command_type::scut:
+                {
+                    if (inst.operands.size() < 3) return false;
+                    data_block *dst = nullptr, *src = nullptr, *offset_block = nullptr;
+                    if (!mem.resolve_ref(inst.operands[0], dst) ||
+                        !mem.resolve_ref(inst.operands[1], src) ||
+                        !mem.resolve_ref(inst.operands[2], offset_block)) return false;
+                    if (!dst || !src || !offset_block) return false;
+                    size_t target_idx = static_cast<size_t>(offset_block->as_int64());
+                    constexpr uint32_t chunk_checksum_mask = 0x00480048;
+                    size_t offset = 0;
+                    size_t cur_idx = 0;
+                    bool found = false;
+                    while (offset + 8 <= src->bytes.size())
+                    {
+                        uint32_t len = static_cast<uint32_t>(src->bytes[offset]) |
+                                       (static_cast<uint32_t>(src->bytes[offset+1]) << 8) |
+                                       (static_cast<uint32_t>(src->bytes[offset+2]) << 16) |
+                                       (static_cast<uint32_t>(src->bytes[offset+3]) << 24);
+                        uint32_t chk = static_cast<uint32_t>(src->bytes[offset+4]) |
+                                       (static_cast<uint32_t>(src->bytes[offset+5]) << 8) |
+                                       (static_cast<uint32_t>(src->bytes[offset+6]) << 16) |
+                                       (static_cast<uint32_t>(src->bytes[offset+7]) << 24);
+                        if (chk != (len ^ chunk_checksum_mask)) break;
+                        offset += 8;
+                        if (offset + len > src->bytes.size()) break;
+                        if (cur_idx == target_idx)
+                        {
+                            dst->bytes.assign(src->bytes.begin() + offset, src->bytes.begin() + offset + len);
+                            found = true;
+                            break;
+                        }
+                        offset += len;
+                        cur_idx++;
+                    }
+                    if (!found)
+                    {
+                        dst->bytes.clear();
+                    }
+                    break;
+                }
                 case command_type::cutl:
                 {
                     if (inst.operands.size() < 4) return false;
@@ -383,6 +442,43 @@ namespace primitive
                         size_t available = src->bytes.size() - offset;
                         size_t count = std::min(available, len);
                         dst->bytes.assign(src->bytes.begin() + offset, src->bytes.begin() + offset + count);
+                    }
+                    break;
+                }
+                case command_type::scutl:
+                {
+                    if (inst.operands.size() < 4) return false;
+                    data_block *dst = nullptr, *src = nullptr, *offset_block = nullptr, *len_block = nullptr;
+                    if (!mem.resolve_ref(inst.operands[0], dst) ||
+                        !mem.resolve_ref(inst.operands[1], src) ||
+                        !mem.resolve_ref(inst.operands[2], offset_block) ||
+                        !mem.resolve_ref(inst.operands[3], len_block)) return false;
+                    if (!dst || !src || !offset_block || !len_block) return false;
+                    size_t target_offset = static_cast<size_t>(offset_block->as_int64());
+                    size_t target_count = static_cast<size_t>(len_block->as_int64());
+                    constexpr uint32_t chunk_checksum_mask = 0x00480048;
+                    size_t offset = 0;
+                    size_t cur_idx = 0;
+                    dst->bytes.clear();
+                    while (offset + 8 <= src->bytes.size() && target_count > 0)
+                    {
+                        uint32_t len = static_cast<uint32_t>(src->bytes[offset]) |
+                                       (static_cast<uint32_t>(src->bytes[offset+1]) << 8) |
+                                       (static_cast<uint32_t>(src->bytes[offset+2]) << 16) |
+                                       (static_cast<uint32_t>(src->bytes[offset+3]) << 24);
+                        uint32_t chk = static_cast<uint32_t>(src->bytes[offset+4]) |
+                                       (static_cast<uint32_t>(src->bytes[offset+5]) << 8) |
+                                       (static_cast<uint32_t>(src->bytes[offset+6]) << 16) |
+                                       (static_cast<uint32_t>(src->bytes[offset+7]) << 24);
+                        if (chk != (len ^ chunk_checksum_mask)) break;
+                        size_t chunk_total = 8 + len;
+                        if (offset + chunk_total > src->bytes.size()) break;
+                        if (cur_idx >= target_offset && cur_idx < target_offset + target_count)
+                        {
+                            dst->bytes.insert(dst->bytes.end(), src->bytes.begin() + offset, src->bytes.begin() + offset + chunk_total);
+                        }
+                        offset += chunk_total;
+                        cur_idx++;
                     }
                     break;
                 }
@@ -511,7 +607,7 @@ namespace primitive
                     if (!mem.resolve_ref(inst.operands[0], res) ||
                         !mem.resolve_ref(inst.operands[1], src)) return false;
                     if (!res || !src) return false;
-                    *res = data_block::from_int64(static_cast<int64_t>(src->bytes.size()));
+                    *res = data_block::from_int32(static_cast<int32_t>(src->bytes.size()));
                     break;
                 }
                 case command_type::empty:

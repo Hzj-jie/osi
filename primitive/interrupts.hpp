@@ -109,13 +109,18 @@ namespace primitive {
             });
 
             register_method("big_udec_to_str", [](const std::vector<uint8_t>& in) -> std::vector<uint8_t> {
-                osi::math::big_uint bu(in);
+                osi::math::big_udec bu;
+                if (!osi::math::big_udec::from_bytes(in, bu)) {
+                    return {};
+                }
                 std::string s = bu.str();
                 return data_block::from_string(s).bytes;
             });
 
             register_method("big_uint_to_big_udec", [](const std::vector<uint8_t>& in) -> std::vector<uint8_t> {
-                return in;
+                osi::math::big_uint bu(in);
+                osi::math::big_udec d(bu, osi::math::big_uint(1ULL));
+                return d.as_bytes();
             });
         }
     };

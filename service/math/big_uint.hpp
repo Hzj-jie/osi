@@ -533,15 +533,21 @@ public:
     }
 
     std::vector<uint8_t> as_bytes() const {
-        if (is_zero()) return {0};
+        if (is_zero()) return {};
         std::vector<uint8_t> bytes;
-        for (uint64_t limb : limbs_) {
-            for (size_t j = 0; j < 8; ++j) {
-                bytes.push_back(static_cast<uint8_t>((limb >> (j * 8)) & 0xFF));
-            }
+        size_t total_uint32 = (limbs_.size() - 1) * 2;
+        if ((limbs_.back() >> 32) != 0) {
+            total_uint32 += 2;
+        } else {
+            total_uint32 += 1;
         }
-        while (bytes.size() > 1 && bytes.back() == 0) {
-            bytes.pop_back();
+        bytes.resize(total_uint32 * 4);
+        for (size_t i = 0; i < limbs_.size(); ++i) {
+            uint64_t limb = limbs_[i];
+            size_t base = i * 8;
+            for (size_t j = 0; j < 8 && (base + j) < bytes.size(); ++j) {
+                bytes[base + j] = static_cast<uint8_t>((limb >> (j * 8)) & 0xFF);
+            }
         }
         return bytes;
     }
