@@ -108,7 +108,10 @@ namespace primitive
                         !mem.resolve_ref(inst.operands[1], b1) ||
                         !mem.resolve_ref(inst.operands[2], b2)) return false;
                     if (!res || !b1 || !b2) return false;
-                    *res = data_block::from_int64(b1->as_int64() + b2->as_int64());
+                    osi::math::big_uint v1(b1->bytes);
+                    osi::math::big_uint v2(b2->bytes);
+                    v1.add(v2);
+                    res->bytes = v1.as_bytes();
                     break;
                 }
                 case command_type::sub:
@@ -119,7 +122,19 @@ namespace primitive
                         !mem.resolve_ref(inst.operands[1], b1) ||
                         !mem.resolve_ref(inst.operands[2], b2)) return false;
                     if (!res || !b1 || !b2) return false;
-                    *res = data_block::from_int64(b1->as_int64() - b2->as_int64());
+                    osi::math::big_uint v1(b1->bytes);
+                    osi::math::big_uint v2(b2->bytes);
+                    if (v1 < v2)
+                    {
+                        reg.carry_over = true;
+                        res->bytes = {0};
+                    }
+                    else
+                    {
+                        reg.carry_over = false;
+                        v1.sub(v2);
+                        res->bytes = v1.as_bytes();
+                    }
                     break;
                 }
                 case command_type::mul:
@@ -130,31 +145,13 @@ namespace primitive
                         !mem.resolve_ref(inst.operands[1], b1) ||
                         !mem.resolve_ref(inst.operands[2], b2)) return false;
                     if (!res || !b1 || !b2) return false;
-                    *res = data_block::from_int64(b1->as_int64() * b2->as_int64());
+                    osi::math::big_uint v1(b1->bytes);
+                    osi::math::big_uint v2(b2->bytes);
+                    v1.multiply(v2);
+                    res->bytes = v1.as_bytes();
                     break;
                 }
                 case command_type::div:
-                {
-                    if (inst.operands.size() < 4) return false;
-                    data_block *quot = nullptr, *rem = nullptr, *b1 = nullptr, *b2 = nullptr;
-                    if (!mem.resolve_ref(inst.operands[0], quot) ||
-                        !mem.resolve_ref(inst.operands[1], rem) ||
-                        !mem.resolve_ref(inst.operands[2], b1) ||
-                        !mem.resolve_ref(inst.operands[3], b2)) return false;
-                    if (!quot || !rem || !b1 || !b2) return false;
-                    int64_t v2 = b2->as_int64();
-                    if (v2 == 0)
-                    {
-                        reg.divided_by_zero = true;
-                    }
-                    else
-                    {
-                        int64_t v1 = b1->as_int64();
-                        *quot = data_block::from_int64(v1 / v2);
-                        *rem = data_block::from_int64(v1 % v2);
-                    }
-                    break;
-                }
                 case command_type::ext:
                 {
                     if (inst.operands.size() < 4) return false;
@@ -164,16 +161,19 @@ namespace primitive
                         !mem.resolve_ref(inst.operands[2], b1) ||
                         !mem.resolve_ref(inst.operands[3], b2)) return false;
                     if (!quot || !rem || !b1 || !b2) return false;
-                    int64_t v2 = b2->as_int64();
-                    if (v2 == 0)
+                    osi::math::big_uint v1(b1->bytes);
+                    osi::math::big_uint v2(b2->bytes);
+                    if (v2.is_zero())
                     {
                         reg.divided_by_zero = true;
                     }
                     else
                     {
-                        int64_t v1 = b1->as_int64();
-                        *quot = data_block::from_int64(v1 / v2);
-                        *rem = data_block::from_int64(v1 % v2);
+                        reg.divided_by_zero = false;
+                        osi::math::big_uint remainder;
+                        osi::math::big_uint quotient = v1.divide(v2, remainder);
+                        quot->bytes = quotient.as_bytes();
+                        rem->bytes = remainder.as_bytes();
                     }
                     break;
                 }
@@ -185,9 +185,10 @@ namespace primitive
                         !mem.resolve_ref(inst.operands[1], b1) ||
                         !mem.resolve_ref(inst.operands[2], b2)) return false;
                     if (!res || !b1 || !b2) return false;
-                    int64_t base = b1->as_int64();
-                    int64_t exp = b2->as_int64();
-                    *res = data_block::from_int64(static_cast<int64_t>(std::pow(base, exp)));
+                    osi::math::big_uint v1(b1->bytes);
+                    osi::math::big_uint v2(b2->bytes);
+                    v1.power(v2.as_uint32());
+                    res->bytes = v1.as_bytes();
                     break;
                 }
                 case command_type::equal:
@@ -198,7 +199,9 @@ namespace primitive
                         !mem.resolve_ref(inst.operands[1], b1) ||
                         !mem.resolve_ref(inst.operands[2], b2)) return false;
                     if (!res || !b1 || !b2) return false;
-                    *res = data_block::from_bool(b1->as_int64() == b2->as_int64());
+                    osi::math::big_uint v1(b1->bytes);
+                    osi::math::big_uint v2(b2->bytes);
+                    *res = data_block::from_bool(v1 == v2);
                     break;
                 }
                 case command_type::less:
@@ -209,7 +212,9 @@ namespace primitive
                         !mem.resolve_ref(inst.operands[1], b1) ||
                         !mem.resolve_ref(inst.operands[2], b2)) return false;
                     if (!res || !b1 || !b2) return false;
-                    *res = data_block::from_bool(b1->as_int64() < b2->as_int64());
+                    osi::math::big_uint v1(b1->bytes);
+                    osi::math::big_uint v2(b2->bytes);
+                    *res = data_block::from_bool(v1 < v2);
                     break;
                 }
                 case command_type::fadd:
@@ -220,7 +225,10 @@ namespace primitive
                         !mem.resolve_ref(inst.operands[1], b1) ||
                         !mem.resolve_ref(inst.operands[2], b2)) return false;
                     if (!res || !b1 || !b2) return false;
-                    *res = data_block::from_double(b1->as_double() + b2->as_double());
+                    osi::math::big_udec v1(b1->bytes);
+                    osi::math::big_udec v2(b2->bytes);
+                    v1.add(v2);
+                    res->bytes = v1.as_bytes();
                     break;
                 }
                 case command_type::fsub:
@@ -231,7 +239,19 @@ namespace primitive
                         !mem.resolve_ref(inst.operands[1], b1) ||
                         !mem.resolve_ref(inst.operands[2], b2)) return false;
                     if (!res || !b1 || !b2) return false;
-                    *res = data_block::from_double(b1->as_double() - b2->as_double());
+                    osi::math::big_udec v1(b1->bytes);
+                    osi::math::big_udec v2(b2->bytes);
+                    if (v1 < v2)
+                    {
+                        reg.imaginary_number = true;
+                        res->bytes = {0};
+                    }
+                    else
+                    {
+                        reg.imaginary_number = false;
+                        v1.sub(v2);
+                        res->bytes = v1.as_bytes();
+                    }
                     break;
                 }
                 case command_type::fmul:
@@ -242,10 +262,14 @@ namespace primitive
                         !mem.resolve_ref(inst.operands[1], b1) ||
                         !mem.resolve_ref(inst.operands[2], b2)) return false;
                     if (!res || !b1 || !b2) return false;
-                    *res = data_block::from_double(b1->as_double() * b2->as_double());
+                    osi::math::big_udec v1(b1->bytes);
+                    osi::math::big_udec v2(b2->bytes);
+                    v1.multiply(v2);
+                    res->bytes = v1.as_bytes();
                     break;
                 }
                 case command_type::fdiv:
+                case command_type::fext:
                 {
                     if (inst.operands.size() < 3) return false;
                     data_block *res = nullptr, *b1 = nullptr, *b2 = nullptr;
@@ -253,14 +277,17 @@ namespace primitive
                         !mem.resolve_ref(inst.operands[1], b1) ||
                         !mem.resolve_ref(inst.operands[2], b2)) return false;
                     if (!res || !b1 || !b2) return false;
-                    double v2 = b2->as_double();
-                    if (v2 == 0.0)
+                    osi::math::big_udec v1(b1->bytes);
+                    osi::math::big_udec v2(b2->bytes);
+                    if (v2.is_zero())
                     {
                         reg.divided_by_zero = true;
                     }
                     else
                     {
-                        *res = data_block::from_double(b1->as_double() / v2);
+                        reg.divided_by_zero = false;
+                        v1.divide(v2);
+                        res->bytes = v1.as_bytes();
                     }
                     break;
                 }
@@ -272,7 +299,22 @@ namespace primitive
                         !mem.resolve_ref(inst.operands[1], b1) ||
                         !mem.resolve_ref(inst.operands[2], b2)) return false;
                     if (!res || !b1 || !b2) return false;
-                    *res = data_block::from_bool(b1->as_double() == b2->as_double());
+                    osi::math::big_udec v1(b1->bytes);
+                    osi::math::big_udec v2(b2->bytes);
+                    *res = data_block::from_bool(v1 == v2);
+                    break;
+                }
+                case command_type::fless:
+                {
+                    if (inst.operands.size() < 3) return false;
+                    data_block *res = nullptr, *b1 = nullptr, *b2 = nullptr;
+                    if (!mem.resolve_ref(inst.operands[0], res) ||
+                        !mem.resolve_ref(inst.operands[1], b1) ||
+                        !mem.resolve_ref(inst.operands[2], b2)) return false;
+                    if (!res || !b1 || !b2) return false;
+                    osi::math::big_udec v1(b1->bytes);
+                    osi::math::big_udec v2(b2->bytes);
+                    *res = data_block::from_bool(v1 < v2);
                     break;
                 }
                 case command_type::fpow:
@@ -283,26 +325,10 @@ namespace primitive
                         !mem.resolve_ref(inst.operands[1], b1) ||
                         !mem.resolve_ref(inst.operands[2], b2)) return false;
                     if (!res || !b1 || !b2) return false;
-                    *res = data_block::from_double(std::pow(b1->as_double(), b2->as_double()));
-                    break;
-                }
-                case command_type::fext:
-                {
-                    if (inst.operands.size() < 3) return false;
-                    data_block *res = nullptr, *b1 = nullptr, *b2 = nullptr;
-                    if (!mem.resolve_ref(inst.operands[0], res) ||
-                        !mem.resolve_ref(inst.operands[1], b1) ||
-                        !mem.resolve_ref(inst.operands[2], b2)) return false;
-                    if (!res || !b1 || !b2) return false;
-                    double v2 = b2->as_double();
-                    if (v2 == 0.0)
-                    {
-                        reg.divided_by_zero = true;
-                    }
-                    else
-                    {
-                        *res = data_block::from_double(std::fmod(b1->as_double(), v2));
-                    }
+                    osi::math::big_udec v1(b1->bytes);
+                    osi::math::big_uint v2(b2->bytes);
+                    v1.power(v2.as_uint32());
+                    res->bytes = v1.as_bytes();
                     break;
                 }
                 case command_type::sapp:
@@ -368,7 +394,10 @@ namespace primitive
                         !mem.resolve_ref(inst.operands[1], b1) ||
                         !mem.resolve_ref(inst.operands[2], b2)) return false;
                     if (!res || !b1 || !b2) return false;
-                    *res = data_block::from_int64(b1->as_int64() & b2->as_int64());
+                    osi::math::big_uint v1(b1->bytes);
+                    osi::math::big_uint v2(b2->bytes);
+                    osi::math::big_uint r = v1 & v2;
+                    res->bytes = r.as_bytes();
                     break;
                 }
                 case command_type::cmd_or:
@@ -379,7 +408,10 @@ namespace primitive
                         !mem.resolve_ref(inst.operands[1], b1) ||
                         !mem.resolve_ref(inst.operands[2], b2)) return false;
                     if (!res || !b1 || !b2) return false;
-                    *res = data_block::from_int64(b1->as_int64() | b2->as_int64());
+                    osi::math::big_uint v1(b1->bytes);
+                    osi::math::big_uint v2(b2->bytes);
+                    osi::math::big_uint r = v1 | v2;
+                    res->bytes = r.as_bytes();
                     break;
                 }
                 case command_type::cmd_not:
@@ -389,7 +421,9 @@ namespace primitive
                     if (!mem.resolve_ref(inst.operands[0], res) ||
                         !mem.resolve_ref(inst.operands[1], b1)) return false;
                     if (!res || !b1) return false;
-                    *res = data_block::from_int64(~b1->as_int64());
+                    osi::math::big_uint v1(b1->bytes);
+                    osi::math::big_uint r = ~v1;
+                    res->bytes = r.as_bytes();
                     break;
                 }
                 case command_type::interrupt_cmd:
@@ -412,7 +446,10 @@ namespace primitive
                         !mem.resolve_ref(inst.operands[1], b1) ||
                         !mem.resolve_ref(inst.operands[2], b2)) return false;
                     if (!res || !b1 || !b2) return false;
-                    *res = data_block::from_int64(b1->as_int64() << b2->as_int64());
+                    osi::math::big_uint v1(b1->bytes);
+                    osi::math::big_uint v2(b2->bytes);
+                    osi::math::big_uint r = v1 << static_cast<size_t>(v2.as_uint64());
+                    res->bytes = r.as_bytes();
                     break;
                 }
                 case command_type::rfs:
@@ -423,7 +460,10 @@ namespace primitive
                         !mem.resolve_ref(inst.operands[1], b1) ||
                         !mem.resolve_ref(inst.operands[2], b2)) return false;
                     if (!res || !b1 || !b2) return false;
-                    *res = data_block::from_int64(b1->as_int64() >> b2->as_int64());
+                    osi::math::big_uint v1(b1->bytes);
+                    osi::math::big_uint v2(b2->bytes);
+                    osi::math::big_uint r = v1 >> static_cast<size_t>(v2.as_uint64());
+                    res->bytes = r.as_bytes();
                     break;
                 }
                 case command_type::stst:

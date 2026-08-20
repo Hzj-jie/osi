@@ -52,10 +52,16 @@ public:
 
     explicit big_uint(const std::vector<uint8_t>& bytes) {
         set_zero();
-        for (int i = static_cast<int>(bytes.size()) - 1; i >= 0; --i) {
-            multiply(256ULL);
-            add(big_uint(static_cast<uint64_t>(bytes[i])));
+        if (bytes.empty()) return;
+        limbs_.clear();
+        for (size_t i = 0; i < bytes.size(); i += 8) {
+            uint64_t limb = 0;
+            for (size_t j = 0; j < 8 && (i + j) < bytes.size(); ++j) {
+                limb |= (static_cast<uint64_t>(bytes[i + j]) << (j * 8));
+            }
+            limbs_.push_back(limb);
         }
+        remove_trailing_zeros();
     }
 
     void set_zero() {
@@ -515,6 +521,29 @@ public:
         }
         res.remove_trailing_zeros();
         return res;
+    }
+
+    big_uint operator~() const {
+        big_uint res = *this;
+        for (size_t i = 0; i < res.limbs_.size(); ++i) {
+            res.limbs_[i] = ~res.limbs_[i];
+        }
+        res.remove_trailing_zeros();
+        return res;
+    }
+
+    std::vector<uint8_t> as_bytes() const {
+        if (is_zero()) return {0};
+        std::vector<uint8_t> bytes;
+        for (uint64_t limb : limbs_) {
+            for (size_t j = 0; j < 8; ++j) {
+                bytes.push_back(static_cast<uint8_t>((limb >> (j * 8)) & 0xFF));
+            }
+        }
+        while (bytes.size() > 1 && bytes.back() == 0) {
+            bytes.pop_back();
+        }
+        return bytes;
     }
 
     void add_offset(uint64_t val, size_t offset) {

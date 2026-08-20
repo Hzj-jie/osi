@@ -65,6 +65,46 @@ public:
         assert(!d_.is_zero(), "Denominator cannot be zero");
     }
 
+    std::vector<uint8_t> as_bytes() const {
+        std::vector<uint8_t> n_bytes = n_.as_bytes();
+        std::vector<uint8_t> d_bytes = d_.as_bytes();
+        uint32_t n_len = static_cast<uint32_t>(n_bytes.size());
+        std::vector<uint8_t> bytes;
+        bytes.reserve(sizeof(uint32_t) + n_bytes.size() + d_bytes.size());
+        for (size_t i = 0; i < sizeof(uint32_t); ++i) {
+            bytes.push_back(static_cast<uint8_t>((n_len >> (i * 8)) & 0xFF));
+        }
+        bytes.insert(bytes.end(), n_bytes.begin(), n_bytes.end());
+        bytes.insert(bytes.end(), d_bytes.begin(), d_bytes.end());
+        return bytes;
+    }
+
+    static bool from_bytes(const std::vector<uint8_t>& bytes, big_udec& out) {
+        if (bytes.size() < sizeof(uint32_t)) {
+            out = big_udec(big_uint(bytes), big_uint(1ULL));
+            return true;
+        }
+        uint32_t n_len = 0;
+        for (size_t i = 0; i < sizeof(uint32_t); ++i) {
+            n_len |= (static_cast<uint32_t>(bytes[i]) << (i * 8));
+        }
+        if (sizeof(uint32_t) + n_len > bytes.size()) {
+            out = big_udec(big_uint(bytes), big_uint(1ULL));
+            return true;
+        }
+        std::vector<uint8_t> n_bytes(bytes.begin() + sizeof(uint32_t), bytes.begin() + sizeof(uint32_t) + n_len);
+        std::vector<uint8_t> d_bytes(bytes.begin() + sizeof(uint32_t) + n_len, bytes.end());
+        big_uint n(n_bytes);
+        big_uint d = d_bytes.empty() ? big_uint(1ULL) : big_uint(d_bytes);
+        if (d.is_zero()) d.set_one();
+        out = big_udec(n, d);
+        return true;
+    }
+
+    explicit big_udec(const std::vector<uint8_t>& bytes) {
+        from_bytes(bytes, *this);
+    }
+
     static big_udec fraction(uint64_t n, uint64_t d) {
         return big_udec(big_uint(n), big_uint(d));
     }

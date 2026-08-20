@@ -14,6 +14,8 @@ namespace primitive
 
         instruction() = default;
         explicit instruction(command_type c) : cmd(c) {}
+        instruction(command_type c, data_ref ref)
+            : cmd(c), operands{ref} {}
         instruction(command_type c, std::vector<data_ref> ops)
             : cmd(c), operands(std::move(ops)) {}
         instruction(command_type c, data_ref target_ref, data_block const_val)

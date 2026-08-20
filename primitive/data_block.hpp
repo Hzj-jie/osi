@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <cstring>
 #include <algorithm>
+#include "../service/math/big_uint.hpp"
+#include "../service/math/big_udec.hpp"
 
 namespace primitive
 {
@@ -64,32 +66,58 @@ namespace primitive
             return b;
         }
 
+        static data_block from_big_uint(const osi::math::big_uint& val)
+        {
+            return data_block(val.as_bytes());
+        }
+
+        static data_block from_big_udec(const osi::math::big_udec& val)
+        {
+            return data_block(val.as_bytes());
+        }
+
+        osi::math::big_uint as_big_uint() const
+        {
+            return osi::math::big_uint(bytes);
+        }
+
+        osi::math::big_udec as_big_udec() const
+        {
+            return osi::math::big_udec(bytes);
+        }
+
         int32_t as_int32() const
         {
+            if (bytes.empty()) return 0;
             if (bytes.size() >= sizeof(int32_t))
             {
                 int32_t v;
                 std::memcpy(&v, bytes.data(), sizeof(v));
                 return v;
             }
-            return 0;
+            int32_t v = 0;
+            for (size_t i = 0; i < bytes.size(); ++i)
+            {
+                v |= (static_cast<int32_t>(bytes[i]) << (i * 8));
+            }
+            return v;
         }
 
         int64_t as_int64() const
         {
+            if (bytes.empty()) return 0;
             if (bytes.size() >= sizeof(int64_t))
             {
                 int64_t v;
                 std::memcpy(&v, bytes.data(), sizeof(v));
                 return v;
             }
-            if (bytes.size() >= sizeof(int32_t))
+            int64_t v = 0;
+            for (size_t i = 0; i < bytes.size(); ++i)
             {
-                int32_t v;
-                std::memcpy(&v, bytes.data(), sizeof(v));
-                return static_cast<int64_t>(v);
+                v |= (static_cast<int64_t>(bytes[i]) << (i * 8));
             }
-            return 0;
+            return v;
         }
 
         double as_double() const
