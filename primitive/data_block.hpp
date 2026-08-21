@@ -27,6 +27,28 @@ namespace primitive
 
         data_block() = default;
         explicit data_block(std::vector<uint8_t> b) : bytes(std::move(b)) {}
+        explicit data_block(int32_t v) : data_block(from_int32(v)) {}
+        explicit data_block(uint32_t v) : data_block(from_int32(static_cast<int32_t>(v))) {}
+        explicit data_block(int64_t v) : data_block(from_int64(v)) {}
+        explicit data_block(uint64_t v) : data_block(from_int64(static_cast<int64_t>(v))) {}
+        explicit data_block(bool v) : data_block(from_bool(v)) {}
+        explicit data_block(const std::string& v) : data_block(from_string(v)) {}
+        explicit data_block(const char* v) : data_block(from_string(v != nullptr ? std::string(v) : std::string())) {}
+
+        size_t value_bytes_size() const { return bytes.size(); }
+
+        std::string to_assembly_string() const
+        {
+            static const char hex_chars[] = "0123456789abcdef";
+            std::string res = "a";
+            res.reserve(1 + bytes.size() * 2);
+            for (uint8_t b : bytes)
+            {
+                res += hex_chars[(b >> 4) & 0x0F];
+                res += hex_chars[b & 0x0F];
+            }
+            return res;
+        }
 
         static data_block from_int32(int32_t v)
         {

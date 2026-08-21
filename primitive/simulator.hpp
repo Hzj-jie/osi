@@ -15,6 +15,10 @@ namespace primitive {
     public:
         simulator() = default;
 
+        explicit simulator(interrupts intr) {
+            mem_.intr() = std::move(intr);
+        }
+
         void load_instructions(std::vector<instruction> insts) {
             instructions_ = std::move(insts);
             instructions_.push_back(instruction(command_type::stop));
@@ -33,6 +37,38 @@ namespace primitive {
         const memory_space& mem() const { return mem_; }
 
         const std::vector<instruction>& instructions() const { return instructions_; }
+
+        size_t stack_size() const { return mem_.stack_size(); }
+        bool halt() const { return reg_.halt; }
+        std::string halt_error() const { return "executor halted at instruction " + std::to_string(reg_.ip); }
+
+        uint32_t access_as_uint32(const data_ref& ref) const {
+            data_block* b = nullptr;
+            if (const_cast<memory_space&>(mem_).resolve_ref(ref, b) && b) {
+                return static_cast<uint32_t>(b->as_int64());
+            }
+            return 0;
+        }
+
+        bool access_as_bool(const data_ref& ref) const {
+            data_block* b = nullptr;
+            if (const_cast<memory_space&>(mem_).resolve_ref(ref, b) && b) {
+                return b->as_bool();
+            }
+            return false;
+        }
+
+        std::vector<uint8_t> access(const data_ref& ref) const {
+            data_block* b = nullptr;
+            if (const_cast<memory_space&>(mem_).resolve_ref(ref, b) && b) {
+                return b->bytes;
+            }
+            return {};
+        }
+
+        void execute() {
+            run();
+        }
 
         bool step() {
             if (reg_.halt || reg_.stop) return false;

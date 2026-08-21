@@ -11,6 +11,8 @@
 #include "../service/math/big_uint.hpp"
 #include "../service/math/big_udec.hpp"
 
+#include "console_io.hpp"
+
 namespace primitive {
     using method_handler = std::function<std::vector<uint8_t>(const std::vector<uint8_t>&)>;
     using interrupt_handler = method_handler;
@@ -130,9 +132,16 @@ namespace primitive {
         std::unordered_map<uint32_t, interrupt_handler> handlers_;
         std::unordered_map<std::string, uint32_t> name_to_id_;
         mutable loaded_methods loaded_methods_;
+        std::shared_ptr<console_io> io_;
 
     public:
-        interrupts() {
+        interrupts(std::shared_ptr<console_io> io = nullptr)
+            : io_(io ? std::move(io) : std::make_shared<console_io>()) {
+            register_default_handlers();
+        }
+
+        interrupts(console_io io)
+            : io_(std::make_shared<console_io>(std::move(io))) {
             register_default_handlers();
         }
 
@@ -158,27 +167,39 @@ namespace primitive {
             return true;
         }
 
+        bool of(const std::string& name, uint32_t& out_id) const {
+            return get_id(name, out_id);
+        }
+
+        const std::shared_ptr<console_io>& io() const { return io_; }
+
     private:
         void register_default_handlers() {
             // 0: stdout
-            register_handler(0, "stdout", [](const std::vector<uint8_t>& in) -> std::vector<uint8_t> {
-                std::cout.write(reinterpret_cast<const char*>(in.data()), in.size());
-                std::cout.flush();
+            register_handler(0, "stdout", [this](const std::vector<uint8_t>& in) -> std::vector<uint8_t> {
+                if (io_) {
+                    io_->out().write(reinterpret_cast<const char*>(in.data()), in.size());
+                    io_->out().flush();
+                }
                 return {};
             });
             // 1: stderr
-            register_handler(1, "stderr", [](const std::vector<uint8_t>& in) -> std::vector<uint8_t> {
-                std::cerr.write(reinterpret_cast<const char*>(in.data()), in.size());
-                std::cerr.flush();
+            register_handler(1, "stderr", [this](const std::vector<uint8_t>& in) -> std::vector<uint8_t> {
+                if (io_) {
+                    io_->err().write(reinterpret_cast<const char*>(in.data()), in.size());
+                    io_->err().flush();
+                }
                 return {};
             });
             // 2: stdin
-            register_handler(2, "stdin", [](const std::vector<uint8_t>&) -> std::vector<uint8_t> {
+            register_handler(2, "stdin", [this](const std::vector<uint8_t>&) -> std::vector<uint8_t> {
                 std::vector<uint8_t> out;
-                char c;
-                while (std::cin.get(c))
-                {
-                    out.push_back(static_cast<uint8_t>(c));
+                if (io_) {
+                    char c;
+                    while (io_->in().get(c))
+                    {
+                        out.push_back(static_cast<uint8_t>(c));
+                    }
                 }
                 return out;
             });
@@ -203,19 +224,21 @@ namespace primitive {
                 return res;
             });
             // 6: getchar
-            register_handler(6, "getchar", [](const std::vector<uint8_t>&) -> std::vector<uint8_t> {
-                int c = std::cin.get();
+            register_handler(6, "getchar", [this](const std::vector<uint8_t>&) -> std::vector<uint8_t> {
+                int c = io_ ? io_->in().get() : std::cin.get();
                 int32_t val = (c == EOF) ? -1 : static_cast<int32_t>(c);
                 return data_block::from_int32(val).bytes;
             });
             // 7: putchar
-            register_handler(7, "putchar", [](const std::vector<uint8_t>& in) -> std::vector<uint8_t> {
+            register_handler(7, "putchar", [this](const std::vector<uint8_t>& in) -> std::vector<uint8_t> {
                 if (in.size() >= sizeof(int32_t))
                 {
                     int32_t val = 0;
                     std::memcpy(&val, in.data(), sizeof(int32_t));
-                    std::cout.put(static_cast<char>(val));
-                    std::cout.flush();
+                    if (io_) {
+                        io_->out().put(static_cast<char>(val));
+                        io_->out().flush();
+                    }
                 }
                 return {};
             });

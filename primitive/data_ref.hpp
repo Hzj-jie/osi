@@ -104,6 +104,71 @@ namespace primitive
             return (offset << 2) | static_cast<uint8_t>(type);
         }
 
+        std::string as_string() const
+        {
+            std::string prefix;
+            switch (type)
+            {
+                case ref_type::abs: prefix = "abs"; break;
+                case ref_type::rel: prefix = "rel"; break;
+                case ref_type::habs: prefix = "habs"; break;
+                case ref_type::hrel: prefix = "hrel"; break;
+            }
+            return prefix + std::to_string(offset);
+        }
+
+        data_ref to_heap() const
+        {
+            if (type == ref_type::abs) return data_ref(ref_type::habs, offset);
+            if (type == ref_type::rel) return data_ref(ref_type::hrel, offset);
+            return *this;
+        }
+
+        data_ref to_stack() const
+        {
+            if (type == ref_type::habs) return data_ref(ref_type::abs, offset);
+            if (type == ref_type::hrel) return data_ref(ref_type::rel, offset);
+            return *this;
+        }
+
+        bool is_heap() const
+        {
+            return type == ref_type::habs || type == ref_type::hrel;
+        }
+
+        bool on_stack() const
+        {
+            return type == ref_type::abs || type == ref_type::rel;
+        }
+
+        bool is_rel() const
+        {
+            return type == ref_type::rel || type == ref_type::hrel;
+        }
+
+        bool is_abs() const
+        {
+            return type == ref_type::abs || type == ref_type::habs;
+        }
+
+        bool absolute() const
+        {
+            return is_abs();
+        }
+
+        bool to_rel(uint64_t stack_size, data_ref& out) const
+        {
+            if (is_abs())
+            {
+                if (offset < 0 || static_cast<uint64_t>(offset) >= stack_size) return false;
+                int64_t rel_off = static_cast<int64_t>(stack_size) - offset - 1;
+                if (is_heap()) return hrel(rel_off, out);
+                else return rel(rel_off, out);
+            }
+            out = *this;
+            return true;
+        }
+
         bool operator==(const data_ref& other) const
         {
             return type == other.type && offset == other.offset;

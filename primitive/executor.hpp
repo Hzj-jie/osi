@@ -647,7 +647,6 @@ namespace primitive
                 case command_type::stop:
                 {
                     reg.stop = true;
-                    reg.halt = true;
                     break;
                 }
                 default:

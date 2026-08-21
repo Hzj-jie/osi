@@ -67,8 +67,30 @@ namespace primitive
                     if (next == 'n') res += '\n';
                     else if (next == 'r') res += '\r';
                     else if (next == 't') res += '\t';
+                    else if (next == 'a') res += '\a';
+                    else if (next == 'b') res += '\b';
+                    else if (next == 'f') res += '\f';
+                    else if (next == 'v') res += '\v';
+                    else if (next == '0') res += '\0';
                     else if (next == '"') res += '"';
+                    else if (next == '\'') res += '\'';
+                    else if (next == '?') res += '?';
                     else if (next == '\\') res += '\\';
+                    else if (next == 'x' && i + 2 < sv.size())
+                    {
+                        char hex[3] = { sv[i + 1], sv[i + 2], '\0' };
+                        char* end_ptr = nullptr;
+                        unsigned long b = std::strtoul(hex, &end_ptr, 16);
+                        if (end_ptr == hex + 2)
+                        {
+                            res += static_cast<char>(b);
+                            i += 2;
+                        }
+                        else
+                        {
+                            res += next;
+                        }
+                    }
                     else res += next;
                 }
                 else

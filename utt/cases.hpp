@@ -53,4 +53,11 @@
 #include "../utt_cases/primitive/bytecode_test.hpp"
 #include "../utt_cases/primitive/interrupts_test.hpp"
 #include "../utt_cases/service/math/math_test.hpp"
-
+#include "../utt_cases/service/compiler/logic/scope_test.hpp"
+#include "../utt_cases/service/compiler/logic/variable_test.hpp"
+#include "../utt_cases/service/compiler/logic/caller_test.hpp"
+#include "../utt_cases/service/compiler/logic/condition_test.hpp"
+#include "../utt_cases/service/compiler/logic/while_then_test.hpp"
+#include "../utt_cases/service/compiler/logic/interrupt_test.hpp"
+#include "../utt_cases/service/compiler/logic/importer_test.hpp"
+#include "../utt_cases/service/compiler/logic/import_executor_tests.hpp"
