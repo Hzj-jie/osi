@@ -34,13 +34,20 @@ namespace osi
             }
 
         public:
-            virtual ~scope_base()
+            void run_end_scope()
             {
-                assert(in_thread == static_cast<T*>(this));
-                for (auto it = ds.rbegin(); it != ds.rend(); ++it)
+                auto actions = std::move(ds);
+                ds.clear();
+                for (auto it = actions.rbegin(); it != actions.rend(); ++it)
                 {
                     if (*it) (*it)();
                 }
+            }
+
+            virtual ~scope_base()
+            {
+                assert(in_thread == static_cast<T*>(this));
+                run_end_scope();
                 if (parent != nullptr)
                 {
                     assert(parent->child == static_cast<T*>(this));

@@ -447,6 +447,11 @@ namespace osi
                     }
                 }
 
+                ~scope() override
+                {
+                    this->run_end_scope();
+                }
+
                 variable_proxy variables()
                 {
                     return variable_proxy(this);
