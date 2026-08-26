@@ -1,7 +1,7 @@
 app_info envs
 envs envs
-math envs service/math
+math envs math
 primitive envs
-service/compiler/logic envs service/compiler/logic primitive
+compiler/logic envs compiler/logic primitive
 sync envs
 utils envs

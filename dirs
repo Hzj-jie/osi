@@ -10,10 +10,10 @@ sync envs
 template envs
 tests envs
 threadpool envs
-service/math envs const utils formation
-tests/math/calculate_e envs service/math
-tests/math/calculate_pi envs service/math
-tests/service/compiler/logic/logic_run envs service/compiler/logic primitive
+math envs const utils formation
+tests/math/calculate_e envs math
+tests/math/calculate_pi envs math
+tests/compiler/logic/logic_run envs compiler/logic primitive
 utt envs utt_cases
-utt_cases app_info const delegates envs formation procedure service/math sync template threadpool utils
+utt_cases app_info const delegates envs formation procedure math sync template threadpool utils
 

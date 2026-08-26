@@ -2,8 +2,8 @@
 #include <string>
 #include <vector>
 #include <sstream>
-#include "../../app_info/assert.hpp"
-#include "../../utils/strutils.hpp"
+#include "../app_info/assert.hpp"
+#include "../utils/strutils.hpp"
 
 namespace osi
 {

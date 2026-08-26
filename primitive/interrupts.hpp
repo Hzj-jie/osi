@@ -8,8 +8,8 @@
 #include <cstdint>
 #include "../app_info/assert.hpp"
 #include "data_block.hpp"
-#include "../service/math/big_uint.hpp"
-#include "../service/math/big_udec.hpp"
+#include "../math/big_uint.hpp"
+#include "../math/big_udec.hpp"
 
 #include "console_io.hpp"
 

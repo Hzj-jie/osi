@@ -4,8 +4,8 @@
 #include <string>
 #include <filesystem>
 #include <algorithm>
-#include "../../../../../service/compiler/logic/importer.hpp"
-#include "../../../../../primitive/simulator.hpp"
+#include "../../../../compiler/logic/importer.hpp"
+#include "../../../../primitive/simulator.hpp"
 
 namespace fs = std::filesystem;
 using namespace osi::compiler::logic;

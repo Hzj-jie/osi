@@ -2,7 +2,7 @@
 #include <functional>
 #include <vector>
 #include <memory>
-#include "../../../app_info/assert.hpp"
+#include "../../app_info/assert.hpp"
 
 namespace osi
 {

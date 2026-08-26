@@ -1,7 +1,7 @@
 #pragma once
-#include "../../../../service/compiler/logic/scope.hpp"
-#include "../../../../utt/icase.hpp"
-#include "../../../../utt/utt_assert.hpp"
+#include "../../../compiler/logic/scope.hpp"
+#include "../../../utt/icase.hpp"
+#include "../../../utt/utt_assert.hpp"
 
 namespace logic_test
 {

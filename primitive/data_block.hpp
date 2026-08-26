@@ -4,8 +4,8 @@
 #include <cstdint>
 #include <cstring>
 #include <algorithm>
-#include "../service/math/big_uint.hpp"
-#include "../service/math/big_udec.hpp"
+#include "../math/big_uint.hpp"
+#include "../math/big_udec.hpp"
 
 namespace primitive
 {

@@ -2,12 +2,12 @@
 #include <vector>
 #include <memory>
 #include <functional>
-#include "../../../../service/compiler/logic/statements.hpp"
-#include "../../../../service/compiler/logic/importer.hpp"
-#include "../../../../primitive/simulator.hpp"
-#include "../../../../primitive/interrupts.hpp"
-#include "../../../../utt/icase.hpp"
-#include "../../../../utt/utt_assert.hpp"
+#include "../../../compiler/logic/statements.hpp"
+#include "../../../compiler/logic/importer.hpp"
+#include "../../../primitive/simulator.hpp"
+#include "../../../primitive/interrupts.hpp"
+#include "../../../utt/icase.hpp"
+#include "../../../utt/utt_assert.hpp"
 
 namespace logic_test
 {

@@ -6,7 +6,7 @@
 #include <numeric>
 #include <type_traits>
 #include <iostream>
-#include "../../app_info/assert.hpp"
+#include "../app_info/assert.hpp"
 
 namespace osi {
 namespace math {

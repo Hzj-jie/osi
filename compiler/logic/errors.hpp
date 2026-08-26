@@ -1,8 +1,8 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "../../../app_info/error_handle.hpp"
-#include "../../../utils/strutils.hpp"
+#include "../../app_info/error_handle.hpp"
+#include "../../utils/strutils.hpp"
 
 namespace osi
 {

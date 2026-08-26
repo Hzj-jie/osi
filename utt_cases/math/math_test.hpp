@@ -1,10 +1,10 @@
 #pragma once
-#include "../../../service/math/big_uint.hpp"
-#include "../../../service/math/big_udec.hpp"
-#include "../../../service/math/big_int.hpp"
-#include "../../../service/math/big_dec.hpp"
-#include "../../../utt/icase.hpp"
-#include "../../../utt/utt_assert.hpp"
+#include "../../math/big_uint.hpp"
+#include "../../math/big_udec.hpp"
+#include "../../math/big_int.hpp"
+#include "../../math/big_dec.hpp"
+#include "../../utt/icase.hpp"
+#include "../../utt/utt_assert.hpp"
 
 namespace math_test {
 

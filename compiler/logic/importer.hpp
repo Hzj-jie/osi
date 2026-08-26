@@ -5,9 +5,9 @@
 #include <sstream>
 #include <cctype>
 #include "statements.hpp"
-#include "../../../primitive/simulator.hpp"
-#include "../../../primitive/parser.hpp"
-#include "../../../primitive/data_block.hpp"
+#include "../../primitive/simulator.hpp"
+#include "../../primitive/parser.hpp"
+#include "../../primitive/data_block.hpp"
 
 namespace osi
 {

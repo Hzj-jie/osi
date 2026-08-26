@@ -3,8 +3,8 @@
 #include <vector>
 #include "instruction_gen.hpp"
 #include "variable.hpp"
-#include "../../../app_info/assert.hpp"
-#include "../../../utils/strutils.hpp"
+#include "../../app_info/assert.hpp"
+#include "../../utils/strutils.hpp"
 
 namespace osi
 {

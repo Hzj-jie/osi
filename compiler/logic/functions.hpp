@@ -8,8 +8,8 @@
 #include "control_flow.hpp"
 #include "copy_move.hpp"
 #include "copy_const.hpp"
-#include "../../../primitive/interrupts.hpp"
-#include "../../../primitive/data_block.hpp"
+#include "../../primitive/interrupts.hpp"
+#include "../../primitive/data_block.hpp"
 
 namespace osi
 {
