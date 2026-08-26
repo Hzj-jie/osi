@@ -7,7 +7,7 @@ Makefile
 git.hpp
 /tests/math/calculate_e/calculate_e
 /tests/math/calculate_pi/calculate_pi
-/tests/primitive/primitive_run/primitive_run
+/tests/interpreter/primitive/primitive_run/primitive_run
 /tests/compiler/logic/logic_run/logic_run
 *.un~
 

@@ -2,9 +2,9 @@
 #include <fstream>
 #include <vector>
 #include <string>
-#include "../../../primitive/simulator.hpp"
-#include "../../../primitive/parser.hpp"
-#include "../../../primitive/bytecode.hpp"
+#include "../../../../interpreter/primitive/simulator.hpp"
+#include "../../../../interpreter/primitive/parser.hpp"
+#include "../../../../interpreter/primitive/bytecode.hpp"
 
 using namespace primitive;
 

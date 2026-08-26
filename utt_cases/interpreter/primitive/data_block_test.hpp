@@ -1,7 +1,7 @@
 #pragma once
-#include "../../primitive/data_block.hpp"
-#include "../../utt/icase.hpp"
-#include "../../utt/utt_assert.hpp"
+#include "../../../interpreter/primitive/data_block.hpp"
+#include "../../../utt/icase.hpp"
+#include "../../../utt/utt_assert.hpp"
 
 namespace primitive_test
 {

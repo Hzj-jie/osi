@@ -1,8 +1,8 @@
 #pragma once
-#include "../../primitive/bytecode.hpp"
-#include "../../primitive/parser.hpp"
-#include "../../utt/icase.hpp"
-#include "../../utt/utt_assert.hpp"
+#include "../../../interpreter/primitive/bytecode.hpp"
+#include "../../../interpreter/primitive/parser.hpp"
+#include "../../../utt/icase.hpp"
+#include "../../../utt/utt_assert.hpp"
 
 namespace primitive_test
 {

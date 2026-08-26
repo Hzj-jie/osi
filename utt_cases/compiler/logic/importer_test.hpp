@@ -1,6 +1,6 @@
 #pragma once
 #include "../../../compiler/logic/importer.hpp"
-#include "../../../primitive/simulator.hpp"
+#include "../../../interpreter/primitive/simulator.hpp"
 #include "../../../utt/icase.hpp"
 #include "../../../utt/utt_assert.hpp"
 

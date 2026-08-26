@@ -6,8 +6,8 @@
 #include "../scope/scope.hpp"
 #include "../function_signature.hpp"
 #include "errors.hpp"
-#include "../../primitive/data_ref.hpp"
-#include "../../primitive/interrupts.hpp"
+#include "../../interpreter/primitive/data_ref.hpp"
+#include "../../interpreter/primitive/interrupts.hpp"
 #include "../../app_info/assert.hpp"
 #include "../../utils/strutils.hpp"
 

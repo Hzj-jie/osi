@@ -26,7 +26,7 @@ A modern, high-performance C++17 utility and infrastructure library providing cr
 | **`app_info/`** | Assertion macros (`assert.hpp`), tracing (`trace.hpp`), and error handling (`error_handle.hpp`). |
 | **`math/`** | High-performance arbitrary-precision arithmetic (`big_uint`, `big_udec`, `big_int`, `big_dec`). |
 | **`compiler/`** | Logic intermediate representation compiler, statement generator, and scope resolver. |
-| **`primitive/`** | Custom bytecode virtual machine & interpreter engine (`data_ref`, `data_block`, `registers`, `memory_space`, `executor`, `simulator`, `parser`, `bytecode`, `interrupts`). |
+| **`interpreter/`** | Virtual machine & bytecode interpreter engine (`interpreter/primitive/`: `simulator`, `executor`, `parser`, `registers`, `memory_space`, `data_block`, `data_ref`, `bytecode`, `interrupts`). |
 | **`utt/`** & **`utt_cases/`** | Unit testing framework (`utt`) and suite of test cases across all modules. |
 
 ---

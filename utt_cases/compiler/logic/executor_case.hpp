@@ -4,8 +4,8 @@
 #include <functional>
 #include "../../../compiler/logic/statements.hpp"
 #include "../../../compiler/logic/importer.hpp"
-#include "../../../primitive/simulator.hpp"
-#include "../../../primitive/interrupts.hpp"
+#include "../../../interpreter/primitive/simulator.hpp"
+#include "../../../interpreter/primitive/interrupts.hpp"
 #include "../../../utt/icase.hpp"
 #include "../../../utt/utt_assert.hpp"
 

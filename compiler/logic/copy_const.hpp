@@ -2,7 +2,7 @@
 #include <string>
 #include "instruction_gen.hpp"
 #include "variable.hpp"
-#include "../../primitive/data_block.hpp"
+#include "../../interpreter/primitive/data_block.hpp"
 
 namespace osi
 {

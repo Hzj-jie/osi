@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <stdexcept>
-#include "../app_info/assert.hpp"
+#include "../../app_info/assert.hpp"
 
 namespace primitive
 {

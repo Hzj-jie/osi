@@ -4,8 +4,8 @@
 #include <memory>
 #include "scope.hpp"
 #include "errors.hpp"
-#include "../../primitive/data_ref.hpp"
-#include "../../primitive/data_block.hpp"
+#include "../../interpreter/primitive/data_ref.hpp"
+#include "../../interpreter/primitive/data_block.hpp"
 #include "../../app_info/assert.hpp"
 #include "../../utils/strutils.hpp"
 

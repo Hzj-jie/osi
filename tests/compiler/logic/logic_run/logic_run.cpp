@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <algorithm>
 #include "../../../../compiler/logic/importer.hpp"
-#include "../../../../primitive/simulator.hpp"
+#include "../../../../interpreter/primitive/simulator.hpp"
 
 namespace fs = std::filesystem;
 using namespace osi::compiler::logic;

@@ -5,7 +5,7 @@
 #include "instruction.hpp"
 #include "registers.hpp"
 #include "memory_space.hpp"
-#include "../app_info/assert.hpp"
+#include "../../app_info/assert.hpp"
 
 namespace primitive
 {

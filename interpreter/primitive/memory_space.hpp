@@ -6,7 +6,7 @@
 #include "data_block.hpp"
 #include "data_ref.hpp"
 #include "interrupts.hpp"
-#include "../app_info/assert.hpp"
+#include "../../app_info/assert.hpp"
 
 namespace primitive
 {
