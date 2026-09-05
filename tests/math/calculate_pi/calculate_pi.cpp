@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <cstdint>
+#include <cstdlib>
 #include <chrono>
 #include <iomanip>
 #include "../../../math/big_udec.hpp"
@@ -44,6 +45,7 @@ int main(int argc, char* argv[]) {
     uint64_t max_iterations = 500;
     std::string checkpoint_file;
     std::string resume_file;
+    uint64_t output_interval_sec = 3600; // 1 hour by default
 
     if (argc >= 2) {
         max_iterations = static_cast<uint64_t>(std::stoull(argv[1]));
@@ -53,6 +55,13 @@ int main(int argc, char* argv[]) {
     }
     if (argc >= 4) {
         resume_file = argv[3];
+    }
+    const char* env_interval = std::getenv("OUTPUT_INTERVAL_SEC");
+    if (env_interval != nullptr) {
+        output_interval_sec = static_cast<uint64_t>(std::stoull(env_interval));
+    }
+    if (argc >= 5) {
+        output_interval_sec = static_cast<uint64_t>(std::stoull(argv[4]));
     }
 
     uint64_t step = 1;
@@ -75,22 +84,26 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    std::cout << "Calculating pi (Newton arctangent series) from step " << start_step << " up to " << max_iterations << " iterations..." << std::endl;
+    std::cout << "Calculating pi (Newton arctangent series) from step " << start_step
+              << " up to " << max_iterations << " iterations (output interval: "
+              << output_interval_sec << "s)..." << std::endl;
 
     auto start_time = std::chrono::steady_clock::now();
     auto last_time = start_time;
     uint64_t last_step = start_step - 1;
+    auto interval_duration = std::chrono::seconds(output_interval_sec);
 
     for (uint64_t i = start_step; i <= max_iterations; ++i) {
         sum.add(term);
         big_udec factor(big_uint(i), big_uint(2 * i + 1));
         term.multiply(factor);
 
-        if (i % 1000 == 0 || i == max_iterations) {
+        auto now = std::chrono::steady_clock::now();
+        if (now - last_time >= interval_duration || i == max_iterations) {
             sum.reduce_fraction();
             term.reduce_fraction();
 
-            auto now = std::chrono::steady_clock::now();
+            now = std::chrono::steady_clock::now();
             double interval_sec = std::chrono::duration<double>(now - last_time).count();
             double total_sec = std::chrono::duration<double>(now - start_time).count();
             uint64_t interval_steps = i - last_step;
