@@ -666,6 +666,10 @@ namespace osi
 
                 bool import(const std::string& s, primitive::simulator& sim)
                 {
+                    if (this->functions)
+                    {
+                        sim.mem().intr() = *this->functions;
+                    }
                     std::vector<std::shared_ptr<instruction_gen>> es;
                     if (!import(s, es)) return false;
                     std::vector<primitive::instruction> insts;

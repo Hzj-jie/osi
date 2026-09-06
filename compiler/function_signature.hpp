@@ -88,9 +88,10 @@ namespace osi
                 return ref == other.ref && _type == other._type;
             }
 
-            bool operator!=(const parameter_type& other) const
+            template <typename F>
+            parameter_type map_type(F&& f) const
             {
-                return !(*this == other);
+                return parameter_type(f(_type), ref);
             }
         };
 
@@ -118,6 +119,23 @@ namespace osi
                 parameter p(type, name);
                 assert(!p.ref);
                 return p;
+            }
+
+            static parameter to_ref(const parameter& p)
+            {
+                return parameter(p.unrefed_type(), true, p.name);
+            }
+
+            template <typename F>
+            parameter map_type(F&& f) const
+            {
+                return parameter(f(_type), ref, name);
+            }
+
+            template <typename F>
+            parameter map_name(F&& f) const
+            {
+                return parameter(_type, ref, f(name));
             }
 
             std::string ToString() const

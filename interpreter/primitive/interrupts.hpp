@@ -129,19 +129,25 @@ namespace primitive {
 
     class interrupts {
     private:
+        struct state_t {
+            std::shared_ptr<console_io> io;
+            loaded_methods loaded_methods_;
+        };
+
+        std::shared_ptr<state_t> state_;
         std::unordered_map<uint32_t, interrupt_handler> handlers_;
         std::unordered_map<std::string, uint32_t> name_to_id_;
-        mutable loaded_methods loaded_methods_;
-        std::shared_ptr<console_io> io_;
 
     public:
         interrupts(std::shared_ptr<console_io> io = nullptr)
-            : io_(io ? std::move(io) : std::make_shared<console_io>()) {
+            : state_(std::make_shared<state_t>()) {
+            state_->io = io ? std::move(io) : std::make_shared<console_io>();
             register_default_handlers();
         }
 
         interrupts(console_io io)
-            : io_(std::make_shared<console_io>(std::move(io))) {
+            : state_(std::make_shared<state_t>()) {
+            state_->io = std::make_shared<console_io>(std::move(io));
             register_default_handlers();
         }
 
@@ -171,32 +177,33 @@ namespace primitive {
             return get_id(name, out_id);
         }
 
-        const std::shared_ptr<console_io>& io() const { return io_; }
+        const std::shared_ptr<console_io>& io() const { return state_->io; }
 
     private:
         void register_default_handlers() {
+            auto st = state_;
             // 0: stdout
-            register_handler(0, "stdout", [this](const std::vector<uint8_t>& in) -> std::vector<uint8_t> {
-                if (io_) {
-                    io_->out().write(reinterpret_cast<const char*>(in.data()), in.size());
-                    io_->out().flush();
+            register_handler(0, "stdout", [st](const std::vector<uint8_t>& in) -> std::vector<uint8_t> {
+                if (st->io) {
+                    st->io->out().write(reinterpret_cast<const char*>(in.data()), in.size());
+                    st->io->out().flush();
                 }
                 return {};
             });
             // 1: stderr
-            register_handler(1, "stderr", [this](const std::vector<uint8_t>& in) -> std::vector<uint8_t> {
-                if (io_) {
-                    io_->err().write(reinterpret_cast<const char*>(in.data()), in.size());
-                    io_->err().flush();
+            register_handler(1, "stderr", [st](const std::vector<uint8_t>& in) -> std::vector<uint8_t> {
+                if (st->io) {
+                    st->io->err().write(reinterpret_cast<const char*>(in.data()), in.size());
+                    st->io->err().flush();
                 }
                 return {};
             });
             // 2: stdin
-            register_handler(2, "stdin", [this](const std::vector<uint8_t>&) -> std::vector<uint8_t> {
+            register_handler(2, "stdin", [st](const std::vector<uint8_t>&) -> std::vector<uint8_t> {
                 std::vector<uint8_t> out;
-                if (io_) {
+                if (st->io) {
                     char c;
-                    while (io_->in().get(c))
+                    while (st->io->in().get(c))
                     {
                         out.push_back(static_cast<uint8_t>(c));
                     }
@@ -211,33 +218,33 @@ namespace primitive {
                 return db.bytes;
             });
             // 4: load_method
-            register_handler(4, "load_method", [this](const std::vector<uint8_t>& in) -> std::vector<uint8_t> {
-                bool ok = loaded_methods_.load(in);
+            register_handler(4, "load_method", [st](const std::vector<uint8_t>& in) -> std::vector<uint8_t> {
+                bool ok = st->loaded_methods_.load(in);
                 assert(ok, "load_method failed to find method");
                 return {};
             });
             // 5: execute_loaded_method
-            register_handler(5, "execute_loaded_method", [this](const std::vector<uint8_t>& in) -> std::vector<uint8_t> {
+            register_handler(5, "execute_loaded_method", [st](const std::vector<uint8_t>& in) -> std::vector<uint8_t> {
                 bool ok = false;
-                auto res = loaded_methods_.execute(in, ok);
+                auto res = st->loaded_methods_.execute(in, ok);
                 assert(ok, "execute_loaded_method failed: no method loaded or execution failed");
                 return res;
             });
             // 6: getchar
-            register_handler(6, "getchar", [this](const std::vector<uint8_t>&) -> std::vector<uint8_t> {
-                int c = io_ ? io_->in().get() : std::cin.get();
+            register_handler(6, "getchar", [st](const std::vector<uint8_t>&) -> std::vector<uint8_t> {
+                int c = st->io ? st->io->in().get() : std::cin.get();
                 int32_t val = (c == EOF) ? -1 : static_cast<int32_t>(c);
                 return data_block::from_int32(val).bytes;
             });
             // 7: putchar
-            register_handler(7, "putchar", [this](const std::vector<uint8_t>& in) -> std::vector<uint8_t> {
+            register_handler(7, "putchar", [st](const std::vector<uint8_t>& in) -> std::vector<uint8_t> {
                 if (in.size() >= sizeof(int32_t))
                 {
                     int32_t val = 0;
                     std::memcpy(&val, in.data(), sizeof(int32_t));
-                    if (io_) {
-                        io_->out().put(static_cast<char>(val));
-                        io_->out().flush();
+                    if (st->io) {
+                        st->io->out().put(static_cast<char>(val));
+                        st->io->out().flush();
                     }
                 }
                 return {};
