@@ -54,6 +54,41 @@ namespace osi
             return res;
         }
 
+        inline std::string c_escape(const std::string& s)
+        {
+            std::string res;
+            res.reserve(s.size() + 8);
+            for (char c : s)
+            {
+                switch (c)
+                {
+                    case '\a': res += "\\a"; break;
+                    case '\b': res += "\\b"; break;
+                    case '\f': res += "\\f"; break;
+                    case '\n': res += "\\n"; break;
+                    case '\r': res += "\\r"; break;
+                    case '\t': res += "\\t"; break;
+                    case '\v': res += "\\v"; break;
+                    case '\\': res += "\\\\"; break;
+                    case '\"': res += "\\\""; break;
+                    case '\0': res += "\\0"; break;
+                    default:
+                        if (static_cast<unsigned char>(c) < 32 || static_cast<unsigned char>(c) >= 127)
+                        {
+                            char buf[8];
+                            std::snprintf(buf, sizeof(buf), "\\x%02x", static_cast<unsigned char>(c));
+                            res += buf;
+                        }
+                        else
+                        {
+                            res += c;
+                        }
+                        break;
+                }
+            }
+            return res;
+        }
+
         template <typename Writer, typename ShouldIncludeFunc, typename FoldersFunc>
         class includes : public reparser<Writer>
         {

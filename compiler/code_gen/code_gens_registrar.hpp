@@ -69,6 +69,13 @@ namespace osi
                 return with(code_gen_delegate<Writer>::of(name, std::move(f)));
             }
 
+            code_gens_registrar& with_delegate(
+                const std::string& name,
+                typename code_gen_delegate<Writer>::full_func_t f)
+            {
+                return with(code_gen_delegate<Writer>::of(name, std::move(f)));
+            }
+
             code_gens_registrar& with_of_only_childs(const std::vector<std::string>& names)
             {
                 for (const auto& name : names)

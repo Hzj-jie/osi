@@ -182,9 +182,9 @@ namespace osi
                     {
                         return false;
                     }
-                    if (!scope::current()->variables().undefine(name)) return false;
+                    if (!scope::current()->variables_undefine(name)) return false;
                     return v.for_each_primitive([&o](const parameter& m) {
-                        return scope::current()->variables().undefine(m.name) &&
+                        return scope::current()->variables_undefine(m.name) &&
                                builders::of_undefine(m.name).to(o);
                     });
                 }
@@ -196,9 +196,9 @@ namespace osi
                     {
                         return false;
                     }
-                    if (!scope::current()->variables().redefine(type, name)) return false;
+                    if (!scope::current()->variables_redefine(type, name)) return false;
                     return v.for_each_primitive([&o](const parameter& m) {
-                        return scope::current()->variables().redefine(m.non_ref_type(), m.name) &&
+                        return scope::current()->variables_redefine(m.non_ref_type(), m.name) &&
                                builders::of_redefine(m.name, m.non_ref_type()).to(o);
                     });
                 }

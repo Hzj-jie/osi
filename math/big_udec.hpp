@@ -304,7 +304,7 @@ public:
         return true;
     }
 
-    std::string str(size_t max_decimal_places = 10) const {
+    std::string str(size_t max_decimal_places = 64) const {
         big_uint rem;
         big_uint integer_part = n_.divide(d_, rem);
         std::string res = integer_part.str();

@@ -243,7 +243,7 @@ namespace osi
                         },
                         [](const std::string& name, std::string& type) {
                             function_signature<parameter_type> sig;
-                            if (!scope::current()->delegates_retrieve(name, sig)) return false;
+                            if (!scope::current()->variables_delegate_of(name, sig)) return false;
                             type = sig.return_type;
                             return true;
                         });

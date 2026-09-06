@@ -798,7 +798,7 @@ namespace osi
                     parameter o;
                     if (variables_resolve(name, o, &sig))
                     {
-                        return true;
+                        return delegates_retrieve(o.full_type(), sig);
                     }
                     return false;
                 }

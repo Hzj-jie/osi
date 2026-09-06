@@ -173,13 +173,13 @@ namespace osi
 
             std::string ToString() const
             {
-                std::string res = return_type + " " + name + "(";
+                std::string res = return_type + " " + name + "([";
                 for (size_t i = 0; i < parameters.size(); ++i)
                 {
                     if (i > 0) res += ", ";
                     res += parameters[i].ToString();
                 }
-                res += ")";
+                res += "])";
                 return res;
             }
         };

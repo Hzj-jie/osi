@@ -22,7 +22,7 @@ namespace osi
 
             bool append(const std::string& s)
             {
-                assert(!s.empty());
+                if (s.empty()) return true;
                 v_.emplace_back([s]() { return s; });
                 return true;
             }
@@ -99,6 +99,13 @@ namespace osi
                 return true;
             }
 
+            bool append(const std::shared_ptr<lazy_list_writer>& w)
+            {
+                assert(w != nullptr);
+                v_.emplace_back([w]() { return w->str(); });
+                return true;
+            }
+
             std::string str() const
             {
                 std::string res;
@@ -114,6 +121,11 @@ namespace osi
             }
 
             std::string ToString() const
+            {
+                return str();
+            }
+
+            std::string dump() const
             {
                 return str();
             }

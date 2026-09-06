@@ -22,7 +22,7 @@ namespace primitive
         std::vector<data_block> stack_;
         std::vector<call_state> call_stack_;
         std::unordered_map<uint64_t, std::vector<data_block>> heap_;
-        uint64_t next_heap_id_{1};
+        uint64_t next_heap_id_{0};
         interrupts intr_;
 
     public:
@@ -143,7 +143,7 @@ namespace primitive
             stack_.clear();
             call_stack_.clear();
             heap_.clear();
-            next_heap_id_ = 1;
+            next_heap_id_ = 0;
         }
     };
 }

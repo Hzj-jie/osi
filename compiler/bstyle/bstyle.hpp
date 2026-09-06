@@ -116,7 +116,7 @@ namespace osi
                              std::string name = scope::variable_name::of(n->child(2));
                              return struct_node::undefine(name, o) ||
                                     (builders::of_undefine(name).to(o) &&
-                                     scope::current()->variables().undefine(name));
+                                     scope::current()->variables_undefine(name));
                          })
                      .with_delegate("dealloc",
                          [](const std::shared_ptr<automata::typed_node>& n, logic_writer& o) {

@@ -97,7 +97,7 @@ namespace osi
                     std::string type = scope::normalized_type::parameter_type_of(n->child(4)).full_type();
                     return struct_node::redefine(name, type, o) ||
                            (builders::of_redefine(name, type).to(o) &&
-                            scope::current()->variables().redefine(type, name));
+                            scope::current()->variables_redefine(type, name));
                 }
             };
 

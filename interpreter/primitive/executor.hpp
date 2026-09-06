@@ -122,18 +122,44 @@ namespace primitive
                         !mem.resolve_ref(inst.operands[1], b1) ||
                         !mem.resolve_ref(inst.operands[2], b2)) return false;
                     if (!res || !b1 || !b2) return false;
-                    osi::math::big_uint v1(b1->bytes);
-                    osi::math::big_uint v2(b2->bytes);
-                    if (v1 < v2)
-                    {
-                        reg.carry_over = true;
-                        res->bytes = {0};
+
+                    auto to_limbs = [](const std::vector<uint8_t>& bytes) -> std::vector<uint32_t> {
+                        if (bytes.empty()) return {};
+                        size_t num = (bytes.size() + 3) / 4;
+                        std::vector<uint32_t> limbs(num, 0);
+                        for (size_t i = 0; i < bytes.size(); ++i) {
+                            limbs[i / 4] |= static_cast<uint32_t>(bytes[i]) << ((i % 4) * 8);
+                        }
+                        while (!limbs.empty() && limbs.back() == 0) {
+                            limbs.pop_back();
+                        }
+                        return limbs;
+                    };
+
+                    std::vector<uint32_t> l1 = to_limbs(b1->bytes);
+                    std::vector<uint32_t> l2 = to_limbs(b2->bytes);
+                    size_t n = std::max(l1.size(), l2.size());
+                    std::vector<uint32_t> r(n, 0);
+                    int64_t borrow = 0;
+                    for (size_t i = 0; i < n; ++i) {
+                        int64_t w1 = (i < l1.size()) ? l1[i] : 0;
+                        int64_t w2 = (i < l2.size()) ? l2[i] : 0;
+                        int64_t diff = w1 - w2 - borrow;
+                        r[i] = static_cast<uint32_t>(diff);
+                        borrow = (diff < 0) ? 1 : 0;
                     }
-                    else
-                    {
-                        reg.carry_over = false;
-                        v1.sub(v2);
-                        res->bytes = v1.as_bytes();
+                    reg.carry_over = (borrow != 0);
+                    while (!r.empty() && r.back() == 0) {
+                        r.pop_back();
+                    }
+                    res->bytes.clear();
+                    res->bytes.resize(r.size() * 4);
+                    for (size_t i = 0; i < r.size(); ++i) {
+                        uint32_t val = r[i];
+                        res->bytes[i * 4 + 0] = static_cast<uint8_t>(val & 0xFF);
+                        res->bytes[i * 4 + 1] = static_cast<uint8_t>((val >> 8) & 0xFF);
+                        res->bytes[i * 4 + 2] = static_cast<uint8_t>((val >> 16) & 0xFF);
+                        res->bytes[i * 4 + 3] = static_cast<uint8_t>((val >> 24) & 0xFF);
                     }
                     break;
                 }
