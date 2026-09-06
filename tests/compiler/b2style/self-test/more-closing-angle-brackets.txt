@@ -1,0 +1,24 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+template <T>
+class C {
+  void f() {
+    b2style::testing::assert_true(true);
+  }
+};
+
+template <T>
+class C2 {
+  void f() {
+    T t;
+	t.f();
+  }
+};
+
+void main() {
+  C2<C2<C2<C2<C2<C<void>>>>>> c;
+  c.f();
+  b2style::testing::finished();
+}

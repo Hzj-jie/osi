@@ -1,0 +1,37 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+class B {
+  int x;
+  void f() {
+	this.x++;
+  }
+};
+
+class B2: B {
+  void f2() {
+    this.x+=2;
+  }
+};
+
+class B3 {
+  void finish() {
+	b2style::testing::finished();
+  }
+};
+
+class C: B2, B3 {
+  void f3() {
+    this.x+=3;
+  }
+};
+
+void main() {
+  C c;
+  c.f();
+  c.f2();
+  c.f3();
+  b2style::testing::assert_equal<int>(c.x, 6);
+  c.finish();
+}

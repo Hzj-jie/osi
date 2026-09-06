@@ -62,7 +62,7 @@ namespace osi
                             return true;
                         })) return false;
                         return builders::of_undefine(name).to(o) &&
-                               scope::current()->variables().redefine(type, name);
+                               scope::current()->variables_redefine(type, name);
                     }
                     if (scope::current()->structs_is_variable_defined(name))
                     {
@@ -75,9 +75,9 @@ namespace osi
                                builders::of_copy(name, first_prim).to(o) &&
                                sdef.for_each_primitive([&o](const parameter& t) {
                                    return builders::of_undefine(t.name).to(o) &&
-                                          scope::current()->variables().undefine(t.name);
+                                          scope::current()->variables_undefine(t.name);
                                }) &&
-                               scope::current()->variables().redefine(type, name);
+                               scope::current()->variables_redefine(type, name);
                     }
                     raise_error("Unsupported static_cast ", name, " to ", type);
                     return false;

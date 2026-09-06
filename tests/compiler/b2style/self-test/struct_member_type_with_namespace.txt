@@ -1,0 +1,16 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+namespace N {
+struct S {
+  ::b2style::int i;
+};
+}  // namespace N
+
+void main() {
+  N::S s;
+  s.i = 100;
+  b2style::testing::assert_equal<int>(s.i, 100);
+  b2style::testing::finished();
+}

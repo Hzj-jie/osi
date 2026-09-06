@@ -1,0 +1,28 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+#include <b2style/stdio.h>
+
+struct S {
+  int x;
+  string y;
+};
+
+void main() {
+  S s;
+  {
+    S x[10];
+    s = x;
+    undefine(x);
+  }
+  for (int i = 0; i < 10; i++) {
+    s[i].x = i + 1;
+    s[i].y = b2style::int_to_str(i + 2);
+  }
+  for (int i = 0; i < 10; i++) {
+    b2style::testing::assert_equal<int>(s[i].x, i + 1);
+    b2style::testing::assert_equal<string>(s[i].y, b2style::int_to_str(i + 2));
+  }
+  dealloc(s);
+  b2style::testing::finished();
+}

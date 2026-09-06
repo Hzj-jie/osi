@@ -1,0 +1,32 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+#include <b2style/to_str.h>
+
+struct S {
+  int x;
+  string y;
+};
+
+void f(S s) {
+  for (int i = 0; i < 10; i++) {
+    b2style::testing::assert_equal<int>(s[i].x, i);
+    b2style::testing::assert_equal<string>(s[i].y, b2style::int_to_str(i));
+  }
+}
+
+void f(type_ptr p) {
+  static_cast(p, S);
+  f(p);
+}
+
+void main() {
+  S s[10];
+  for (int i = 0; i < 10; i++) {
+    s[i].x = i;
+    s[i].y = b2style::to_str(i);
+  }
+  static_cast(s, type_ptr);
+  f(s);
+  b2style::testing::finished();
+}

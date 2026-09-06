@@ -1,0 +1,11 @@
+﻿
+// ERROR: [syntaxer] Cannot match token struct
+// ERROR: struct(6):[kw-struct] S(1):[raw-name] >>> &(1):[bit-and]  <<<{(1):[start-paragraph]
+
+#include <b2style.h>
+
+struct S& {
+  int x;
+};
+
+void main() {}

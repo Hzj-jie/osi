@@ -1,0 +1,17 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+class C {
+  void f(int& x) {
+    x++;
+  }
+};
+
+void main() {
+  C c;
+  int x = 0;
+  c . f ( x );
+  b2style:: testing:: assert_true( x == 1 );
+  b2style:: testing:: finished();
+}

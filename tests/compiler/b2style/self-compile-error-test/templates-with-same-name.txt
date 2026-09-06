@@ -1,0 +1,15 @@
+﻿
+// ERROR: Template [{, ATemplate__1}] has been defined already.
+
+#include <b2style.h>
+
+template <T>
+class ATemplate {};
+
+template <T>
+delegate void ATemplate();
+
+template <T>
+void ATemplate() {}
+
+void main() {}

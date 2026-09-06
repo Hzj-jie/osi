@@ -1,0 +1,29 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+void f(int& x, int i, int j) {
+  x = i;
+  b2style::testing::assert_equal<int>(i, j);
+  b2style::testing::assert_equal<int>(x, j);
+  x = i;
+  b2style::testing::assert_equal<int>(i, j);
+  b2style::testing::assert_equal<int>(x, j);
+}
+
+void g(int x, int i, int j) {
+  x = i;
+  b2style::testing::assert_equal<int>(i, j);
+  b2style::testing::assert_equal<int>(x, j);
+  x = i;
+  b2style::testing::assert_equal<int>(i, j);
+  b2style::testing::assert_equal<int>(x, j);
+}
+
+void main() {
+  int x;
+  f(x, 1, 1);
+  b2style::testing::assert_equal<int>(x, 1);
+  f(1, 1, 1);
+  b2style::testing::finished();
+}

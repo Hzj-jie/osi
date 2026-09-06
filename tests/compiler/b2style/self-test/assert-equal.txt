@@ -1,0 +1,9 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+void main() {
+  b2style::testing::assert_equal<int, int>(1, 1);
+  b2style::testing::assert_equal<string, string>("abc", "abc");
+  b2style::testing::finished();
+}

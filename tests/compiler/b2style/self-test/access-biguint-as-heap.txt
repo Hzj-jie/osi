@@ -1,0 +1,16 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+void main() {
+  int x[100];
+  for (int i = 0; i < 100; i++) {
+    x[i] = i + 1;
+  }
+  type_ptr y = x;
+  reinterpret_cast(y, int);
+  for (int i = 0; i < 100; i++) {
+    b2style::testing::assert_equal<int>(y[i], i + 1);
+  }
+  b2style::testing::finished();
+}

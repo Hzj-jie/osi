@@ -1,0 +1,22 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+class C {
+  template <T>
+  void f() {}
+
+  template <T>
+  overridable void g() {}
+};
+
+/* TODO: Remove comments, the function template needs to carry to type information to avoid duplicating with others.
+class D : C {
+  template <T>
+  override void g() {}
+};
+*/
+
+void main() {
+  b2style::testing::finished();
+}

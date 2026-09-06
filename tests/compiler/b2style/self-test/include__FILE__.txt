@@ -1,0 +1,10 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+#include <b2style/str.h>
+
+void main() {
+  b2style::testing::assert_true(b2style::str_ends_with(b2style::testing::assert__FILE__(), "testing/assert.h"));
+  b2style::testing::assert_true(b2style::str_ends_with(b2style::testing::types__FILE__(), "testing/types.h"));
+  b2style::testing::finished();
+}

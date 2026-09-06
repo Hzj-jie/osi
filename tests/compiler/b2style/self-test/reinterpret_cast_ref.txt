@@ -1,0 +1,33 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+class B {
+  int x;
+  void f() {
+    this.x++;
+  }
+};
+
+class C : B {
+  void f2() {
+    reinterpret_cast(this, B);
+	this.f();
+    f(this);
+  }
+
+  void f3() {
+    reinterpret_cast(this, B);
+	this.f();
+    f(this);
+  }
+};
+
+void main() {
+  C c;
+  c.x = 100;
+  c.f2();
+  c.f3();
+  b2style::testing::assert_equal<int>(c.x, 104);
+  b2style::testing::finished();
+}

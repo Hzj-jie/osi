@@ -1,0 +1,3 @@
+﻿
+/* An empty source code to test the behavior of the compiler. */
+/* This test won't introduce compilation error, but should create no instructions. */

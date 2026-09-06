@@ -1,0 +1,18 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+typedef int INT;
+
+struct S {
+  INT i;
+};
+
+typedef string INT;
+
+void main() {
+  S s;
+  s.i = 100;
+  b2style::testing::assert_equal<int>(s.i, 100);
+  b2style::testing::finished();
+}

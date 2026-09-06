@@ -1,0 +1,17 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+delegate void p();
+
+void f() {
+  b2style::testing::assert_true(true);
+}
+
+void main() {
+  p x = f;
+  p y = x;
+  x();
+  y();
+  b2style::testing::finished();
+}

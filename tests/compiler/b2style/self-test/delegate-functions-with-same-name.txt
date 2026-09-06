@@ -1,0 +1,22 @@
+﻿
+#include <b2style.h>
+#include <b2style/delegates.h>
+#include <testing.h>
+
+int f(int x) {
+  return x + 1;
+}
+
+string f(string x) {
+  return x;
+}
+
+void main() {
+  b2style::function<int, int> d = f;
+  b2style::testing::assert_equal<int>(d(1), 2);
+
+  b2style::function<string, string> d2 = f;
+  b2style::testing::assert_equal<string>(d2("abc"), "abc");
+
+  b2style::testing::finished();
+}

@@ -1,0 +1,14 @@
+﻿
+// ERROR PATTERN: *Type *S of s does not match the rvalue *Integer*
+// b3style supports namespace, the output would be "::S of s" and "Integer" instead.
+
+#include <b2style.h>
+
+struct S {
+  int x;
+};
+
+void main() {
+  int x = 100;
+  S s = x;
+}

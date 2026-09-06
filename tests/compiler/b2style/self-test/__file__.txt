@@ -1,0 +1,15 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+void main() {
+  b2style::testing::assert_equal<string>(__FILE__, __FILE__);
+  b2style::testing::assert_equal<string>(__func__, __func__);
+  // The __LINE__ is handled as the start of character, so the following assertion won't pass.
+  // b2style::testing::assert_equal<int>(__LINE__, __LINE__);
+  b2style::testing::assert_true(__LINE__ > 0);
+  b2style::testing::assert_equal<string>(__STATEMENT__, __STATEMENT__);
+  string s = __STATEMENT__;
+  b2style::testing::assert_equal<string>(s, "string s = __STATEMENT__ ;");
+  b2style::testing::finished();
+}

@@ -1547,6 +1547,249 @@ void main() {
 }
 )B2STYLE_EOF";
 
+
+            inline const std::string errors_class_initializer_for_non_class = R"B2STYLE_EOF(
+
+#include <b2style.h>
+
+logic "type ooops_this_is_not_a_class 1";
+
+void main() {
+  ooops_this_is_not_a_class ooops_this_is_not_a_class_value(10);
+})B2STYLE_EOF";
+
+            inline const std::string errors_cycle_typedef = R"B2STYLE_EOF(
+
+#include <b2style.h>
+
+namespace CYCLE_TYPEDEF {
+  typedef A B;
+  typedef B C;
+  typedef C A;
+}  // namespace CYCLE_TYPEDEF
+
+void main() {
+  CYCLE_TYPEDEF::A a;
+})B2STYLE_EOF";
+
+            inline const std::string errors_dollar_in_number = R"B2STYLE_EOF(
+
+void main() {
+  float x = 1$1;
+})B2STYLE_EOF";
+
+            inline const std::string errors_duplicate_template_type_parameters = R"B2STYLE_EOF(
+
+template<T, T>
+class C{};)B2STYLE_EOF";
+
+            inline const std::string errors_function_name_ends_with_dot = R"B2STYLE_EOF(
+
+class C{
+  int x;
+
+  void print() {}
+};
+
+void main() {
+  C c;
+  c.();
+})B2STYLE_EOF";
+
+            inline const std::string errors_function_return_struct_type_mismatch = R"B2STYLE_EOF(
+
+#include <b2style.h>
+
+struct S1 {
+  int x;
+  string y;
+};
+
+struct S2 {
+  int v;
+  string w;
+};
+
+S2 f() {
+  S1 s;
+  s.x = 100;
+  s.y = "abc";
+  return s;
+}
+
+void main() {
+  S2 s = f();
+}
+)B2STYLE_EOF";
+
+            inline const std::string errors_include_needs_wraps = R"B2STYLE_EOF(
+
+#include abc.h
+
+void main() {})B2STYLE_EOF";
+
+            inline const std::string errors_missing_ending_quota = R"B2STYLE_EOF(
+
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+void main() {
+  b2style::std_out("abc);
+}
+)B2STYLE_EOF";
+
+            inline const std::string errors_reinterpret_cast_heap_with_index = R"B2STYLE_EOF(
+
+#include <b2style.h>
+
+struct S {
+  int x;
+};
+
+struct S2 {
+  int x;
+};
+
+void main() {
+  S s[1];
+  S2__struct__type__id__type s.S2__struct__type__id[1];
+  reinterpret_cast(s[0], S2);
+}
+)B2STYLE_EOF";
+
+            inline const std::string errors_reinterpret_cast_unknown_type = R"B2STYLE_EOF(
+
+#include <b2style.h>
+
+void f(int x) {}
+
+void main() {
+  int x;
+  reinterpret_cast(x, this_is_an_unknown_type);
+  f(x);
+}
+)B2STYLE_EOF";
+
+            inline const std::string errors_reinterpret_cast_unknown_variable = R"B2STYLE_EOF(
+
+#include <b2style.h>
+
+void main() {
+  reinterpret_cast(this_is_an_unknown_variable, int);
+})B2STYLE_EOF";
+
+            inline const std::string errors_reinterpret_cast_without_type_id = R"B2STYLE_EOF(
+
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+class S {
+  int x;
+  void print() {
+    b2style::std_out(this.x);
+  }
+};
+
+struct S2 {
+  int x;
+};
+
+// This function should not be used.
+void f(S& s) {
+  s.x = 0;
+}
+
+void f(S2& s) {
+  s.x = 100;
+}
+
+void main() {
+  S s;
+  s.x = -100;
+  s.print();
+  reinterpret_cast(s, S2);
+  f(s);  // s.S2__struct__type__id should be missing here.
+  reinterpret_cast(s, S);
+  s.print();
+}
+)B2STYLE_EOF";
+
+            inline const std::string errors_template_without_type_parameter = R"B2STYLE_EOF(
+
+#include <b2style.h>
+
+template<>
+class ThisTemplateHasNoTypeParameter {};
+
+void main() {})B2STYLE_EOF";
+
+            inline const std::string errors_three_pluses = R"B2STYLE_EOF(
+
+#include   <b2style.h>
+
+void main() {
+  int i = 0;
+  i +++;
+}
+)B2STYLE_EOF";
+
+            inline const std::string errors_undefined_value_clause = R"B2STYLE_EOF(
+
+void main() {
+  this_is_an_undefined_value_clause = 100;
+})B2STYLE_EOF";
+
+            inline const std::string errors_value_clause_struct_type_mismatch = R"B2STYLE_EOF(
+
+#include <b2style.h>
+
+struct S1 {
+  int x;
+  string y;
+};
+
+struct S2 {
+  int v;
+  string w;
+};
+
+S1 f() {
+  S1 s;
+  s.x = 100;
+  s.y = "abc";
+  return s;
+}
+
+void main() {
+  S2 s = f();
+})B2STYLE_EOF";
+
+            inline const std::string errors_value_clause_struct_type_mismatch2 = R"B2STYLE_EOF(
+
+#include <b2style.h>
+
+struct S1 {
+  int x;
+  string y;
+};
+
+struct S2 {
+  int v;
+  string w;
+};
+
+S1 f() {
+  S1 s;
+  s.x = 100;
+  s.y = "abc";
+  return s;
+}
+
+void main() {
+  S1 s1 = f();
+  S2 s2 = s1;
+})B2STYLE_EOF";
+
         }
     }
 }

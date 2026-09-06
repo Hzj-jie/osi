@@ -1,0 +1,18 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+class C {
+  template <T>
+  T f(T x) {
+    return x;
+  }
+};
+
+void main() {
+  C c;
+  b2style::testing::assert_equal<int>(c.f<int>(100), 100);
+  b2style::testing::assert_equal<bool>(c.f<bool>(true), true);
+  b2style::testing::assert_equal<string>(c.f<string>("100"), "100");
+  b2style::testing::finished();
+}

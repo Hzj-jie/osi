@@ -1,0 +1,33 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+class A {
+  int a;
+};
+
+class B {
+  int b;
+};
+
+class C : B {
+  int c;
+};
+
+class D : A, C {
+  int d;
+};
+
+void main() {
+  D d;
+  d.a=1;
+  d.b=2;
+  d.c=3;
+  d.d=4;
+  // The "type-id"s are not tested.
+  b2style::testing::assert_equal<int>(d.a, 1);
+  b2style::testing::assert_equal<int>(d.b, 2);
+  b2style::testing::assert_equal<int>(d.c, 3);
+  b2style::testing::assert_equal<int>(d.d, 4);
+  b2style::testing::finished();
+}

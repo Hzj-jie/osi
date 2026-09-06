@@ -1,0 +1,37 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+namespace N {
+
+typedef ::void void;
+
+template <T>
+class C {
+  void f() {
+    ::b2style::testing::assert_true(true);
+  }
+};
+
+template <T>
+delegate void f();
+
+template <T>
+void f2() {
+    ::b2style::testing::assert_true(true);
+}
+
+}  // namespace N
+
+void f() {
+  ::b2style::testing::assert_true(true);
+}
+
+void main() {
+  N::C<int> c;
+  c.f();
+  N::f<int> f2 = f;
+  f2();
+  N::f2<int>();
+  b2style::testing::finished();
+}

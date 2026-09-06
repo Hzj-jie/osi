@@ -1,0 +1,18 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+class B {
+  int x;
+};
+
+class C : B {
+  int y;
+};
+
+void main() {
+  C c;
+  c.y = 100;
+  b2style::testing::assert_equal<int>(c.y, 100);
+  b2style::testing::finished();
+}

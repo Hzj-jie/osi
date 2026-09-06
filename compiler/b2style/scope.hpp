@@ -28,37 +28,7 @@ namespace osi
             // Forward declaration of build_code for recursive code builds (templates, classes, etc.)
             bool build_code(const std::string& input, rewriter::typed_node_writer& o);
 
-            class current_file_guard
-            {
-            private:
-                static std::vector<std::string>& stack()
-                {
-                    static thread_local std::vector<std::string> s;
-                    return s;
-                }
-            public:
-                static std::string get()
-                {
-                    if (!stack().empty())
-                    {
-                        return stack().back();
-                    }
-                    return "unknown_file";
-                }
-
-                explicit current_file_guard(const std::string& file)
-                {
-                    stack().push_back(file);
-                }
-
-                ~current_file_guard()
-                {
-                    if (!stack().empty())
-                    {
-                        stack().pop_back();
-                    }
-                }
-            };
+            using current_file_guard = bstyle_compiler::current_file_guard;
 
             class current_namespace_t
             {
@@ -615,8 +585,12 @@ namespace osi
                                             const std::unordered_set<std::string>& ignored_types = {}) const
                     {
                         auto get_type = [&](const std::string& t) -> std::string {
-                            if (ignored_types.find(t) != ignored_types.end()) return t;
-                            return namespace_t::fully_qualified_name(t);
+                            if (t.empty()) return t;
+                            bool has_ref = (t.back() == '&');
+                            std::string base = has_ref ? t.substr(0, t.length() - 1) : t;
+                            if (ignored_types.find(base) != ignored_types.end()) return t;
+                            if (base.rfind(current_namespace_t::namespace_separator, 0) == 0) return t;
+                            return current_namespace_t::of(base) + (has_ref ? "&" : "");
                         };
 
                         std::string d = get_type(return_type) + " " +
@@ -645,6 +619,34 @@ namespace osi
                 void with_var(const parameter& p)
                 {
                     vars_.push_back(p);
+                }
+
+                bool check() const
+                {
+                    std::unordered_set<std::string> var_names;
+                    for (const auto& v : vars_)
+                    {
+                        if (!var_names.insert(v.name).second)
+                        {
+                            raise_error("Duplicate variable in ", name.fully_qualified_name(), ": ", v.name);
+                            return false;
+                        }
+                    }
+                    std::unordered_set<std::string> func_sigs;
+                    for (const auto& f : funcs_)
+                    {
+                        std::string sig = f.name;
+                        for (const auto& p : f.params)
+                        {
+                            sig += ":" + p.first;
+                        }
+                        if (!func_sigs.insert(sig).second)
+                        {
+                            raise_error("Duplicate function in ", name.fully_qualified_name(), ": ", f.name);
+                            return false;
+                        }
+                    }
+                    return true;
                 }
 
                 void inherit_from(const class_def& other);

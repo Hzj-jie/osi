@@ -1,0 +1,28 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+template <T>
+bool is_null(T t) {
+  bool r;
+  logic "empty r t";
+  return r;
+}
+
+template <T>
+void set_null(T& t) {
+  T x;
+  t = x;
+}
+
+void main() {
+  int i;
+  b2style::testing::assert_true(is_null<int>(i));
+  i = 0;
+  b2style::testing::assert_false(is_null<int>(i));
+  set_null<int>(i);
+  b2style::testing::assert_true(is_null<int>(i));
+  i = 1;
+  b2style::testing::assert_false(is_null<int>(i));
+  b2style::testing::finished();
+}

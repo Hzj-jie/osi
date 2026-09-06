@@ -1,0 +1,10 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+void main() {
+  void v;
+  void v2[100];
+  // void is not assignable, but defining a variable with void type should still be allowed.
+  b2style::testing::finished();
+}

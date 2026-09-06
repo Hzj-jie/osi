@@ -1,0 +1,37 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+template <T>
+class C {
+  void f(T& x) {
+    x++;
+  }
+};
+
+template <T>
+class C2 {
+  void f(T x) {
+    x++;
+  }
+};
+
+template <T>
+class C3 {
+  void f(T t) {
+    int x = 0;
+	t.f(x);
+	b2style::testing::assert_true(x == 1);
+  }
+};
+
+void main() {
+  C<int> c;
+  C2<int&> c2;
+  // TODO: Remove right-shift and avoid adding a space between two >>.
+  C3<C<int> > r;
+  r.f(c);
+  C3<C2<int&> > r2;
+  r2.f(c2);
+  b2style::testing::finished();
+}

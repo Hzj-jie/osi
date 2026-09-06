@@ -30,6 +30,17 @@ static void assert_execute_without_errors(primitive::simulator& sim)
     assert(!sim.halt());
 }
 
+void test_nlp_parsable()
+{
+    std::shared_ptr<osi::automata::nlp> parser;
+    bool ok = osi::automata::nlp::of(b2style::nlexer_rule(),
+                                     b2style::syntaxer_rule(),
+                                     parser);
+    assert(ok);
+    assert(parser != nullptr);
+    std::cout << "[PASS] nlp_parsable\n";
+}
+
 void test_case1()
 {
     primitive::console_io::test_wrapper io;
@@ -760,9 +771,99 @@ void test_func()
     std::cout << "[PASS] __func__\n";
 }
 
+void test_compile_errors()
+{
+    std::cout << "\nStarting 17 compile error tests...\n";
+    const std::vector<std::pair<std::string, std::string>> errors = {
+        {"dollar_in_number", b2style_test_data::errors_dollar_in_number},
+        {"include_needs_wraps", b2style_test_data::errors_include_needs_wraps},
+        {"three_pluses", b2style_test_data::errors_three_pluses},
+        {"value_clause_struct_type_mismatch", b2style_test_data::errors_value_clause_struct_type_mismatch},
+        {"value_clause_struct_type_mismatch2", b2style_test_data::errors_value_clause_struct_type_mismatch2},
+        {"function_return_struct_type_mismatch", b2style_test_data::errors_function_return_struct_type_mismatch},
+        {"function_name_ends_with_dot", b2style_test_data::errors_function_name_ends_with_dot},
+        {"missing_ending_quota", b2style_test_data::errors_missing_ending_quota},
+        {"undefined_value_clause", b2style_test_data::errors_undefined_value_clause},
+        {"reinterpret_cast_unknown_variable", b2style_test_data::errors_reinterpret_cast_unknown_variable},
+        {"reinterpret_cast_unknown_type", b2style_test_data::errors_reinterpret_cast_unknown_type},
+        {"reinterpret_cast_heap_with_index", b2style_test_data::errors_reinterpret_cast_heap_with_index},
+        {"template_without_type_parameter", b2style_test_data::errors_template_without_type_parameter},
+        {"class_initializer_for_non_class", b2style_test_data::errors_class_initializer_for_non_class},
+        {"duplicate_template_type_parameters", b2style_test_data::errors_duplicate_template_type_parameters},
+        {"cycle_typedef", b2style_test_data::errors_cycle_typedef},
+        {"reinterpret_cast_without_type_id", b2style_test_data::errors_reinterpret_cast_without_type_id}
+    };
+
+    for (const auto& err : errors)
+    {
+        primitive::simulator sim;
+        bool ok = b2style::with_default_functions().compile(err.second, sim);
+        assert(!ok);
+        std::cout << "[PASS EXPECTED FAIL] " << err.first << "\n";
+    }
+}
+
+void test_template_template()
+{
+    std::cout << "\nStarting template_template tests...\n";
+    // Case 1
+    {
+        std::shared_ptr<osi::automata::typed_node> n;
+        assert(b2style_nlp()->parse(b2style_test_data::template_template_case1, n));
+        assert(n != nullptr);
+        auto tmpl_node = n->child(0)->child(0);
+        auto head = tmpl_node->child(0);
+        auto body = tmpl_node->child(1)->child(0);
+        auto type_param_list = head->child(2);
+        std::vector<std::string> type_params;
+        for (uint32_t i = 0; i < type_param_list->child_count(); ++i)
+        {
+            auto p = type_param_list->child(i);
+            if (p->type_name == "type-param-with-comma") p = p->child(0);
+            type_params.push_back(p->input_without_ignored());
+        }
+        auto name_node = body->child(1);
+        auto tmpl = std::make_shared<template_template>(body, name_node, type_params);
+        std::string impl;
+        assert(tmpl->apply({"int"}, impl));
+        assert(impl == "class C__int { int x ; void f ( int y ) { } } ;");
+        std::cout << "[PASS] template_template_case1\n";
+    }
+    // Disallow duplicated template type parameters
+    {
+        primitive::simulator sim;
+        bool ok = b2style::with_default_functions().compile(b2style_test_data::errors_duplicate_template_type_parameters, sim);
+        assert(!ok);
+        std::cout << "[PASS] template_template_disallow_duplicated_params\n";
+    }
+    // Two template parameters
+    {
+        std::shared_ptr<osi::automata::typed_node> n;
+        assert(b2style_nlp()->parse(b2style_test_data::two_template_type_parameters, n));
+        assert(n != nullptr);
+        auto tmpl_node = n->child(0)->child(0);
+        auto head = tmpl_node->child(0);
+        auto body = tmpl_node->child(1)->child(0);
+        auto type_param_list = head->child(2);
+        std::vector<std::string> type_params;
+        for (uint32_t i = 0; i < type_param_list->child_count(); ++i)
+        {
+            auto p = type_param_list->child(i);
+            if (p->type_name == "type-param-with-comma") p = p->child(0);
+            type_params.push_back(p->input_without_ignored());
+        }
+        auto name_node = body->child(1);
+        auto tmpl = std::make_shared<template_template>(body, name_node, type_params);
+        std::string impl;
+        assert(tmpl->apply({"int", "string"}, impl));
+        assert(impl == "class C__int__string { int x ; string y ; void p ( int x , string y ) { } } ;");
+        std::cout << "[PASS] template_template_two_params\n";
+    }
+}
+
 int main()
 {
-    std::cout << "Running b2style tests...\n";
+    test_nlp_parsable();
     test_case1();
     test_case2();
     test_bool_and_bool();
@@ -833,6 +934,9 @@ int main()
     test_reinterpret_cast_to_a_different_class_type();
     test_func();
 
-    std::cout << "\nALL 60 B2STYLE TESTS PASSED!\n";
+    test_compile_errors();
+    test_template_template();
+
+    std::cout << "\nALL 70 UNIT TESTS + 17 COMPILE ERROR TESTS + 3 TEMPLATE_TEMPLATE TESTS PASSED!\n";
     return 0;
 }

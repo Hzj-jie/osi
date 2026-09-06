@@ -1,0 +1,12 @@
+﻿
+// ERROR PATTERN: *[Logic] Anchor *construct*:C__struct__type__id__type*:Integer is not defined.*
+
+#include <b2style.h>
+
+class C {
+  void construct(int x, int y) {}
+};
+
+void main() {
+  C c(1);
+}

@@ -1,0 +1,21 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+class C {
+  overridable void f() {}
+};
+
+class D : C {
+  override void f() {}
+};
+
+void main() {
+  C c;
+  D d;
+
+  c.f();
+  d.f();
+
+  b2style::testing::finished();
+}

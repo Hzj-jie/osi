@@ -1,0 +1,18 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+#define YES
+#define YES2
+
+#ifndef YES || NO
+void f() {
+}
+#endif
+
+#ifdef YES2 || NO
+void main() {
+  f();
+  b2style::testing::finished();
+}
+#endif

@@ -1,0 +1,8 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+void main() {
+  b2style::testing::assert_equal<string>(__FILE__, "real__file__.txt");
+  b2style::testing::finished();
+}

@@ -1,0 +1,10 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+#ifdef NO
+#else
+void main() {
+  b2style::testing::finished();
+}
+#endif

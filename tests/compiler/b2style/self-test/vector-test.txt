@@ -1,0 +1,29 @@
+﻿
+#include <b2style.h>
+#include <std/vector>
+#include <testing.h>
+
+void main() {
+  std::vector<int> v();
+  for (int i = 0; i < 10; i++) {
+    v.push_back(i + 1);
+  }
+  b2style::testing::assert_equal<int>(v.size(), 10);
+
+  for (int i = 0; i < 10; i++) {
+    b2style::testing::assert_equal<int>(v.get(i), i + 1);
+  }
+
+  for (int i = 0; i < 10; i++) {
+    v.set(i, i + 2);
+  }
+
+  for (int i = 0; i < 10; i++) {
+    b2style::testing::assert_equal<int>(v.get(i), i + 2);
+  }
+
+  v.clear();
+  b2style::testing::assert_equal<int>(v.size(), 0);
+
+  b2style::testing::finished();
+}

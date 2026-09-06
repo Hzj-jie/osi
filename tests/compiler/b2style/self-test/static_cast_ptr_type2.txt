@@ -1,0 +1,19 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+struct S {
+  int x;
+  string y;
+};
+
+void main() {
+  S s[10];
+  s[0].x = 10;
+  s[0].y = "11";
+  static_cast(s, type_ptr);
+  static_cast(s, S);
+  b2style::testing::assert_equal<int>(s[0].x, 10);
+  b2style::testing::assert_equal<string>(s[0].y, "11");
+  b2style::testing::finished();
+}

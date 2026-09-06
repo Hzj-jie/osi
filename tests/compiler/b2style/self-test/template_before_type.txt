@@ -1,0 +1,23 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+#include <std/vector>
+
+class C {
+  int x;
+};
+
+void main() {
+  std::vector<C> v();
+  for (int i = 0; i < 100; i++) {
+    C c;
+    c.x = i + 1;
+    v.push_back(c);
+  }
+
+  for (int i = 0; i < 100; i++) {
+    C c = v.get(i);
+    b2style::testing::assert_equal<int>(c.x, i + 1);
+  }
+  b2style::testing::finished();
+}

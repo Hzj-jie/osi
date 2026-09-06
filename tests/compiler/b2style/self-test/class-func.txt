@@ -1,0 +1,21 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+class C {
+  int base;
+
+  int inc(int x) {
+    return x + this.base;
+  }
+
+  void construct(int base) {
+	this.base = base;
+  }
+};
+
+void main() {
+  C c(1);
+  b2style::testing::assert_equal<int>(c.inc(1), 2);
+  b2style::testing::finished();
+}

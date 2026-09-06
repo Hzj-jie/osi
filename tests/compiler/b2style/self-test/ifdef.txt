@@ -1,0 +1,11 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+#define YES
+#ifdef YES
+void main() {
+  b2style::testing::assert_equal<bool>(true, true);
+  b2style::testing::finished();
+}
+#endif

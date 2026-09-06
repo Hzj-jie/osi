@@ -1,0 +1,11 @@
+﻿
+// ERROR: [syntaxer] Cannot match token struct
+// ERROR: >>> int(3):[raw-name]  <<<&(1):[bit-and] i(1):[raw-name]
+
+#include <b2style.h>
+
+struct S {
+  int& i;
+};
+
+void main() {}

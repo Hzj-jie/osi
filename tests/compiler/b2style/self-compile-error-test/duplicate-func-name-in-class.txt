@@ -1,0 +1,12 @@
+﻿
+// ERROR PATTERN: *Duplicate function in {, B}: [{{[{, f} {, *}]: {, *}}, 2}],*
+// b3style always uses canonical type names, i.e. Integer and type0 instead of int and void.
+
+#include <b2style.h>
+
+class B {
+  void f(int x) {}
+  void f(int y) {}
+};
+
+void main() {}

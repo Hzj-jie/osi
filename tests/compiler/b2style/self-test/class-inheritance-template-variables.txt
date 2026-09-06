@@ -1,0 +1,32 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+template <T>
+class B {
+  T x;
+};
+
+class C : B<int> {
+  int y;
+};
+
+class C2 : B<string> {
+  int y;
+};
+
+void main() {
+  C c;
+  c.x= 1;
+  c.y=2;
+
+  C2 c2;
+  c2.x="a";
+  c2.y=3;
+
+  b2style::testing::assert_equal<int>(c.x, 1);
+  b2style::testing::assert_equal<int>(c.y, 2);
+  b2style::testing::assert_equal<string>(c2.x, "a");
+  b2style::testing::assert_equal<int>(c2.y, 3);
+  b2style::testing::finished();
+}

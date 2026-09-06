@@ -1,0 +1,33 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+void main() {
+#ifdef NO
+  b2style::testing::assert_true(false);
+#else
+  b2style::testing::assert_true(true);
+#endif
+
+#ifndef NO
+  b2style::testing::assert_true(true);
+#else
+  b2style::testing::assert_true(false);
+#endif
+
+#ifdef NO {
+  b2style::testing::assert_true(false);
+} #else {
+  b2style::testing::assert_true(true);
+} #endif
+
+#ifndef NO {
+  b2style::testing::assert_true(true);
+} #else {
+  b2style::testing::assert_true(false);
+} #endif
+
+#ifdef B2STYLE || B3STYLE
+  b2style::testing::finished();
+#endif
+}

@@ -1,0 +1,31 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+struct S {
+  bool x;
+  bool y;
+};
+
+void f(S s) {
+  for (int i = 0; i < 10; i++) {
+    b2style::testing::assert_equal<bool>(s[i].x, (i % 2) == 0);
+    b2style::testing::assert_equal<bool>(s[i].y, (i % 2) == 1);
+  }
+}
+
+void f(type_ptr p) {
+  static_cast(p, S);
+  f(p);
+}
+
+void main() {
+  S s[10];
+  for (int i = 0; i < 10; i++) {
+    s[i].x = ((i % 2) == 0);
+    s[i].y = ((i % 2) == 1);
+  }
+  static_cast(s, type_ptr);
+  f(s);
+  b2style::testing::finished();
+}

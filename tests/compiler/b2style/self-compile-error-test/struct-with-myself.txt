@@ -1,0 +1,18 @@
+﻿
+// ERROR PATTERN: *Failed to declare *S with name s as a primitive type variable.*
+// ERROR PATTERN: *Failed to declare *S with name s.s as a primitive type variable.*
+
+#include <b2style.h>
+#include <testing.h>
+
+struct S {
+  S s;
+  int x;
+};
+
+void main() {
+  S s;
+  s.x = 1;
+  s.s.x = 2;
+  s.s.s.x = 3;
+}

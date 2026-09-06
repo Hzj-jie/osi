@@ -95,7 +95,18 @@ namespace osi
                             p = p->child(0);
                         }
                         assert(p->type_name == "paramtype");
-                        types.push_back(p->input_without_ignored());
+                        rewriter::typed_node_writer w;
+                        if (code_gen_of(p).build(w))
+                        {
+                            std::string s = w.dump();
+                            while (!s.empty() && (s.back() == ' ' || s.back() == '\t')) s.pop_back();
+                            while (!s.empty() && (s.front() == ' ' || s.front() == '\t')) s.erase(s.begin());
+                            types.push_back(s);
+                        }
+                        else
+                        {
+                            types.push_back(p->input_without_ignored());
+                        }
                     }
                     return types;
                 }

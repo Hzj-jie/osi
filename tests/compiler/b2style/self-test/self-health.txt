@@ -1,0 +1,8 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+void main() {
+  b2style::testing::assert_true(true);
+  b2style::testing::finished();
+}

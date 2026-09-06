@@ -1,0 +1,9 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+#ifdef B2STYLE || B3STYLE
+void main() {
+  b2style::testing::finished();
+}
+#endif

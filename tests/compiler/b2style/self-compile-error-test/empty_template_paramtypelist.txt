@@ -1,0 +1,11 @@
+﻿
+// ERROR: [syntaxer] Cannot match token void
+
+#include <b2style.h>
+
+template <T>
+class C {};
+
+void main() {
+  C<> c;
+}

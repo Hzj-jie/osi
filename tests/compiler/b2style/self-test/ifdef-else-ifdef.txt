@@ -1,0 +1,18 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+#ifdef NO
+void main() {
+  b2style::testing::assert_equal<bool>(__STATEMENT__, true, false);
+}
+#else #ifdef NO_AGAIN
+void main() {
+  b2style::testing::assert_equal<bool>(__STATEMENT__, false, true);
+}
+#else
+void main() {
+  b2style::testing::finished();
+}
+#endif
+#endif

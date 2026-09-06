@@ -165,8 +165,9 @@ namespace osi
                                         pnode = pnode->child(0);
                                     }
                                     assert(pnode->type_name == "param");
-                                    std::string pt = pnode->child(0)->input_without_ignored();
-                                    std::string pn = pnode->child(1)->input_without_ignored();
+                                    bool is_ref = (pnode->child_count() == 3);
+                                    std::string pt = pnode->child(0)->input_without_ignored() + (is_ref ? "&" : "");
+                                    std::string pn = pnode->last_child()->input_without_ignored();
                                     params.emplace_back(pt, pn);
                                     param_names.push_back(pn);
                                 }
@@ -213,8 +214,9 @@ namespace osi
                                         pnode = pnode->child(0);
                                     }
                                     assert(pnode->type_name == "param");
-                                    std::string pt = pnode->child(0)->input_without_ignored();
-                                    std::string pn = pnode->child(1)->input_without_ignored();
+                                    bool is_ref = (pnode->child_count() == 3);
+                                    std::string pt = pnode->child(0)->input_without_ignored() + (is_ref ? "&" : "");
+                                    std::string pn = pnode->last_child()->input_without_ignored();
                                     params.emplace_back(pt, pn);
                                     param_names.push_back(pn);
                                 }
@@ -275,7 +277,14 @@ namespace osi
                             {
                                 tnode = tnode->child(0);
                             }
-                            std::string base_type = tnode->input_without_ignored();
+                            rewriter::typed_node_writer base_writer;
+                            if (!code_gen_of(tnode).build(base_writer))
+                            {
+                                return false;
+                            }
+                            std::string base_type = base_writer.dump();
+                            while (!base_type.empty() && (base_type.back() == ' ' || base_type.back() == '\t')) base_type.pop_back();
+                            while (!base_type.empty() && (base_type.front() == ' ' || base_type.front() == '\t')) base_type.erase(base_type.begin());
                             class_def bcd;
                             if (!scope::current()->classes().resolve(base_type, bcd))
                             {
@@ -287,7 +296,7 @@ namespace osi
                         }
                     }
 
-                    if (!scope::current()->classes().define(class_name, cd))
+                    if (!cd.check() || !scope::current()->classes().define(class_name, cd))
                     {
                         return false;
                     }

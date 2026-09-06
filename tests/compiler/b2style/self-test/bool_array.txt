@@ -1,0 +1,18 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+void main() {
+  bool a[100];
+  bool b;
+  for (int i = 0; i < 100; i++) {
+    a[i] = ((i % 2) == 1);
+  }
+  reinterpret_cast(b, int);
+  b = a;
+  reinterpret_cast(b, bool);
+  for (int i = 0; i < 100; i++) {
+    b2style::testing::assert_equal<bool>(b[i], (i % 2) == 1);
+  }
+  b2style::testing::finished();
+}

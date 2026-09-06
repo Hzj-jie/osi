@@ -1,0 +1,53 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+#include <assert.h>
+
+/* TODO: Implement
+template <T>
+class linked_node {
+  T v;
+  type_ptr _next;
+
+  void construct() {
+    this._next = 0;
+  }
+};
+
+template <T>
+class linked_iterator {
+  type_ptr p;
+
+  void construct(type_ptr p) {
+    assert(__STATEMENT__ + " @" + __FILE__, p != 0);
+	this.p = p;
+  }
+
+  void set(T v) {
+    type_ptr t = this.p;
+	static_cast(t, linked_node<T>);
+	t[0].v = v;
+  }
+
+  T get() {
+    type_ptr t = this.p;
+	static_cast(t, linked_node<T>);
+	return t[0].v;
+  }
+};
+
+template <T>
+class linked_list {
+  type_ptr head;
+  type_ptr tail;
+
+  void construct() {
+    this.head = 0;
+    this.tail = 0;
+  }
+};
+*/
+
+void main() {
+  b2style::testing::finished();
+}

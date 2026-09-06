@@ -1,0 +1,14 @@
+﻿
+// ERROR: Duplicate variable in {, C}: [{x, 2}],
+
+#include <b2style.h>
+
+class B {
+  int x;
+};
+
+class C : B {
+  int x;
+};
+
+void main() {}

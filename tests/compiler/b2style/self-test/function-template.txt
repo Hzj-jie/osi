@@ -1,0 +1,17 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+template <T>
+T add(T& x, T y) {
+  x += y;
+  return x;
+}
+
+void main() {
+  int x = 1;
+  b2style::testing::assert_true(add<int>(x, 1) == 2);
+  add<int>(x, 1);
+  b2style::testing::assert_true(x == 3);
+  b2style::testing::finished();
+}

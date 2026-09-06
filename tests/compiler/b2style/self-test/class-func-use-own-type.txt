@@ -1,0 +1,23 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+class C {
+  int x;
+
+  void add(C that) {
+    this.x += that.x;
+  }
+};
+
+void main() {
+  C c;
+  c.x = 10;
+  C d;
+  d.x = 20;
+  c.add(d);
+
+  b2style::testing::assert_equal<int>(c.x, 30);
+  b2style::testing::assert_equal<int>(d.x, 20);
+  b2style::testing::finished();
+}

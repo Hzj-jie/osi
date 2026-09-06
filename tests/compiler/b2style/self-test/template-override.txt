@@ -1,0 +1,52 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+
+class OutWriter {
+  int c;
+
+  void write(string msg) {
+    this.c++;
+    // Do not really write to stdout, it will mass up the testing assertions.
+    b2style::std_err(msg);
+  }
+};
+
+class ErrWriter {
+  int c;
+
+  void write(string msg) {
+    this.c++;
+    b2style::std_err(msg);
+  }
+};
+
+template <W>
+class Logger {
+  W w;
+
+  void log(string msg) {
+    this.w.write(msg);
+  }
+
+  int count_of_log_lines() {
+    return this.w.c;
+  }
+};
+
+typedef Logger<OutWriter> OutLogger;
+typedef Logger<ErrWriter> ErrLogger;
+
+void main() {
+  OutLogger ol;
+  ErrLogger el;
+
+  ol.log("out");
+  ol.log("out");
+  ol.log("out");
+  el.log("err");
+
+  b2style::testing::assert_equal<int>(ol.count_of_log_lines(), 3);
+  b2style::testing::assert_equal<int>(el.count_of_log_lines(), 1);
+  b2style::testing::finished();
+}

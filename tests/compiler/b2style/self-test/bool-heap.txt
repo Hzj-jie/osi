@@ -1,0 +1,34 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+#include <b2style/heap_ptr.h>
+
+void f(bool s) {
+  for (int i = 0; i < 100; i++) {
+    b2style::testing::assert_equal<bool>(s[i], (i % 2) == 1);
+  }
+}
+
+void f(b2style::heap_ptr<bool> h) {
+  for (int i = 0; i < h.size(); i++) {
+    b2style::testing::assert_equal<bool>(h.get(i), (i % 2) == 1);
+  }
+}
+
+void main() {
+  bool s[100];
+  for (int i = 0; i < 100; i++) {
+    s[i] = ((i % 2) == 1);
+  }
+  f(s);
+
+  b2style::heap_ptr<bool> h(100);
+  for (int i = 0; i < h.size(); i++) {
+    h.set(i, (i % 2) == 1);
+  }
+  f(h);
+
+  b2style::testing::assert_equal<int>(b2style::testing::_assertion_count, 200);
+
+  b2style::testing::finished();
+}

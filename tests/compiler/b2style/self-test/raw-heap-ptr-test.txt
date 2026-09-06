@@ -1,0 +1,27 @@
+﻿
+#include <b2style.h>
+#include <testing.h>
+/* TODO: Implementation
+#include <b2style/raw_heap_ptr.h>
+
+struct S {
+  int x;
+  raw_heap_ptr next;
+};
+
+void main() {
+  S first;
+  first.x = 10;
+  S next;
+  first.next.set(next);
+  next.x = 20;
+
+  next = first.next.get<S>();
+  b2style::testing::assert_equal<int>(next.x, 20);
+  b2style::testing::finished();
+}
+*/
+
+void main() {
+  b2style::testing::finished();
+}
