@@ -1,0 +1,6 @@
+﻿
+#include <bstyle/types.h>
+// Include it twice to test the ifndef.
+#include <bstyle/types.h>
+
+void main() {}

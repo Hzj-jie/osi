@@ -1,0 +1,10 @@
+﻿
+#include <bstyle/types.h>
+
+void main() {
+  string i = __func__;
+  i = __FILE__;
+  i = __STATEMENT__;
+
+  int j = __LINE__;
+}

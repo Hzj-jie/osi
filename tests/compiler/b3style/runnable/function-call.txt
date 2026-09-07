@@ -1,0 +1,12 @@
+﻿
+#include <bstyle/types.h>
+
+string f(string x) {
+  return x;
+}
+
+void main() {
+  string i = "Hello World";
+  string temp = f(i);
+  logic "interrupt stdout temp i";
+}

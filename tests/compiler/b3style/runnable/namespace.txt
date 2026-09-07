@@ -1,0 +1,12 @@
+﻿
+#include <b2style/stdio.h>
+
+namespace N {
+::void f() {
+  ::b2style::std_out("abc");
+}
+}  // namespace N
+
+void main() {
+  N::f();
+}

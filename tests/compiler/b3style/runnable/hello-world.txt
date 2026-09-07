@@ -1,0 +1,8 @@
+﻿
+#include <bstyle/types.h>
+
+void main() {
+  string i = "Hello World";
+  string temp;
+  logic "interrupt stdout i temp";
+}
