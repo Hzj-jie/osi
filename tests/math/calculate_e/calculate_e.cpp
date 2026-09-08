@@ -17,15 +17,12 @@ bool save_checkpoint(const std::string& path, uint64_t step, const big_udec& sum
     return true;
 }
 
-bool load_checkpoint(const std::string& path, uint64_t& step, big_udec& sum, big_udec& c) {
+bool load_checkpoint(const std::string& path, uint64_t& step) {
     std::ifstream ifs(path);
     if (!ifs.is_open()) return false;
-    std::string line_step, line_sum;
-    if (!std::getline(ifs, line_step) || !std::getline(ifs, line_sum)) return false;
+    std::string line_step;
+    if (!std::getline(ifs, line_step)) return false;
     step = static_cast<uint64_t>(std::stoull(line_step));
-    if (!big_udec::parse_fraction(line_sum, sum)) return false;
-
-    c = big_udec(big_uint(1U), sum.denominator());
     return true;
 }
 
@@ -53,12 +50,10 @@ int main(int argc, char* argv[]) {
     }
 
     uint64_t step = 0;
-    big_udec sum{1U};
-    big_udec c{1U};
     uint64_t start_step = 1;
 
     if (!resume_file.empty()) {
-        if (load_checkpoint(resume_file, step, sum, c)) {
+        if (load_checkpoint(resume_file, step)) {
             start_step = step + 1;
             std::cout << "Resumed e calculation from checkpoint step " << step << std::endl;
         } else {
@@ -66,7 +61,7 @@ int main(int argc, char* argv[]) {
             return 1;
         }
     } else if (!checkpoint_file.empty()) {
-        if (load_checkpoint(checkpoint_file, step, sum, c)) {
+        if (load_checkpoint(checkpoint_file, step)) {
             start_step = step + 1;
             std::cout << "Auto-resuming e calculation from existing checkpoint step " << step << std::endl;
         }
@@ -75,19 +70,46 @@ int main(int argc, char* argv[]) {
     std::cout << "Calculating e from step " << start_step << " up to " << max_iterations
               << " iterations (output interval: " << output_interval_sec << "s)..." << std::endl;
 
+    // Optimization: Instead of general fraction arithmetic sum.add(c) where denominators
+    // cross-multiply exponentially and require massive GCD reductions, we exploit the
+    // exact common denominator of the partial sum S_k = \sum_{j=0}^k 1/j! = N_k / k!.
+    //
+    // The recurrence is:
+    //   N_{k+1} = (k+1) * N_k + 1
+    //   D_{k+1} = (k+1) * D_k
+    //
+    // Every step is a single-pass O(limbs) scalar multiplication by a 64-bit integer,
+    // avoiding O(L^2) BigInteger * BigInteger multiplication, division, and GCD in the loop.
+    big_uint N(1ULL);
+    big_uint D(1ULL);
+
+    if (start_step > 1) {
+        std::cout << "Fast-forwarding recurrence state to step " << (start_step - 1) << "..." << std::endl;
+        auto ff_start = std::chrono::steady_clock::now();
+        for (uint64_t k = 1; k < start_step; ++k) {
+            N.multiply(k);
+            N.add(big_uint(1ULL));
+            D.multiply(k);
+        }
+        auto ff_end = std::chrono::steady_clock::now();
+        double ff_sec = std::chrono::duration<double>(ff_end - ff_start).count();
+        std::cout << "Fast-forwarded " << (start_step - 1) << " steps in " << ff_sec << "s." << std::endl;
+    }
+
     auto start_time = std::chrono::steady_clock::now();
     auto last_time = start_time;
     uint64_t last_step = start_step - 1;
     auto interval_duration = std::chrono::seconds(output_interval_sec);
 
     for (uint64_t i = start_step; i <= max_iterations; ++i) {
-        c.divide(big_udec(i));
-        sum.add(c);
+        N.multiply(i);
+        N.add(big_uint(1ULL));
+        D.multiply(i);
 
         auto now = std::chrono::steady_clock::now();
         if (now - last_time >= interval_duration || i == max_iterations) {
+            big_udec sum(N, D);
             sum.reduce_fraction();
-            c.reduce_fraction();
 
             now = std::chrono::steady_clock::now();
             double interval_sec = std::chrono::duration<double>(now - last_time).count();
