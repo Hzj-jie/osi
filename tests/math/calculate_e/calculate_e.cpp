@@ -5,26 +5,9 @@
 #include <cstdlib>
 #include <chrono>
 #include <iomanip>
-#include "../../../math/big_udec.hpp"
+#include "../checkpoint.hpp"
 
 using namespace osi::math;
-
-bool save_checkpoint(const std::string& path, uint64_t step, const big_udec& sum) {
-    std::ofstream ofs(path);
-    if (!ofs.is_open()) return false;
-    ofs << step << "\n";
-    ofs << sum.fractional_str() << "\n";
-    return true;
-}
-
-bool load_checkpoint(const std::string& path, uint64_t& step) {
-    std::ifstream ifs(path);
-    if (!ifs.is_open()) return false;
-    std::string line_step;
-    if (!std::getline(ifs, line_step)) return false;
-    step = static_cast<uint64_t>(std::stoull(line_step));
-    return true;
-}
 
 int main(int argc, char* argv[]) {
     uint64_t max_iterations = 200;
@@ -51,50 +34,49 @@ int main(int argc, char* argv[]) {
 
     uint64_t step = 0;
     uint64_t start_step = 1;
+    big_uint N(1ULL);
+    big_uint D(1ULL);
+    bool is_binary = false;
+    e_checkpoint_state chk_state;
 
-    if (!resume_file.empty()) {
-        if (load_checkpoint(resume_file, step)) {
-            start_step = step + 1;
-            std::cout << "Resumed e calculation from checkpoint step " << step << std::endl;
-        } else {
-            std::cerr << "Error: Failed to load resume checkpoint from " << resume_file << std::endl;
+    std::string load_target = !resume_file.empty() ? resume_file : checkpoint_file;
+    if (!load_target.empty()) {
+        std::ifstream test_open(load_target);
+        if (test_open.is_open()) {
+            test_open.close();
+            if (load_e_checkpoint(load_target, chk_state, is_binary, /*parse_numbers=*/false)) {
+                step = chk_state.step;
+                start_step = step + 1;
+                if (is_binary) {
+                    N = std::move(chk_state.N);
+                    D = std::move(chk_state.D);
+                    std::cout << "Resumed e calculation from binary checkpoint step " << step
+                              << " (exact recurrence state restored directly)." << std::endl;
+                } else {
+                    std::cout << "Resumed e calculation from text checkpoint step " << step
+                              << " (fast-forwarding recurrence state to step " << step << ")..." << std::endl;
+                    auto ff_start = std::chrono::steady_clock::now();
+                    for (uint64_t k = 1; k < start_step; ++k) {
+                        N.multiply(k);
+                        N.add(big_uint(1ULL));
+                        D.multiply(k);
+                    }
+                    auto ff_end = std::chrono::steady_clock::now();
+                    double ff_sec = std::chrono::duration<double>(ff_end - ff_start).count();
+                    std::cout << "Fast-forwarded " << (start_step - 1) << " steps in " << ff_sec << "s." << std::endl;
+                }
+            } else if (!resume_file.empty()) {
+                std::cerr << "Error: Failed to load resume checkpoint from " << resume_file << std::endl;
+                return 1;
+            }
+        } else if (!resume_file.empty()) {
+            std::cerr << "Error: Failed to open resume checkpoint file " << resume_file << std::endl;
             return 1;
-        }
-    } else if (!checkpoint_file.empty()) {
-        if (load_checkpoint(checkpoint_file, step)) {
-            start_step = step + 1;
-            std::cout << "Auto-resuming e calculation from existing checkpoint step " << step << std::endl;
         }
     }
 
     std::cout << "Calculating e from step " << start_step << " up to " << max_iterations
               << " iterations (output interval: " << output_interval_sec << "s)..." << std::endl;
-
-    // Optimization: Instead of general fraction arithmetic sum.add(c) where denominators
-    // cross-multiply exponentially and require massive GCD reductions, we exploit the
-    // exact common denominator of the partial sum S_k = \sum_{j=0}^k 1/j! = N_k / k!.
-    //
-    // The recurrence is:
-    //   N_{k+1} = (k+1) * N_k + 1
-    //   D_{k+1} = (k+1) * D_k
-    //
-    // Every step is a single-pass O(limbs) scalar multiplication by a 64-bit integer,
-    // avoiding O(L^2) BigInteger * BigInteger multiplication, division, and GCD in the loop.
-    big_uint N(1ULL);
-    big_uint D(1ULL);
-
-    if (start_step > 1) {
-        std::cout << "Fast-forwarding recurrence state to step " << (start_step - 1) << "..." << std::endl;
-        auto ff_start = std::chrono::steady_clock::now();
-        for (uint64_t k = 1; k < start_step; ++k) {
-            N.multiply(k);
-            N.add(big_uint(1ULL));
-            D.multiply(k);
-        }
-        auto ff_end = std::chrono::steady_clock::now();
-        double ff_sec = std::chrono::duration<double>(ff_end - ff_start).count();
-        std::cout << "Fast-forwarded " << (start_step - 1) << " steps in " << ff_sec << "s." << std::endl;
-    }
 
     auto start_time = std::chrono::steady_clock::now();
     auto last_time = start_time;
@@ -108,10 +90,6 @@ int main(int argc, char* argv[]) {
 
         auto now = std::chrono::steady_clock::now();
         if (now - last_time >= interval_duration || i == max_iterations) {
-            big_udec sum(N, D);
-            sum.reduce_fraction();
-
-            now = std::chrono::steady_clock::now();
             double interval_sec = std::chrono::duration<double>(now - last_time).count();
             double total_sec = std::chrono::duration<double>(now - start_time).count();
             uint64_t interval_steps = i - last_step;
@@ -126,7 +104,7 @@ int main(int argc, char* argv[]) {
                       << " | Elapsed: " << std::setprecision(2) << total_sec << "s";
 
             if (!checkpoint_file.empty()) {
-                if (save_checkpoint(checkpoint_file, i, sum)) {
+                if (save_e_checkpoint_binary(checkpoint_file, i, N, D)) {
                     std::cout << " [Saved: " << checkpoint_file << "]";
                 } else {
                     std::cout << " [Failed to save checkpoint]";
@@ -147,7 +125,9 @@ int main(int argc, char* argv[]) {
               << " steps completed in " << std::fixed << std::setprecision(2) << total_sec
               << "s, avg " << avg_speed << " steps/s)." << std::endl;
     if (!checkpoint_file.empty()) {
-        std::cout << "Full result saved to checkpoint file: " << checkpoint_file << std::endl;
+        std::cout << "Checkpoint saved to: " << checkpoint_file << std::endl;
+        std::cout << "To export human-readable fraction string, run:\n"
+                  << "  convert_checkpoint " << checkpoint_file << " <output_text_file>" << std::endl;
     }
     return 0;
 }

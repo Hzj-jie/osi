@@ -42,11 +42,30 @@ public:
         while (start < str.size() && (str[start] == ' ' || str[start] == '\t' || str[start] == '\r' || str[start] == '\n')) {
             start++;
         }
-        for (size_t i = start; i < str.size(); ++i) {
-            char c = str[i];
-            if (c < '0' || c > '9') break;
-            multiply(10ULL);
-            add(big_uint(static_cast<uint64_t>(c - '0')));
+        size_t end = start;
+        while (end < str.size() && str[end] >= '0' && str[end] <= '9') {
+            end++;
+        }
+        size_t len = end - start;
+        if (len == 0) return;
+
+        size_t rem_digits = len % 18;
+        size_t pos = start;
+        if (rem_digits > 0) {
+            uint64_t v = 0;
+            for (size_t i = 0; i < rem_digits; ++i) {
+                v = v * 10 + static_cast<uint64_t>(str[pos++] - '0');
+            }
+            limbs_ = {v};
+        }
+        constexpr uint64_t base18 = 1000000000000000000ULL;
+        while (pos < end) {
+            uint64_t v = 0;
+            for (int i = 0; i < 18; ++i) {
+                v = v * 10 + static_cast<uint64_t>(str[pos++] - '0');
+            }
+            multiply(base18);
+            add(big_uint(v));
         }
     }
 
@@ -550,6 +569,28 @@ public:
             }
         }
         return bytes;
+    }
+
+    void write_binary(std::ostream& os) const {
+        uint64_t count = static_cast<uint64_t>(limbs_.size());
+        os.write(reinterpret_cast<const char*>(&count), sizeof(count));
+        if (count > 0) {
+            os.write(reinterpret_cast<const char*>(limbs_.data()), static_cast<std::streamsize>(count * sizeof(uint64_t)));
+        }
+    }
+
+    bool read_binary(std::istream& is) {
+        uint64_t count = 0;
+        if (!is.read(reinterpret_cast<char*>(&count), sizeof(count))) return false;
+        limbs_.resize(static_cast<size_t>(count));
+        if (count > 0) {
+            if (!is.read(reinterpret_cast<char*>(limbs_.data()), static_cast<std::streamsize>(count * sizeof(uint64_t)))) {
+                return false;
+            }
+        }
+        remove_trailing_zeros();
+        if (limbs_.empty()) set_zero();
+        return true;
     }
 
     void add_offset(uint64_t val, size_t offset) {
