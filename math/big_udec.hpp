@@ -105,6 +105,31 @@ public:
         from_bytes(bytes, *this);
     }
 
+    void write_binary(std::ostream& os) const {
+        n_.write_binary(os);
+        d_.write_binary(os);
+    }
+
+    bool read_binary(std::istream& is) {
+        if (!n_.read_binary(is) || !d_.read_binary(is)) return false;
+        if (d_.is_zero()) d_.set_one();
+        fraction_dirty_rate_ = 0;
+        return true;
+    }
+
+    static bool binary_to_decimal(std::istream& is, std::ostream& os) {
+        big_udec v;
+        if (!v.read_binary(is)) return false;
+        os << v.n_.str() << " / " << v.d_.str();
+        return true;
+    }
+
+    static std::string binary_to_decimal(std::istream& is) {
+        big_udec v;
+        if (!v.read_binary(is)) return "";
+        return v.fractional_str();
+    }
+
     static big_udec fraction(uint64_t n, uint64_t d) {
         return big_udec(big_uint(n), big_uint(d));
     }

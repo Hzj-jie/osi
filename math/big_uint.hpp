@@ -593,6 +593,19 @@ public:
         return true;
     }
 
+    static bool binary_to_decimal(std::istream& is, std::ostream& os) {
+        big_uint v;
+        if (!v.read_binary(is)) return false;
+        os << v.str();
+        return true;
+    }
+
+    static std::string binary_to_decimal(std::istream& is) {
+        big_uint v;
+        if (!v.read_binary(is)) return "";
+        return v.str();
+    }
+
     void add_offset(uint64_t val, size_t offset) {
         if (val == 0) return;
         if (limbs_.size() <= offset) {
