@@ -1,3 +1,6 @@
 math envs math
 interpreter/primitive envs interpreter/primitive
 compiler/logic envs compiler/logic interpreter/primitive
+compiler/bstyle envs compiler/bstyle compiler/logic interpreter/primitive
+compiler/b2style envs compiler/b2style compiler/bstyle compiler/logic interpreter/primitive
+compiler/b3style envs compiler/b3style compiler/b2style compiler/bstyle compiler/logic interpreter/primitive

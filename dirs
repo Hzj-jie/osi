@@ -13,10 +13,20 @@ threadpool envs
 math envs const utils formation
 interpreter/primitive envs math app_info
 compiler/logic envs interpreter/primitive
+compiler/bstyle envs compiler/logic interpreter/primitive
+compiler/b2style envs compiler/bstyle compiler/logic interpreter/primitive
+compiler/b3style envs compiler/b3style compiler/b2style compiler/bstyle compiler/logic interpreter/primitive
 tests/math/calculate_e envs math
 tests/math/calculate_pi envs math
 tests/compiler/logic/logic_run envs compiler/logic interpreter/primitive
+tests/compiler/logic/logic_compiler envs compiler/logic interpreter/primitive
+tests/compiler/bstyle/bstyle_compiler envs compiler/bstyle compiler/logic interpreter/primitive
+tests/compiler/bstyle/bstyle_runner envs compiler/bstyle compiler/logic interpreter/primitive
+tests/compiler/b2style/b2style_compiler envs compiler/b2style compiler/bstyle compiler/logic interpreter/primitive
+tests/compiler/b2style/b2style_runner envs compiler/b2style compiler/bstyle compiler/logic interpreter/primitive
+tests/compiler/b3style/b3style_compiler envs compiler/b3style compiler/b2style compiler/bstyle compiler/logic interpreter/primitive
+tests/compiler/b3style/b3style_runner envs compiler/b3style compiler/b2style compiler/bstyle compiler/logic interpreter/primitive
 tests/interpreter/primitive/primitive_run envs interpreter/primitive
 utt envs utt_cases
-utt_cases app_info const delegates envs formation procedure math sync template threadpool utils interpreter/primitive compiler/logic
+utt_cases app_info const delegates envs formation procedure math sync template threadpool utils interpreter/primitive compiler/logic compiler/bstyle compiler/b2style compiler/b3style
 

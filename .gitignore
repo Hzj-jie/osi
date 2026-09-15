@@ -9,6 +9,11 @@ git.hpp
 /tests/math/calculate_pi/calculate_pi
 /tests/interpreter/primitive/primitive_run/primitive_run
 /tests/compiler/logic/logic_run/logic_run
+/tests/compiler/logic/logic_compiler/logic_compiler
+/tests/compiler/bstyle/bstyle_compiler/bstyle_compiler
+/tests/compiler/bstyle/bstyle_runner/bstyle_runner
+/tests/compiler/b2style/b2style_compiler/b2style_compiler
+/tests/compiler/b2style/b2style_runner/b2style_runner
+/tests/compiler/b3style/b3style_compiler/b3style_compiler
+/tests/compiler/b3style/b3style_runner/b3style_runner
 *.un~
-
-
