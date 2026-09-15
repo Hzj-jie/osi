@@ -62,6 +62,7 @@ private:
         r.push_back(join(inputs, "_"));
     }
 
+public:
     static std::vector<std::string> env_keys(const std::initializer_list<const char*>& segs)
     {
         std::vector<std::string> r;
@@ -75,6 +76,12 @@ private:
         add_combination(r, inputs);
         return r;
     }
+
+    static bool env_bool(const std::initializer_list<const char*>& segs)
+    {
+        return ::envs.has(env_keys(segs));
+    }
+private:
 
     template <typename T>
     T from_str(const std::string& s)

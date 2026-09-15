@@ -1,6 +1,9 @@
 
 #pragma once
 #include "../../envs/envs.hpp"
+#include "../../envs/exeinfo.hpp"
+#include "../../envs/processor.hpp"
+#include "../../envs/deploys.hpp"
 #include "../../utt/icase.hpp"
 #include "../../utils/strcmp.hpp"
 #include "../../const/character.hpp"
@@ -36,6 +39,29 @@ public:
                 utt_assert.equal(s, it.second);
             }
         }
+
+        // exeinfo assertions
+        if (!utt_assert.is_false(exeinfo.path().empty())) return false;
+        if (!utt_assert.is_false(exeinfo.name().empty())) return false;
+        if (!utt_assert.is_false(exeinfo.directory().empty())) return false;
+        if (!utt_assert.more(exeinfo.id(), int64_t(0))) return false;
+
+        // processor assertions
+        if (!utt_assert.more(processor.count, uint32_t(0))) return false;
+        if (!utt_assert.equal(processor.single, processor.count == 1)) return false;
+
+        // deploys assertions
+        if (!utt_assert.is_false(deploys.service_name().empty())) return false;
+        if (!utt_assert.is_false(deploys.deploys_folder().empty())) return false;
+        if (!utt_assert.is_false(deploys.apps_folder().empty())) return false;
+        if (!utt_assert.is_false(deploys.data_folder().empty())) return false;
+        if (!utt_assert.is_false(deploys.log_folder().empty())) return false;
+        if (!utt_assert.is_false(deploys.temp_folder().empty())) return false;
+        if (!utt_assert.is_false(deploys.service_data_folder().empty())) return false;
+        if (!utt_assert.is_false(deploys.service_log_folder().empty())) return false;
+        if (!utt_assert.is_false(deploys.service_temp_folder().empty())) return false;
+        if (!utt_assert.is_false(deploys.application_info_output_filename().empty())) return false;
+
         return true;
     }
 

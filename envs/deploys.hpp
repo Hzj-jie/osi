@@ -9,6 +9,8 @@
 #include "os.hpp"
 #include "git.hpp"
 #include "nowadays.hpp"
+#include "preenv.hpp"
+#include <iostream>
 
 const static class deploys_t
 {
@@ -95,6 +97,27 @@ private:
                                      character.minus_sign,
                                      character.minus_sign);
             _application_info_output_filename = p.native();
+        }
+        if(preenv_t::env_bool({"report", "deploys", "folder"}))
+        {
+#ifdef OS_WINDOWS
+#define p(x) std::wcout << #x << '\t' << _##x << std::endl;
+#else
+#define p(x) std::cout << #x << '\t' << _##x << std::endl;
+#endif
+            p(service_name);
+            p(deploys_folder);
+            p(apps_folder);
+            p(counter_folder);
+            p(data_folder);
+            p(log_folder);
+            p(temp_folder);
+            p(service_data_folder);
+            p(service_log_folder);
+            p(service_counter_folder);
+            p(service_temp_folder);
+            p(application_info_output_filename);
+#undef p
         }
     }
 public:
