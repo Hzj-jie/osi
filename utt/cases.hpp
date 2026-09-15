@@ -61,3 +61,7 @@
 #include "../utt_cases/compiler/logic/interrupt_test.hpp"
 #include "../utt_cases/compiler/logic/importer_test.hpp"
 #include "../utt_cases/compiler/logic/import_executor_tests.hpp"
+#include "../utt_cases/compiler/bstyle/bstyle_test.hpp"
+#include "../utt_cases/compiler/b2style/b2style_test.hpp"
+#include "../utt_cases/compiler/b2style/b2style_self_test.hpp"
+#include "../utt_cases/compiler/b3style/b3style_test.hpp"

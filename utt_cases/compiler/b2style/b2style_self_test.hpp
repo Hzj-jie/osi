@@ -1,19 +1,26 @@
+#pragma once
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <filesystem>
 #include <vector>
 #include <string>
-#include <cassert>
 #include <algorithm>
 #include "../../../compiler/b2style/b2style.hpp"
 #include "../../../interpreter/primitive/simulator.hpp"
 #include "../../../interpreter/primitive/interrupts.hpp"
 #include "../../../interpreter/primitive/console_io.hpp"
+#include "../../../utt/icase.hpp"
+#include "../../../utt/utt_assert.hpp"
 
 namespace fs = std::filesystem;
-using namespace osi::compiler::b2style_compiler;
 
+namespace osi::compiler::b2style_compiler
+{
+    class b2style_self_test : public icase
+    {
+    private:
 static std::string trim(const std::string& s)
 {
     size_t start = 0;
@@ -55,6 +62,14 @@ static fs::path find_directory(const std::string& name)
         {
             return exe_path / name;
         }
+        if (fs::exists(exe_path / "utt_cases/compiler/b2style" / name))
+        {
+            return exe_path / "utt_cases/compiler/b2style" / name;
+        }
+        if (fs::exists(exe_path / "../utt_cases/compiler/b2style" / name))
+        {
+            return exe_path / "../utt_cases/compiler/b2style" / name;
+        }
     }
     catch (...)
     {
@@ -63,6 +78,16 @@ static fs::path find_directory(const std::string& name)
     if (fs::exists(name))
     {
         return fs::path(name);
+    }
+
+    if (fs::exists("utt_cases/compiler/b2style/" + name))
+    {
+        return fs::path("utt_cases/compiler/b2style/" + name);
+    }
+
+    if (fs::exists("../utt_cases/compiler/b2style/" + name))
+    {
+        return fs::path("../utt_cases/compiler/b2style/" + name);
     }
 
     if (fs::exists("tests/compiler/b2style/" + name))
@@ -207,33 +232,27 @@ static bool test_self_compile_errors(int& passed, int& failed)
     return true;
 }
 
-int main()
-{
-    int pass_count = 0;
-    int fail_count = 0;
-    int skip_count = 0;
 
-    if (!test_self_assertions(pass_count, fail_count, skip_count))
-    {
-        return 1;
-    }
+    public:
+        bool run() override
+        {
+            int pass_count = 0;
+            int fail_count = 0;
+            int skip_count = 0;
 
-    int err_pass_count = 0;
-    int err_fail_count = 0;
-    if (!test_self_compile_errors(err_pass_count, err_fail_count))
-    {
-        return 1;
-    }
+            utt_assert.is_true(test_self_assertions(pass_count, fail_count, skip_count));
+            utt_assert.equal(fail_count, 0);
 
-    std::cout << "\n=== b2style Self-Test Summary ===\n";
-    std::cout << "Self-assertion tests: " << pass_count << " passed, " << fail_count << " failed, " << skip_count << " skipped.\n";
-    std::cout << "Compile-error tests: " << err_pass_count << " passed, " << err_fail_count << " failed.\n";
+            int err_pass_count = 0;
+            int err_fail_count = 0;
+            utt_assert.is_true(test_self_compile_errors(err_pass_count, err_fail_count));
+            utt_assert.equal(err_fail_count, 0);
 
-    if (fail_count > 0 || err_fail_count > 0)
-    {
-        return 1;
-    }
+            return fail_count == 0 && err_fail_count == 0;
+        }
 
-    std::cout << "\nALL b2style SELF-TESTS PASSED!\n";
-    return 0;
+        DEFINE_CASE(b2style_self_test);
+    };
+
+    REGISTER_CASE(b2style_self_test);
 }

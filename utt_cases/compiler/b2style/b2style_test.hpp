@@ -1,35 +1,41 @@
+#pragma once
 #include <iostream>
 #include <string>
-#include <cassert>
 #include <memory>
 #include <algorithm>
+#include <vector>
 #include "b2style_test_data.hpp"
 #include "../../../compiler/b2style/b2style.hpp"
 #include "../../../interpreter/primitive/simulator.hpp"
 #include "../../../interpreter/primitive/interrupts.hpp"
 #include "../../../interpreter/primitive/console_io.hpp"
 #include "../../../automata/nlp.hpp"
+#include "../../../utt/icase.hpp"
+#include "../../../utt/utt_assert.hpp"
 
-using namespace osi::compiler;
-using namespace osi::compiler::b2style_compiler;
-
-static bool parse(primitive::console_io::test_wrapper& io,
-                  const std::string& content,
-                  primitive::simulator& sim)
+namespace osi::compiler::b2style_compiler
 {
-    return b2style::with_functions(primitive::interrupts(io.io())).compile(content, sim);
-}
-
-static void assert_execute_without_errors(primitive::simulator& sim)
-{
-    sim.execute();
-    if (sim.halt())
+    class b2style_test : public icase
     {
-        std::cerr << "Execution halted with error: " << sim.halt_error() << std::endl;
-    }
-    assert(!sim.halt());
-}
+    private:
+        static bool parse(primitive::console_io::test_wrapper& io,
+                          const std::string& content,
+                          primitive::simulator& sim)
+        {
+            return b2style::with_functions(primitive::interrupts(io.io())).compile(content, sim);
+        }
 
+        void assert_execute_without_errors(primitive::simulator& sim)
+        {
+            sim.execute();
+            if (sim.halt())
+            {
+                std::cerr << "Execution halted with error: " << sim.halt_error() << std::endl;
+            }
+            utt_assert.is_false(sim.halt());
+        }
+
+    public:
 void test_nlp_parsable()
 {
     std::shared_ptr<osi::automata::nlp> parser;
@@ -861,82 +867,85 @@ void test_template_template()
     }
 }
 
-int main()
-{
-    test_nlp_parsable();
-    test_case1();
-    test_case2();
-    test_bool_and_bool();
-    test_str_unescape();
-    test_1_to_100();
-    test_self_add();
-    test_biguint();
-    test_another_1_to_100();
-    test_loaded_method();
-    test_while_1_to_100();
-    // test_pi_integral_0_1 is <command_line_specified> in osi.net
-    test_shift();
-    test_include();
-    test_include2();
-    test_ifndef();
-    test_namespaces();
-    test_multiline_string();
-    test_comments();
-    test_typedef();
-    test_legacy_biguint_to_str();
-    test_heap_declaration();
-    test_struct_function_ref();
-    test_i_pre_post();
-    test_for_loop();
-    test_i_post();
-    test_i_post_2();
-    test_i_pre();
-    test_heap_function_ref();
-    test_nested_paragraph();
-    test_function_with_global_namespace();
-    test_nested_heap_access();
-    test_heap_ptr_to_int64();
-    test_unused_functions_should_be_removed();
-    test_empty_struct();
-    test_delegate();
-    test_delegate2();
-    test_struct_in_namespace();
-    test_class();
-    test_nested_class();
-    test_class_in_namespace();
-    test_class_constructor();
-    test_negative_int();
-    test_ufloat_std_out();
-    test_ufloat_operators();
-    test_while_0_to_1();
-    test_calculate_pi_bbp();
-    test_function_ref();
-    test_class_inheritance();
-    test_lots_of_semi_colons();
-    test_test_assert();
-    test_assert_();
-    test_assert_with_statement();
-    test_heap();
-    test_class_on_heap();
-    test_class_function_with_namespace();
-    test_delegate_ref();
-    test_delegate_template();
-    test_function_ptr();
-    test_nested_template();
-    test_primitive_template();
-    test_reinterpret_cast();
-    test_reinterpret_cast_heap();
-    test_template();
-    test_template_with_different_length();
-    test_template_wont_be_extended_twice();
-    test_vector_destructor();
-    test_order_of_operators();
-    test_reinterpret_cast_to_a_different_class_type();
-    test_func();
 
-    test_compile_errors();
-    test_template_template();
+        bool run() override
+        {
+            test_nlp_parsable();
+            test_case1();
+            test_case2();
+            test_bool_and_bool();
+            test_str_unescape();
+            test_1_to_100();
+            test_self_add();
+            test_biguint();
+            test_another_1_to_100();
+            test_loaded_method();
+            test_while_1_to_100();
+            test_shift();
+            test_include();
+            test_include2();
+            test_ifndef();
+            test_namespaces();
+            test_multiline_string();
+            test_comments();
+            test_typedef();
+            test_legacy_biguint_to_str();
+            test_heap_declaration();
+            test_struct_function_ref();
+            test_i_pre_post();
+            test_for_loop();
+            test_i_post();
+            test_i_post_2();
+            test_i_pre();
+            test_heap_function_ref();
+            test_nested_paragraph();
+            test_function_with_global_namespace();
+            test_nested_heap_access();
+            test_heap_ptr_to_int64();
+            test_unused_functions_should_be_removed();
+            test_empty_struct();
+            test_delegate();
+            test_delegate2();
+            test_struct_in_namespace();
+            test_class();
+            test_nested_class();
+            test_class_in_namespace();
+            test_class_constructor();
+            test_negative_int();
+            test_ufloat_std_out();
+            test_ufloat_operators();
+            test_while_0_to_1();
+            test_calculate_pi_bbp();
+            test_function_ref();
+            test_class_inheritance();
+            test_lots_of_semi_colons();
+            test_test_assert();
+            test_assert_();
+            test_assert_with_statement();
+            test_heap();
+            test_class_on_heap();
+            test_class_function_with_namespace();
+            test_delegate_ref();
+            test_delegate_template();
+            test_function_ptr();
+            test_nested_template();
+            test_primitive_template();
+            test_reinterpret_cast();
+            test_reinterpret_cast_heap();
+            test_template();
+            test_template_with_different_length();
+            test_template_wont_be_extended_twice();
+            test_vector_destructor();
+            test_order_of_operators();
+            test_reinterpret_cast_to_a_different_class_type();
+            test_func();
+            test_compile_errors();
+            test_template_template();
+            return true;
+        }
 
-    std::cout << "\nALL 70 UNIT TESTS + 17 COMPILE ERROR TESTS + 3 TEMPLATE_TEMPLATE TESTS PASSED!\n";
-    return 0;
+        DEFINE_CASE(b2style_test);
+    };
+
+    REGISTER_CASE(b2style_test);
 }

@@ -1,8 +1,9 @@
+#pragma once
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <cassert>
 #include <memory>
 #include <vector>
 #include <filesystem>
@@ -15,24 +16,78 @@
 #include "../../../interpreter/primitive/interrupts.hpp"
 #include "../../../interpreter/primitive/console_io.hpp"
 #include "../../../automata/nlp.hpp"
+#include "../../../utt/icase.hpp"
+#include "../../../utt/utt_assert.hpp"
 
 namespace fs = std::filesystem;
-using namespace osi::compiler;
-using namespace osi::compiler::b3style_compiler;
 
-static void assert_execute_without_errors(primitive::simulator& sim)
+namespace osi::compiler::b3style_compiler
 {
-    sim.execute();
-    if (sim.halt())
+    class b3style_test : public icase
     {
-        std::cerr << "Execution halted with error: " << sim.halt_error() << std::endl;
-    }
-    assert(!sim.halt());
-}
+    private:
+        static std::string trim(const std::string& s)
+        {
+            size_t start = 0;
+            while (start < s.size() && (s[start] == ' ' || s[start] == '\t' || s[start] == '\r' || s[start] == '\n'))
+            {
+                start++;
+            }
+            size_t end = s.size();
+            while (end > start && (s[end - 1] == ' ' || s[end - 1] == '\t' || s[end - 1] == '\r' || s[end - 1] == '\n'))
+            {
+                end--;
+            }
+            return s.substr(start, end - start);
+        }
 
+        void assert_execute_without_errors(primitive::simulator& sim)
+        {
+            sim.execute();
+            if (sim.halt())
+            {
+                std::cerr << "Execution halted with error: " << sim.halt_error() << std::endl;
+            }
+            utt_assert.is_false(sim.halt());
+        }
 
-
-// 1. Core b3style tests
+        static fs::path find_runnable_dir()
+        {
+            try
+            {
+                auto exe_path = fs::canonical("/proc/self/exe").parent_path();
+                if (fs::exists(exe_path / "runnable"))
+                {
+                    return exe_path / "runnable";
+                }
+                if (fs::exists(exe_path / "utt_cases/compiler/b3style/runnable"))
+                {
+                    return exe_path / "utt_cases/compiler/b3style/runnable";
+                }
+                if (fs::exists(exe_path / "../utt_cases/compiler/b3style/runnable"))
+                {
+                    return exe_path / "../utt_cases/compiler/b3style/runnable";
+                }
+            }
+            catch (...) {}
+            if (fs::exists("utt_cases/compiler/b3style/runnable"))
+            {
+                return fs::canonical("utt_cases/compiler/b3style/runnable");
+            }
+            if (fs::exists("../utt_cases/compiler/b3style/runnable"))
+            {
+                return fs::canonical("../utt_cases/compiler/b3style/runnable");
+            }
+            if (fs::exists("tests/compiler/b3style/runnable"))
+            {
+                return fs::canonical("tests/compiler/b3style/runnable");
+            }
+            if (fs::exists("runnable"))
+            {
+                return fs::canonical("runnable");
+            }
+            return "";
+        }
 void test_func_kw()
 {
     primitive::console_io::test_wrapper io;
@@ -70,29 +125,6 @@ void test_destruction_in_definition()
 }
 
 // 2. Runnable tests
-static fs::path find_runnable_dir()
-{
-    try
-    {
-        auto exe_path = fs::canonical("/proc/self/exe").parent_path();
-        if (fs::exists(exe_path / "runnable"))
-        {
-            return exe_path / "runnable";
-        }
-    }
-    catch (...) {}
-    if (fs::exists("tests/compiler/b3style/runnable"))
-    {
-        return fs::canonical("tests/compiler/b3style/runnable");
-    }
-    if (fs::exists("runnable"))
-    {
-        return fs::canonical("runnable");
-    }
-    assert(false && "Cannot find runnable directory");
-    return "";
-}
-
 void test_runnable()
 {
     fs::path dir = find_runnable_dir();
@@ -171,7 +203,7 @@ void test_compile_error()
 }
 
 // 5. Compatibility tests with b2style test data
-static void check_compatibility(const std::string& name, const std::string& code, const std::string& expected, const std::string& input = "")
+void check_compatibility(const std::string& name, const std::string& code, const std::string& expected, const std::string& input = "")
 {
     primitive::console_io::test_wrapper io(input);
     primitive::simulator sim;
@@ -446,30 +478,35 @@ void test_template_template()
     }
 }
 
-int main()
-{
-    error_handle::add_writer(new error_handle::console_error_writer());
-    std::cout << "Starting b3style tests...\n";
-    test_func_kw();
-    test_destruction_in_declaration();
-    test_destruction_in_definition();
-    test_runnable();
-    test_compile_only();
-    test_compile_error();
-    test_compatibility();
-    test_multiline_string();
-    test_i_post();
-    test_i_post_2();
-    test_i_pre();
-    test_heap_function_ref();
-    test_nested_paragraph();
-    test_test_assert();
-    test_assert_();
-    test_assert_with_statement();
-    test_class_on_heap();
-    test_vector_destructor();
-    test_unused_functions_should_be_removed();
-    test_template_template();
-    std::cout << "\nALL TESTS PASSED!\n";
-    return 0;
+
+    public:
+        bool run() override
+        {
+            test_func_kw();
+            test_destruction_in_declaration();
+            test_destruction_in_definition();
+            test_runnable();
+            test_compile_only();
+            test_compile_error();
+            test_compatibility();
+            test_multiline_string();
+            test_i_post();
+            test_i_post_2();
+            test_i_pre();
+            test_heap_function_ref();
+            test_nested_paragraph();
+            test_test_assert();
+            test_assert_();
+            test_assert_with_statement();
+            test_class_on_heap();
+            test_vector_destructor();
+            test_unused_functions_should_be_removed();
+            test_template_template();
+            return true;
+        }
+
+        DEFINE_CASE(b3style_test);
+    };
+
+    REGISTER_CASE(b3style_test);
 }

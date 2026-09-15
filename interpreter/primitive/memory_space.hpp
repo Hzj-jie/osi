@@ -22,7 +22,7 @@ namespace primitive
         std::vector<data_block> stack_;
         std::vector<call_state> call_stack_;
         std::unordered_map<uint64_t, std::vector<data_block>> heap_;
-        uint64_t next_heap_id_{0};
+        uint64_t next_heap_id_{1};
         interrupts intr_;
 
     public:
