@@ -108,6 +108,10 @@ namespace osi
                 bool build(const std::shared_ptr<automata::typed_node>& n, logic_writer& o) override
                 {
                     assert(n != nullptr);
+                    if (n->child_count() == 1)
+                    {
+                        return code_gen_of(n->child(0)).build(o);
+                    }
                     o.append(scope::type_name::of(n));
                     return true;
                 }

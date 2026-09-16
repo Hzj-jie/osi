@@ -63,10 +63,10 @@ namespace osi
                 {
                     assert(n != nullptr);
                     assert(n->child_count() >= 5);
-                    std::string full_type = scope::normalized_type::parameter_type_of(n->child(1)).full_type();
+                    std::string struct_name = scope::type_name::of(n->child(1));
                     auto members = parse_struct_body(n);
                     return scope::current()->structs().define(
-                        full_type,
+                        struct_name,
                         std::move(members),
                         [&o](const std::string& type, uint32_t size) {
                             assert(builders::of_type(type, size).to(o));

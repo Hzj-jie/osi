@@ -6,6 +6,7 @@
 #include "../../../../compiler/b3style/b3style.hpp"
 #include "../../../../compiler/logic/importer.hpp"
 #include "../../../../interpreter/primitive/bytecode.hpp"
+#include "../../../../app_info/error_handle.hpp"
 
 namespace fs = std::filesystem;
 using namespace osi::compiler::b3style_compiler;
@@ -37,6 +38,10 @@ static bool has_extension(const std::string& path, const std::string& ext)
 
 int main(int argc, char* argv[])
 {
+    if (std::getenv("OSI_DEBUG"))
+    {
+        error_handle::add_writer(new error_handle::console_error_writer());
+    }
     std::string input_file;
     std::string output_file;
     bool logic_mode = false;

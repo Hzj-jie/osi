@@ -139,9 +139,9 @@ namespace osi
                     .with_delegate("typedef",
                         [](const std::shared_ptr<automata::typed_node>& n, logic_writer&) {
                             assert(n != nullptr && n->child_count() == 3);
-                            std::string alias_type, original_type;
-                            if (!code_gen_of(n->child(2)).dump(alias_type) ||
-                                !code_gen_of(n->child(1)).dump(original_type))
+                            std::string alias_type = scope::type_name::of(n->child(2));
+                            std::string original_type;
+                            if (!code_gen_of(n->child(1)).dump(original_type))
                             {
                                 return false;
                             }
@@ -225,7 +225,7 @@ namespace osi
                     .with_delegate("root-type",
                         [](const std::shared_ptr<automata::typed_node>& n, logic_writer& o) {
                             assert(n != nullptr && n->child_count() == 1);
-                            scope::current()->root_type_injector()._new(o);
+                            auto g = scope::current()->root_type_injector()._new(o);
                             return code_gen_of(n->child(0)).build(o);
                         })
                     .with<delegate_with_semi_colon_node>()

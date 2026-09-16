@@ -6,6 +6,7 @@
 #include <algorithm>
 #include "../../../../compiler/b3style/b3style.hpp"
 #include "../../../../interpreter/primitive/simulator.hpp"
+#include "../../../../app_info/error_handle.hpp"
 
 namespace fs = std::filesystem;
 using namespace osi::compiler::b3style_compiler;
@@ -89,6 +90,10 @@ static bool run_path(const fs::path& p)
 
 int main(int argc, char* argv[])
 {
+    if (std::getenv("OSI_DEBUG"))
+    {
+        error_handle::add_writer(new error_handle::console_error_writer());
+    }
     if (argc <= 1 || (argc == 2 && std::string(argv[1]) == "-"))
     {
         std::string content;

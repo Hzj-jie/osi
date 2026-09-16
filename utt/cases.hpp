@@ -65,6 +65,7 @@
 #include "../utt_cases/compiler/b2style/b2style_test.hpp"
 #include "../utt_cases/compiler/b2style/b2style_self_test.hpp"
 #include "../utt_cases/compiler/b3style/b3style_test.hpp"
+#include "../utt_cases/compiler/b3style/b3style_self_test.hpp"
 #include "../utt_cases/automata/nlexer/nlexer_test.hpp"
 #include "../utt_cases/automata/syntax/syntaxer_test.hpp"
 #include "../utt_cases/automata/nlp/nlp_test.hpp"

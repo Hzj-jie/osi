@@ -226,7 +226,20 @@ namespace osi
 
                 static bool retrieve(const std::string& name, std::vector<std::string>* v, variable& o)
                 {
-                    return variable::of(variable_name(name), v, o);
+                    scope::exported_ref r;
+                    std::string target_name = name;
+                    if (!scope::current()->variables().export_var(variable_name(target_name), r))
+                    {
+                        if (name.rfind("::", 0) != 0 && scope::current()->variables().export_var(variable_name("::" + name), r))
+                        {
+                            target_name = "::" + name;
+                        }
+                        else if (name.rfind("::", 0) == 0 && scope::current()->variables().export_var(variable_name(name.substr(2)), r))
+                        {
+                            target_name = name.substr(2);
+                        }
+                    }
+                    return variable::of(variable_name(target_name), v, o);
                 }
             };
 

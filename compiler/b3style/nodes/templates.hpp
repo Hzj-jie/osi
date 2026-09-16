@@ -136,8 +136,10 @@ namespace osi
             {
                 assert(n != nullptr && n->child_count() == 4);
                 std::string raw_name = n->child(0)->input_without_ignored();
+                size_t dot_pos = raw_name.rfind('.');
+                std::string lookup_base = (dot_pos != std::string::npos) ? raw_name.substr(dot_pos + 1) : raw_name;
                 auto types = template_type_name::extract_param_types(n->child(2));
-                std::string lookup_name = template_t::name_of(raw_name, static_cast<uint32_t>(types.size()));
+                std::string lookup_name = template_t::name_of(lookup_base, static_cast<uint32_t>(types.size()));
                 int res = scope::current()->template_table().resolve(lookup_name, types, extended_type_name);
                 return res > 0;
             }
@@ -175,8 +177,13 @@ namespace osi
                     {
                         return false;
                     }
-                    std::string call_target = has_dot ? (obj + "." + extended_type) : extended_type;
-                    return function_call_build(has_dot ? call_target : namespace_t::fully_qualified_name(call_target), n, o);
+                    std::string clean_extended_type = extended_type;
+                    while (clean_extended_type.rfind(current_namespace_t::namespace_separator, 0) == 0)
+                    {
+                        clean_extended_type = clean_extended_type.substr(current_namespace_t::namespace_separator.length());
+                    }
+                    std::string call_target = has_dot ? (obj + "." + clean_extended_type) : extended_type;
+                    return function_call_build(call_target, n, o);
                 }
 
                 static bool without_return(const std::shared_ptr<automata::typed_node>& n, logic_writer& o)

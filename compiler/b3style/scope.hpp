@@ -204,19 +204,48 @@ namespace osi
             class root_type_injector_t
             {
             private:
-                std::shared_ptr<logic_writer> current_;
+                std::vector<std::shared_ptr<logic_writer>> stack_;
 
             public:
-                void _new(logic_writer& o)
+                struct guard
                 {
-                    current_ = std::make_shared<logic_writer>();
-                    o.append(current_);
+                    root_type_injector_t* self{nullptr};
+                    guard() = default;
+                    explicit guard(root_type_injector_t* s) : self(s) {}
+                    ~guard()
+                    {
+                        if (self && !self->stack_.empty())
+                        {
+                            self->stack_.pop_back();
+                        }
+                    }
+                    guard(const guard&) = delete;
+                    guard& operator=(const guard&) = delete;
+                    guard(guard&& o) noexcept : self(o.self) { o.self = nullptr; }
+                    guard& operator=(guard&& o) noexcept
+                    {
+                        if (this != &o)
+                        {
+                            if (self && !self->stack_.empty()) self->stack_.pop_back();
+                            self = o.self;
+                            o.self = nullptr;
+                        }
+                        return *this;
+                    }
+                };
+
+                [[nodiscard]] std::shared_ptr<guard> _new(logic_writer& o)
+                {
+                    auto w = std::make_shared<logic_writer>();
+                    stack_.push_back(w);
+                    o.append(w);
+                    return std::make_shared<guard>(this);
                 }
 
                 std::shared_ptr<logic_writer> current()
                 {
-                    assert(current_ != nullptr);
-                    return current_;
+                    assert(!stack_.empty());
+                    return stack_.back();
                 }
             };
 
@@ -427,7 +456,7 @@ namespace osi
                                 const std::function<void(const std::string&, uint32_t)>& define_type)
                     {
                         assert(!name.empty());
-                        std::string full_type = normalized_type::parameter_type_of(name).full_type();
+                        std::string full_type = current_namespace_t::of(name);
                         assert(!parameter_type::is_ref_type(full_type));
 
                         parameter type_id = create_type_id(name);
@@ -932,8 +961,8 @@ namespace osi
                 class_t& classes() { return *get_root()->c_; }
                 template_t& template_table() { return *get_root()->tt_; }
 
-                type_alias_t& type_alias() { return ta_; }
-                struct_t& structs() { return s_; }
+                type_alias_t& type_alias() { return get_root()->ta_; }
+                struct_t& structs() { return get_root()->s_; }
                 variable_t& variables() { return v_; }
                 value_target_t& value_target() { return vt_; }
                 params_t& params() { return ps_; }
@@ -945,7 +974,7 @@ namespace osi
                     return *cf;
                 }
 
-                delegate_t& delegates() { return de_; }
+                delegate_t& delegates() { return get_root()->de_; }
 
                 std::unique_ptr<scope> start_scope()
                 {
@@ -996,7 +1025,7 @@ namespace osi
 
                 void type_alias_remove(const std::string& alias)
                 {
-                    ta_.remove(alias);
+                    get_root()->ta_.remove(alias);
                 }
 
                 bool variables_redefine(const std::string& type, const std::string& name)
@@ -1088,13 +1117,7 @@ namespace osi
 
                 bool structs_resolve(const std::string& type, const std::string& name, struct_def& o) const
                 {
-                    const scope* s = this;
-                    while (s != nullptr)
-                    {
-                        if (s->s_.resolve(type, name, o)) return true;
-                        s = s->get_parent();
-                    }
-                    return false;
+                    return get_root()->s_.resolve(type, name, o);
                 }
 
                 bool structs_is_type_defined(const std::string& type) const
@@ -1118,13 +1141,7 @@ namespace osi
 
                 bool delegates_retrieve(const std::string& name, function_signature<parameter_type>& o) const
                 {
-                    const scope* s = this;
-                    while (s != nullptr)
-                    {
-                        if (s->de_.retrieve(name, o)) return true;
-                        s = s->get_parent();
-                    }
-                    return false;
+                    return get_root()->de_.retrieve(name, o);
                 }
             };
 
@@ -1176,6 +1193,15 @@ namespace osi
 
             inline std::string scope::normalized_type::of(const std::string& type)
             {
+                if (type == logic::scope::type_t::variable_type ||
+                    type == logic::scope::type_t::ptr_type ||
+                    type == logic::scope::type_t::zero_type ||
+                    type == current_namespace_t::namespace_separator + logic::scope::type_t::variable_type ||
+                    type == current_namespace_t::namespace_separator + logic::scope::type_t::ptr_type ||
+                    type == current_namespace_t::namespace_separator + logic::scope::type_t::zero_type)
+                {
+                    return type;
+                }
                 std::string scoped = current_namespace_t::of(type);
                 std::string aliased = scope::current()->type_alias(scoped);
                 if (aliased == scoped && type.rfind(current_namespace_t::namespace_separator, 0) != 0)
