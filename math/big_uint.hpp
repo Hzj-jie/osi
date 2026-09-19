@@ -639,66 +639,103 @@ public:
             remainder = big_uint(rem);
             return quotient;
         }
-        remainder = *this;
-        if (remainder < that) {
+        if (*this < that) {
+            remainder = *this;
             return big_uint(0ULL);
         }
-
-        big_uint quotient;
-        size_t i = remainder.limbs_.size() - that.limbs_.size();
-
-        while (true) {
-            while (true) {
-                if (remainder.limbs_.size() < that.limbs_.size() + i) break;
-
-                uint128_t n = 0, d = 0;
-                if (remainder.limbs_.size() == that.limbs_.size() + i) {
-                    if (remainder.limbs_.size() > 1) {
-                        n = (static_cast<uint128_t>(remainder.limbs_.back()) << 64) | remainder.limbs_[remainder.limbs_.size() - 2];
-                        d = (static_cast<uint128_t>(that.limbs_.back()) << 64) | that.limbs_[that.limbs_.size() - 2];
-                    } else {
-                        n = remainder.limbs_.back();
-                        d = that.limbs_.back();
-                    }
-                } else {
-                    n = (static_cast<uint128_t>(remainder.limbs_.back()) << 64) | remainder.limbs_[remainder.limbs_.size() - 2];
-                    d = that.limbs_.back();
-                }
-
-                if (n < d) break;
-                if (n == d) {
-                    int cmp = remainder.compare_offset(that, i);
-                    if (cmp >= 0) {
-                        remainder.sub(that, i);
-                        quotient.add_offset(1ULL, i);
-                        if (cmp == 0) {
-                            quotient.remove_trailing_zeros();
-                            return quotient;
-                        }
-                    }
-                    break;
-                }
-
-                uint128_t q = n / (d + 1);
-                if (q == 0) q = 1;
-                if (q > 0xFFFFFFFFFFFFFFFFULL) q = 0xFFFFFFFFFFFFFFFFULL;
-                uint64_t q64 = static_cast<uint64_t>(q);
-
-                int cmp = remainder.compare_offset(that * q64, i);
-                if (cmp < 0) {
-                    q64 = 1;
-                    cmp = remainder.compare_offset(that, i);
-                    if (cmp < 0) break;
-                }
-
-                quotient.add_offset(q64, i);
-                remainder.sub(that * q64, i);
-            }
-            if (i == 0) break;
-            --i;
+        if (*this == that) {
+            remainder.set_zero();
+            return big_uint(1ULL);
         }
-        quotient.remove_trailing_zeros();
-        return quotient;
+
+        // Knuth Algorithm D in-place
+        std::vector<uint64_t> u = limbs_;
+        std::vector<uint64_t> v = that.limbs_;
+
+        size_t n = v.size();
+        size_t m = u.size() - n;
+
+        int shift = __builtin_clzll(v.back());
+        if (shift > 0) {
+            uint64_t carry = 0;
+            for (size_t i = 0; i < n; ++i) {
+                uint64_t next_carry = (shift == 64) ? 0 : (v[i] >> (64 - shift));
+                v[i] = (v[i] << shift) | carry;
+                carry = next_carry;
+            }
+            carry = 0;
+            for (size_t i = 0; i < u.size(); ++i) {
+                uint64_t next_carry = (shift == 64) ? 0 : (u[i] >> (64 - shift));
+                u[i] = (u[i] << shift) | carry;
+                carry = next_carry;
+            }
+            if (carry > 0) u.push_back(carry);
+        }
+        while (u.size() < n + m + 1) u.push_back(0);
+
+        std::vector<uint64_t> q(m + 1, 0);
+        uint64_t v_n1 = v[n - 1];
+        uint64_t v_n2 = (n >= 2) ? v[n - 2] : 0;
+
+        for (int j = static_cast<int>(m); j >= 0; --j) {
+            uint128_t u_top = (static_cast<uint128_t>(u[j + n]) << 64) | u[j + n - 1];
+            uint128_t q_hat = u_top / v_n1;
+            uint128_t r_hat = u_top % v_n1;
+
+            while (q_hat > 0xFFFFFFFFFFFFFFFFULL ||
+                   (n >= 2 && q_hat * v_n2 > ((r_hat << 64) | u[j + n - 2]))) {
+                --q_hat;
+                r_hat += v_n1;
+                if (r_hat > 0xFFFFFFFFFFFFFFFFULL) break;
+            }
+
+            uint64_t qh = static_cast<uint64_t>(q_hat);
+
+            uint128_t borrow = 0;
+            for (size_t i = 0; i < n; ++i) {
+                uint128_t prod = static_cast<uint128_t>(qh) * v[i] + borrow;
+                uint64_t prod_lo = static_cast<uint64_t>(prod);
+                borrow = prod >> 64;
+                if (u[j + i] < prod_lo) {
+                    ++borrow;
+                }
+                u[j + i] -= prod_lo;
+            }
+            if (u[j + n] < borrow) {
+                u[j + n] -= static_cast<uint64_t>(borrow);
+                --qh;
+                uint128_t carry = 0;
+                for (size_t i = 0; i < n; ++i) {
+                    uint128_t sum = static_cast<uint128_t>(u[j + i]) + v[i] + carry;
+                    u[j + i] = static_cast<uint64_t>(sum);
+                    carry = sum >> 64;
+                }
+                u[j + n] += static_cast<uint64_t>(carry);
+            } else {
+                u[j + n] -= static_cast<uint64_t>(borrow);
+            }
+
+            q[j] = qh;
+        }
+
+        if (shift > 0) {
+            uint64_t carry = 0;
+            for (int i = static_cast<int>(n) - 1; i >= 0; --i) {
+                uint64_t next_carry = (shift == 64) ? 0 : (u[i] << (64 - shift));
+                u[i] = (u[i] >> shift) | carry;
+                carry = next_carry;
+            }
+        }
+        u.resize(n);
+
+        big_uint res_q;
+        res_q.limbs_ = std::move(q);
+        res_q.remove_trailing_zeros();
+
+        remainder.limbs_ = std::move(u);
+        remainder.remove_trailing_zeros();
+
+        return res_q;
     }
 
     big_uint operator/(const big_uint& that) const {
@@ -765,11 +802,8 @@ public:
         return res;
     }
 
-    // TODO: For very large numbers (e.g. > 5000 digits), consider implementing recursive
-    // divide-and-conquer base conversion (dividing by 10^(D/2)) to achieve O(N log^2 N) formatting.
-    std::string str() const {
-        if (is_zero()) return "0";
-        big_uint copy = *this;
+    static std::string base_str(big_uint copy) {
+        if (copy.is_zero()) return "0";
         std::string res;
         constexpr uint64_t base18 = 1000000000000000000ULL;
         while (!copy.is_zero()) {
@@ -790,10 +824,127 @@ public:
         return res;
     }
 
+    std::string str() const;
+
     friend std::ostream& operator<<(std::ostream& os, const big_uint& v) {
         return os << v.str();
     }
 };
+
+struct BarrettPower {
+    big_uint B;        // 10^K
+    big_uint M;        // floor(2^(2k) / B)
+    size_t shift;      // 2 * k
+    size_t num_digits; // K
+};
+
+inline std::vector<BarrettPower>& get_barrett_powers_cache() {
+    static std::vector<BarrettPower> cache;
+    return cache;
+}
+
+inline void ensure_barrett_powers_up_to(const big_uint& target) {
+    auto& cache = get_barrett_powers_cache();
+    constexpr uint64_t base18 = 1000000000000000000ULL;
+    if (cache.empty()) {
+        BarrettPower bp;
+        bp.B = big_uint(base18);
+        bp.num_digits = 18;
+        bp.shift = 2 * bp.B.bit_count();
+        big_uint two_to_shift(1ULL);
+        two_to_shift.shift_left_bits(bp.shift);
+        big_uint rem;
+        bp.M = two_to_shift.divide(bp.B, rem);
+        cache.push_back(std::move(bp));
+    }
+
+    while (cache.back().B <= target) {
+        big_uint next_b = cache.back().B;
+        next_b.power_2();
+
+        BarrettPower bp;
+        bp.B = std::move(next_b);
+        bp.num_digits = cache.back().num_digits * 2;
+        bp.shift = 2 * bp.B.bit_count();
+        big_uint two_to_shift(1ULL);
+        two_to_shift.shift_left_bits(bp.shift);
+        big_uint rem;
+        bp.M = two_to_shift.divide(bp.B, rem);
+        cache.push_back(std::move(bp));
+    }
+}
+
+inline void barrett_div(const big_uint& X, const BarrettPower& bp, big_uint& Q, big_uint& R) {
+    if (X < bp.B) {
+        Q.set_zero();
+        R = X;
+        return;
+    }
+    big_uint prod = X * bp.M;
+    prod.shift_right(bp.shift);
+    Q = std::move(prod);
+
+    big_uint QB = Q * bp.B;
+    if (X >= QB) {
+        R = X - QB;
+    } else {
+        Q.sub(big_uint(1ULL));
+        R = X - (Q * bp.B);
+    }
+    while (R >= bp.B) {
+        R.sub(bp.B);
+        Q.add(big_uint(1ULL));
+    }
+}
+
+inline void format_cached_barrett_rec(const big_uint& val, size_t power_idx,
+                                      std::string& out, bool pad, size_t pad_len) {
+    const auto& cache = get_barrett_powers_cache();
+    if (power_idx == 0 || val < cache[0].B) {
+        std::string s = big_uint::base_str(val);
+        if (pad && s.size() < pad_len) {
+            out.append(pad_len - s.size(), '0');
+        }
+        out.append(s);
+        return;
+    }
+
+    while (power_idx > 0 && cache[power_idx].B > val) {
+        --power_idx;
+    }
+
+    if (cache[power_idx].B > val) {
+        std::string s = big_uint::base_str(val);
+        if (pad && s.size() < pad_len) {
+            out.append(pad_len - s.size(), '0');
+        }
+        out.append(s);
+        return;
+    }
+
+    big_uint q, rem;
+    barrett_div(val, cache[power_idx], q, rem);
+    size_t block_digits = cache[power_idx].num_digits;
+
+    format_cached_barrett_rec(q, power_idx > 0 ? power_idx - 1 : 0, out,
+                              pad, (pad && pad_len > block_digits) ? (pad_len - block_digits) : 0);
+    format_cached_barrett_rec(rem, power_idx > 0 ? power_idx - 1 : 0, out,
+                              true, block_digits);
+}
+
+inline std::string big_uint::str() const {
+    if (is_zero()) return "0";
+    if (bit_count() < 8000) {
+        return base_str(*this);
+    }
+
+    ensure_barrett_powers_up_to(*this);
+    const auto& cache = get_barrett_powers_cache();
+
+    std::string out;
+    format_cached_barrett_rec(*this, cache.size() - 1, out, false, 0);
+    return out;
+}
 
 } // namespace math
 } // namespace osi
