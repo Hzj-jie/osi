@@ -478,6 +478,109 @@ void test_template_template()
     }
 }
 
+void test_local_type_scoping()
+{
+    // 1. Sibling local struct name reuse without collision
+    {
+        const std::string code = R"(
+#include <b2style.h>
+#include <testing.h>
+
+void f1() {
+  struct Point {
+    int x;
+    int y;
+  };
+  Point p;
+  p.x = 10;
+  p.y = 20;
+  b2style::testing::assert_equal<int>(p.x + p.y, 30);
+}
+
+void f2() {
+  struct Point {
+    string name;
+  };
+  Point p;
+  p.name = "osi";
+  b2style::testing::assert_equal<string>(p.name, "osi");
+}
+
+void main() {
+  f1();
+  f2();
+  b2style::testing::finished();
+}
+)";
+        primitive::console_io::test_wrapper io;
+        primitive::simulator sim;
+        bool ok = b3style::with_functions(primitive::interrupts(io.io())).compile(code, sim);
+        utt_assert.is_true(ok);
+        assert_execute_without_errors(sim);
+        std::string out = trim(io.output());
+        utt_assert.is_true(out.find("Success:") != std::string::npos);
+        utt_assert.is_true(out.find("Total assertions: 2") != std::string::npos);
+        std::cout << "[PASS] local_struct_sibling_reuse\n";
+    }
+
+    // 2. Block-level typedef shadowing and scope unwinding
+    {
+        const std::string code = R"(
+#include <b2style.h>
+#include <testing.h>
+
+typedef int Num;
+
+void main() {
+  Num a = 10;
+  {
+    typedef string Num;
+    Num b = "hello";
+    b2style::testing::assert_equal<string>(b, "hello");
+  }
+  Num c = 20;
+  b2style::testing::assert_equal<int>(a + c, 30);
+  b2style::testing::finished();
+}
+)";
+        primitive::console_io::test_wrapper io;
+        primitive::simulator sim;
+        bool ok = b3style::with_functions(primitive::interrupts(io.io())).compile(code, sim);
+        utt_assert.is_true(ok);
+        assert_execute_without_errors(sim);
+        std::string out = trim(io.output());
+        utt_assert.is_true(out.find("Success:") != std::string::npos);
+        utt_assert.is_true(out.find("Total assertions: 2") != std::string::npos);
+        std::cout << "[PASS] block_typedef_shadowing\n";
+    }
+
+    // 3. Local struct encapsulation: referencing LocalSecret outside its declaring function fails to compile
+    {
+        const std::string invalid_code = R"(
+#include <b2style.h>
+
+void f1() {
+  struct LocalSecret {
+    int secret;
+  };
+}
+
+void f2() {
+  LocalSecret s;
+}
+
+void main() {
+  f1();
+  f2();
+}
+)";
+        primitive::simulator sim;
+        bool ok = b3style::with_default_functions().compile(invalid_code, sim);
+        utt_assert.is_false(ok);
+        std::cout << "[PASS] local_struct_encapsulation_expected_failure\n";
+    }
+}
+
 
     public:
         bool run() override
@@ -502,6 +605,7 @@ void test_template_template()
             test_vector_destructor();
             test_unused_functions_should_be_removed();
             test_template_template();
+            test_local_type_scoping();
             return true;
         }
 

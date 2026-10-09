@@ -961,8 +961,8 @@ namespace osi
                 class_t& classes() { return *get_root()->c_; }
                 template_t& template_table() { return *get_root()->tt_; }
 
-                type_alias_t& type_alias() { return get_root()->ta_; }
-                struct_t& structs() { return get_root()->s_; }
+                type_alias_t& type_alias() { return ta_; }
+                struct_t& structs() { return s_; }
                 variable_t& variables() { return v_; }
                 value_target_t& value_target() { return vt_; }
                 params_t& params() { return ps_; }
@@ -974,7 +974,7 @@ namespace osi
                     return *cf;
                 }
 
-                delegate_t& delegates() { return get_root()->de_; }
+                delegate_t& delegates() { return de_; }
 
                 std::unique_ptr<scope> start_scope()
                 {
@@ -1025,7 +1025,7 @@ namespace osi
 
                 void type_alias_remove(const std::string& alias)
                 {
-                    get_root()->ta_.remove(alias);
+                    ta_.remove(alias);
                 }
 
                 bool variables_redefine(const std::string& type, const std::string& name)
@@ -1117,7 +1117,13 @@ namespace osi
 
                 bool structs_resolve(const std::string& type, const std::string& name, struct_def& o) const
                 {
-                    return get_root()->s_.resolve(type, name, o);
+                    const scope* s = this;
+                    while (s != nullptr)
+                    {
+                        if (s->s_.resolve(type, name, o)) return true;
+                        s = s->get_parent();
+                    }
+                    return false;
                 }
 
                 bool structs_is_type_defined(const std::string& type) const
@@ -1141,7 +1147,13 @@ namespace osi
 
                 bool delegates_retrieve(const std::string& name, function_signature<parameter_type>& o) const
                 {
-                    return get_root()->de_.retrieve(name, o);
+                    const scope* s = this;
+                    while (s != nullptr)
+                    {
+                        if (s->de_.retrieve(name, o)) return true;
+                        s = s->get_parent();
+                    }
+                    return false;
                 }
             };
 
