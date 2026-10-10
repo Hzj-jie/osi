@@ -22,6 +22,7 @@ namespace osi
         class current_namespace_t;
         class class_t;
         class template_t;
+        template <typename Writer>
         class root_type_injector_t;
 
         class accessor_t
@@ -42,11 +43,17 @@ namespace osi
             virtual value_target_t* value_target() const { assert(false); return nullptr; }
             virtual call_hierarchy_t* call_hierarchy() const { assert(false); return nullptr; }
             virtual current_namespace_t* current_namespace() const { assert(false); return nullptr; }
-            virtual root_type_injector_t* root_type_injector() const { assert(false); return nullptr; }
             virtual class_t* classes() const { assert(false); return nullptr; }
             virtual template_t* template_table() const { assert(false); return nullptr; }
             virtual function_t* functions() const { assert(false); return nullptr; }
             virtual params_t* params() const { assert(false); return nullptr; }
+        };
+
+        template <typename Writer>
+        class writer_accessor_t : public accessor_t
+        {
+        public:
+            virtual root_type_injector_t<Writer>* root_type_injector() const { assert(false); return nullptr; }
         };
     }
 }

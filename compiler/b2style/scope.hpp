@@ -122,25 +122,6 @@ namespace osi
                 static std::function<bool(const std::shared_ptr<automata::typed_node>&)> from_value_clause();
             };
 
-            class root_type_injector_t
-            {
-            private:
-                std::shared_ptr<rewriter::typed_node_writer> current_;
-
-            public:
-                void _new(rewriter::typed_node_writer& o)
-                {
-                    current_ = std::make_shared<rewriter::typed_node_writer>();
-                    o.append(current_);
-                }
-
-                std::shared_ptr<rewriter::typed_node_writer> current()
-                {
-                    assert(current_ != nullptr);
-                    return current_;
-                }
-            };
-
             class current_function_proxy
             {
             private:
@@ -159,11 +140,20 @@ namespace osi
                 static std::function<bool(const std::shared_ptr<automata::typed_node>&)> define();
             };
 
-            class scope : public compiler_scope<scope>
+            class scope : public compiler_scope<scope, rewriter::typed_node_writer>
             {
             public:
                 using call_hierarchy_t = b2style_compiler::call_hierarchy_t;
-                using root_type_injector_t = b2style_compiler::root_type_injector_t;
+
+                static bool code_build(const std::string& source, rewriter::typed_node_writer& o)
+                {
+                    return build_code(source, o);
+                }
+
+                static osi::compiler::code_gens<rewriter::typed_node_writer>& code_gens()
+                {
+                    return get_b2style_code_gens();
+                }
 
             private:
                 includes_t incs_;
@@ -188,6 +178,7 @@ namespace osi
                     std::string current_function_name() const override { return s_->current_function_name(); }
                     osi::compiler::call_hierarchy_t* call_hierarchy() const override { return &s_->get_root()->fc_; }
                     current_namespace_t* current_namespace() const override { return &s_->get_root()->cn_; }
+                    root_type_injector_t* root_type_injector() const override { return &s_->get_root()->i_; }
                     variable_t* variables() const override { return &s_->v_; }
                     class_t* classes() const override { return &s_->get_root()->c_; }
                     template_t* template_table() const override { return &s_->get_root()->t_; }
@@ -210,45 +201,18 @@ namespace osi
                 const features_t* get_features() const override { return &features_; }
 
                 explicit scope(scope* parent = nullptr)
-                    : compiler_scope<scope>(parent)
+                    : compiler_scope<scope, rewriter::typed_node_writer>(parent)
                 {
                     if (is_root())
                     {
                         defines().define("B2STYLE");
-                        t_.set_code_builder([](const std::string& s) {
-                            return build_code(s, *scope::current()->root_type_injector().current());
-                        });
+                        this->init_root(t_);
                     }
                 }
 
                 ~scope() override
                 {
                     this->run_end_scope();
-                }
-
-                current_namespace_t& current_namespace()
-                {
-                    return get_root()->cn_;
-                }
-
-                b2style_compiler::root_type_injector_t& root_type_injector()
-                {
-                    return get_root()->i_;
-                }
-
-                template_t& template_table()
-                {
-                    return get_root()->t_;
-                }
-
-                class_t& classes()
-                {
-                    return get_root()->c_;
-                }
-
-                variable_t& variables()
-                {
-                    return v_;
                 }
 
                 call_hierarchy_t& call_hierarchy()

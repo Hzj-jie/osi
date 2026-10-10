@@ -60,8 +60,19 @@ namespace osi
                 return !_disable_namespace;
             }
 
-            class scope : public compiler_scope<scope>
+            class scope : public compiler_scope<scope, logic_writer>
             {
+            public:
+                static bool code_build(const std::string& source, logic_writer& o)
+                {
+                    return build_code(source, o);
+                }
+
+                static osi::compiler::code_gens<logic_writer>& code_gens()
+                {
+                    return get_b3style_code_gens();
+                }
+
             private:
                 includes_t incs_;
                 call_hierarchy_t fc_;
@@ -123,41 +134,13 @@ namespace osi
                 const accessor_t* get_accessor() const override { return &accessor_; }
                 const features_t* get_features() const override { return &features_; }
 
-                std::string resolve_type_node_impl(const std::shared_ptr<automata::typed_node>& type) const
-                {
-                    assert(type != nullptr);
-                    if (type->type_name == "template-type-name" ||
-                        (!type->leaf() && type->child_count() > 0 && type->child(0)->type_name == "template-type-name"))
-                    {
-                        auto target_node = (type->type_name == "template-type-name") ? type : type->child(0);
-                        std::string s;
-                        if (code_gen_of(target_node).dump(s))
-                        {
-                            while (!s.empty() && (s.back() == ' ' || s.back() == '\t' || s.back() == '\n' || s.back() == '\r')) s.pop_back();
-                            while (!s.empty() && (s.front() == ' ' || s.front() == '\t' || s.front() == '\n' || s.front() == '\r')) s.erase(s.begin());
-                            if (!s.empty())
-                            {
-                                return s;
-                            }
-                        }
-                    }
-                    return "";
-                }
-
-                std::string resolve_type_node(const std::shared_ptr<automata::typed_node>& type) const override
-                {
-                    return resolve_type_node_impl(type);
-                }
-
                 explicit scope(scope* parent = nullptr)
-                    : compiler_scope<scope>(parent)
+                    : compiler_scope<scope, logic_writer>(parent)
                 {
                     if (is_root())
                     {
                         defines().define("B3STYLE");
-                        tt_.set_code_builder([](const std::string& s) {
-                            return build_code(s, *scope::current()->root_type_injector().current());
-                        });
+                        this->init_root(tt_);
                     }
                 }
 

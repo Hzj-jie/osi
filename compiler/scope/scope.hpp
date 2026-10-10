@@ -6,6 +6,7 @@
 #include <cassert>
 #include "../../app_info/assert.hpp"
 #include "../../app_info/error_handle.hpp"
+#include "../code_gen/code_gen.hpp"
 #include "compiler_scope_interface.hpp"
 #include "features.hpp"
 #include "accessor.hpp"
@@ -164,10 +165,11 @@ namespace osi
             }
         };
 
-        template <typename Derived>
+        template <typename Derived, typename Writer>
         class compiler_scope : public scope_base<Derived>, public compiler_scope_interface
         {
         public:
+            using writer_t = Writer;
             using type_name = osi::compiler::type_name;
             using variable_name = osi::compiler::variable_name;
             using function_name = osi::compiler::function_name;
@@ -192,9 +194,25 @@ namespace osi
             using class_t = osi::compiler::class_t;
             using template_template = osi::compiler::template_template;
             using template_t = osi::compiler::template_t;
-            using root_type_injector_t = osi::compiler::root_type_injector_t;
-            using accessor_t = osi::compiler::accessor_t;
+            using root_type_injector_t = osi::compiler::root_type_injector_t<Writer>;
+            using accessor_t = osi::compiler::writer_accessor_t<Writer>;
             using features_t = osi::compiler::features_t;
+
+            static bool code_build(const std::string& source, Writer& o)
+            {
+                return Derived::code_build(source, o);
+            }
+
+            static osi::compiler::code_gens<Writer>& code_gens()
+            {
+                return Derived::code_gens();
+            }
+
+            static typename osi::compiler::code_gens<Writer>::code_gen_proxy code_gen_of(
+                const std::shared_ptr<automata::typed_node>& n)
+            {
+                return code_gens().of(n);
+            }
 
         public:
             virtual accessor_t* get_accessor() = 0;
@@ -203,6 +221,14 @@ namespace osi
             {
                 static features_t default_features;
                 return &default_features;
+            }
+
+        protected:
+            void init_root(template_t& tmpl)
+            {
+                tmpl.set_code_builder([](const std::string& s) {
+                    return code_build(s, *Derived::current()->root_type_injector().current());
+                });
             }
 
         public:
@@ -263,6 +289,27 @@ namespace osi
             value_target_t& value_target() { return *myself().value_target(); }
             params_t& params() { return *myself().params(); }
             delegate_t& delegates() { return *myself().delegates(); }
+
+            std::string resolve_type_node(const std::shared_ptr<automata::typed_node>& type) const override
+            {
+                assert(type != nullptr);
+                if (type->type_name == "template-type-name" ||
+                    (!type->leaf() && type->child_count() > 0 && type->child(0)->type_name == "template-type-name"))
+                {
+                    auto target_node = (type->type_name == "template-type-name") ? type : type->child(0);
+                    std::string s;
+                    if (code_gen_of(target_node).dump(s))
+                    {
+                        while (!s.empty() && (s.back() == ' ' || s.back() == '\t' || s.back() == '\n' || s.back() == '\r')) s.pop_back();
+                        while (!s.empty() && (s.front() == ' ' || s.front() == '\t' || s.front() == '\n' || s.front() == '\r')) s.erase(s.begin());
+                        if (!s.empty())
+                        {
+                            return s;
+                        }
+                    }
+                }
+                return "";
+            }
 
             std::unique_ptr<Derived> start_scope()
             {

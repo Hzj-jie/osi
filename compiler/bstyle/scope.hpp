@@ -7,6 +7,7 @@
 #include <queue>
 #include <functional>
 #include "../scope/scope.hpp"
+#include "bstyle_forward.hpp"
 
 namespace osi
 {
@@ -14,8 +15,19 @@ namespace osi
     {
         namespace bstyle_compiler
         {
-            class scope : public compiler_scope<scope>
+            class scope : public compiler_scope<scope, logic_writer>
             {
+            public:
+                static bool code_build(const std::string& source, logic_writer& o)
+                {
+                    return build_code(source, o);
+                }
+
+                static osi::compiler::code_gens<logic_writer>& code_gens()
+                {
+                    return get_bstyle_code_gens();
+                }
+
             private:
                 includes_t incs_;
                 call_hierarchy_t fc_;
@@ -69,7 +81,7 @@ namespace osi
                 const features_t* get_features() const override { return &features_; }
 
                 explicit scope(scope* parent = nullptr)
-                    : compiler_scope<scope>(parent)
+                    : compiler_scope<scope, logic_writer>(parent)
                 {
                     if (is_root())
                     {

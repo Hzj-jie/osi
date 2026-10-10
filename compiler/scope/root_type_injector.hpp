@@ -8,10 +8,12 @@ namespace osi
 {
     namespace compiler
     {
+        template <typename Writer = logic_writer>
         class root_type_injector_t
         {
         private:
-            std::vector<std::shared_ptr<logic_writer>> stack_;
+            std::vector<std::shared_ptr<Writer>> stack_;
+            std::shared_ptr<Writer> last_;
 
         public:
             struct guard
@@ -41,18 +43,23 @@ namespace osi
                 }
             };
 
-            [[nodiscard]] std::shared_ptr<guard> _new(logic_writer& o)
+            std::shared_ptr<guard> _new(Writer& o)
             {
-                auto w = std::make_shared<logic_writer>();
+                auto w = std::make_shared<Writer>();
+                last_ = w;
                 stack_.push_back(w);
                 o.append(w);
                 return std::make_shared<guard>(this);
             }
 
-            std::shared_ptr<logic_writer> current()
+            std::shared_ptr<Writer> current()
             {
-                assert(!stack_.empty());
-                return stack_.back();
+                if (!stack_.empty())
+                {
+                    return stack_.back();
+                }
+                assert(last_ != nullptr);
+                return last_;
             }
         };
     }
