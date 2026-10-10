@@ -13,6 +13,7 @@
 #include "../code_gen/statements.hpp"
 #include "../code_gen/includes.hpp"
 #include "../rewriter/typed_node_writer.hpp"
+#include "../rewriter/leaf.hpp"
 #include "../../interpreter/primitive/simulator.hpp"
 #include "../../interpreter/primitive/interrupts.hpp"
 #include "../bstyle/bstyle.hpp"
@@ -173,47 +174,39 @@ namespace osi
                          "undefine",
                          "dealloc",
                          "static-cast"
+                     })
+                     .with_of_leaf_nodes<rewriter::leaf>({
+                         "kw-if",
+                         "kw-else",
+                         "kw-for",
+                         "kw-while",
+                         "kw-do",
+                         "kw-loop",
+                         "kw-return",
+                         "kw-break",
+                         "kw-logic",
+                         "kw-reinterpret-cast",
+                         "kw-undefine",
+                         "kw-dealloc",
+                         "kw-static-cast",
+                         "start-square-bracket",
+                         "end-square-bracket",
+                         "bool",
+                         "integer",
+                         "biguint",
+                         "ufloat",
+                         "string",
+                         "semi-colon",
+                         "comma",
+                         "start-paragraph",
+                         "end-paragraph",
+                         "start-bracket",
+                         "end-bracket",
+                         "assignment",
+                         "kw-typedef",
+                         "kw-struct",
+                         "kw-delegate"
                      });
-
-                    std::vector<std::string> leaf_names = {
-                        "kw-if",
-                        "kw-else",
-                        "kw-for",
-                        "kw-while",
-                        "kw-do",
-                        "kw-loop",
-                        "kw-return",
-                        "kw-break",
-                        "kw-logic",
-                        "kw-reinterpret-cast",
-                        "kw-undefine",
-                        "kw-dealloc",
-                        "kw-static-cast",
-                        "start-square-bracket",
-                        "end-square-bracket",
-                        "bool",
-                        "integer",
-                        "biguint",
-                        "ufloat",
-                        "string",
-                        "semi-colon",
-                        "comma",
-                        "start-paragraph",
-                        "end-paragraph",
-                        "start-bracket",
-                        "end-bracket",
-                        "assignment",
-                        "kw-typedef",
-                        "kw-struct",
-                        "kw-delegate"
-                    };
-                    for (const auto& name : leaf_names)
-                    {
-                        r.with_delegate(name, [](const std::shared_ptr<automata::typed_node>& n, rewriter::typed_node_writer& o) {
-                            assert(n != nullptr && n->leaf());
-                            return o.append(n);
-                        });
-                    }
 
                     r.apply(c);
                     return c;

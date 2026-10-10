@@ -94,6 +94,16 @@ namespace osi
                 return *this;
             }
 
+            template <typename LeafT>
+            code_gens_registrar& with_of_leaf_nodes(const std::vector<std::string>& names)
+            {
+                for (const auto& name : names)
+                {
+                    with(LeafT::of(name));
+                }
+                return *this;
+            }
+
             const std::vector<action_t>& actions() const
             {
                 return actions_;
