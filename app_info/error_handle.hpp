@@ -25,6 +25,7 @@ static std::ostream& operator<<(std::ostream& os, const std::ostringstream& v)
 namespace __error_handle_private
 {
     static std::vector<error_handle::ierror_writer*> writers { };
+    inline thread_local std::ostringstream* tls_capture_stream = nullptr;
 
     template <typename... Args>
     static void k_raise_error(error_type err_type,
@@ -41,6 +42,10 @@ namespace __error_handle_private
            << character.blank
            << strcat(forward<Args>(args)...)
            << endl;
+        if (tls_capture_stream != nullptr)
+        {
+            (*tls_capture_stream) << os.str();
+        }
         for(size_t i = 0; i < writers.size(); i++)
         {
             k_assert(writers[i] != nullptr);
@@ -51,6 +56,25 @@ namespace __error_handle_private
 
 namespace error_handle
 {
+    template <typename Fn>
+    inline std::string capture_log(Fn&& fn)
+    {
+        std::ostringstream oss;
+        std::ostringstream* prev = __error_handle_private::tls_capture_stream;
+        __error_handle_private::tls_capture_stream = &oss;
+        try
+        {
+            fn();
+        }
+        catch (...)
+        {
+            __error_handle_private::tls_capture_stream = prev;
+            throw;
+        }
+        __error_handle_private::tls_capture_stream = prev;
+        return oss.str();
+    }
+
     static void add_writer(ierror_writer* writer)
     {
     	using namespace __error_handle_private;

@@ -31,17 +31,17 @@ namespace osi
                 return false;
             }
 
-            bool define(const std::string& type, std::string name)
+            bool define(std::string type, std::string name)
             {
                 assert(!type.empty());
                 assert(!name.empty());
-                auto* cur = compiler_scope_interface::current_or_null();
-                if (cur && cur->is_root())
+                type = normalized_type::parameter_type_of(type).full_type();
+                assert(!type.empty());
+                name = fully_qualified_variable_name::of(name);
+                assert(!name.empty());
+                if (s_.find(name) != s_.end())
                 {
-                    name = current_namespace_t::of(name);
-                }
-                if (defined(name))
-                {
+                    raise_error("Variable ", name, " (new type ", type, ") has been defined already as ", s_[name].full_type());
                     return false;
                 }
                 s_[name] = parameter(type, name);
@@ -76,10 +76,12 @@ namespace osi
                 return false;
             }
 
-            bool redefine(const std::string& type, const std::string& name)
+            bool redefine(std::string type, const std::string& name)
             {
                 assert(!type.empty());
                 assert(!name.empty());
+                type = normalized_type::parameter_type_of(type).full_type();
+                assert(!type.empty());
                 auto it = s_.find(name);
                 if (it != s_.end())
                 {

@@ -2,10 +2,6 @@
 #error "DIALECT must be defined before including struct_and_values.inc"
 #endif
 
-#ifndef STRUCT_NAME_OF
-#define STRUCT_NAME_OF(node) scope::type_name::of(node)
-#endif
-
             class struct_node;
             class raw_variable_name;
             class heap_name;
@@ -46,7 +42,7 @@
                 {
                     assert(n != nullptr);
                     assert(n->child_count() >= 5);
-                    std::string struct_name = STRUCT_NAME_OF(n->child(1));
+                    std::string struct_name = scope::normalized_type::parameter_type_of(n->child(1)).full_type();
                     auto members = parse_struct_body(n);
                     auto target_scope = (n->parent != nullptr && n->parent->type_name == "base-root-type")
                         ? scope::current()->get_root()
@@ -456,7 +452,8 @@
                 assert(!source.empty());
                 if (targets.empty()) return true;
                 std::string index = targets[0] + "@index";
-                assert(value_declaration::declare_primitive_type(integer_node::type_name, index, o));
+                assert(value_declaration::declare_primitive_type(
+                    namespace_t::fully_qualified_name(integer_node::type_name), index, o));
                 for (const auto& target : targets)
                 {
                     assert(!target.empty());
@@ -655,5 +652,3 @@
                     return build(name, value, o);
                 }
             };
-
-#undef STRUCT_NAME_OF

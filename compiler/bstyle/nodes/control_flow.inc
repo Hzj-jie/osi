@@ -196,7 +196,8 @@ namespace osi
                                 return false;
                             }
                         }
-                        return true;
+                        sc->run_end_scope();
+                        return !sc->has_end_scope_error();
                     });
                 }
             };

@@ -265,13 +265,6 @@ namespace osi
                     type_params.push_back(p->input_without_ignored());
                 }
 
-                std::unordered_set<std::string> unique_types(type_params.begin(), type_params.end());
-                if (unique_types.size() != type_params.size())
-                {
-                    raise_error("Duplicate template type parameters in ", head->input());
-                    return false;
-                }
-
                 std::shared_ptr<automata::typed_node> name_node;
                 if (body->type_name == "class" || body->type_name == "function")
                 {
@@ -284,6 +277,19 @@ namespace osi
                 else
                 {
                     raise_error("Unsupported template body: ", body->type_name);
+                    return false;
+                }
+
+                std::unordered_set<std::string> unique_types(type_params.begin(), type_params.end());
+                if (unique_types.size() != type_params.size())
+                {
+                    std::string joined;
+                    for (size_t i = 0; i < type_params.size(); ++i)
+                    {
+                        if (i > 0) joined += ", ";
+                        joined += type_params[i];
+                    }
+                    raise_error("Template ", template_name::of(name_node), " has duplicated template type parameters: [", joined, "]");
                     return false;
                 }
 

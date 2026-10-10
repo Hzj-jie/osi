@@ -4,25 +4,24 @@
 #include <string>
 #include <memory>
 #include "bstyle_test_data.hpp"
+#include "../compile_error_test_runner.hpp"
 #include "../../../compiler/bstyle/bstyle.hpp"
 #include "../../../interpreter/primitive/simulator.hpp"
 #include "../../../interpreter/primitive/interrupts.hpp"
 #include "../../../interpreter/primitive/console_io.hpp"
 #include "../../../automata/nlp.hpp"
+#include "../../../automata/syntax/syntaxer.hpp"
 #include "../../../utt/icase.hpp"
 #include "../../../utt/utt_assert.hpp"
 
 namespace osi::compiler::bstyle_compiler
 {
-    class bstyle_test : public icase
+    class bstyle_test_runner : public compile_error_test_runner
     {
-    private:
-        static bool parse(primitive::console_io::test_wrapper& io,
-                          const std::string& content,
-                          primitive::simulator& sim)
-        {
-            return bstyle::with_functions(primitive::interrupts(io.io())).compile(content, sim);
-        }
+    protected:
+        virtual bool parse(primitive::console_io::test_wrapper& io,
+                           const std::string& content,
+                           primitive::simulator& sim) = 0;
 
         void assert_execute_without_errors(primitive::simulator& sim)
         {
@@ -35,16 +34,6 @@ namespace osi::compiler::bstyle_compiler
         }
 
     public:
-        void test_nlp_parsable()
-        {
-            std::shared_ptr<osi::automata::nlp> parser;
-            bool ok = osi::automata::nlp::of_file(bstyle::nlexer_rule(),
-                                                  bstyle::syntaxer_rule(),
-                                                  parser);
-            utt_assert.is_true(ok);
-            utt_assert.is_true(parser != nullptr);
-        }
-
         void test_case1()
         {
             primitive::console_io::test_wrapper io;
@@ -167,6 +156,51 @@ namespace osi::compiler::bstyle_compiler
             utt_assert.equal(io.output(), std::string("std_out ( __STATEMENT__ ) ;string s = __STATEMENT__ ;"));
         }
 
+        void run_bstyle_cases()
+        {
+            test_case1();
+            test_case2();
+            test_global_variable();
+            test_overload_function();
+            test_single_level_struct();
+            test_nested_struct();
+            test_function_struct();
+            test_return_struct();
+            test_call_struct_on_heap();
+            test_for_loop();
+            test_empty_struct_overloads();
+            test_delegate();
+            test_statement();
+        }
+    };
+
+    class bstyle_test : public bstyle_test_runner
+    {
+    protected:
+        bool parse(primitive::console_io::test_wrapper& io,
+                   const std::string& content,
+                   primitive::simulator& sim) override
+        {
+            return bstyle::with_functions(primitive::interrupts(io.io())).compile(content, sim);
+        }
+
+        bool parse_error_case(const std::string& content) override
+        {
+            primitive::simulator sim;
+            return bstyle::with_default_functions().compile(content, sim);
+        }
+
+    public:
+        void test_nlp_parsable()
+        {
+            std::shared_ptr<osi::automata::nlp> parser;
+            bool ok = osi::automata::nlp::of_file(bstyle::nlexer_rule(),
+                                                  bstyle::syntaxer_rule(),
+                                                  parser);
+            utt_assert.is_true(ok);
+            utt_assert.is_true(parser != nullptr);
+        }
+
         void test_real__file__()
         {
             primitive::console_io::test_wrapper io;
@@ -199,27 +233,18 @@ namespace osi::compiler::bstyle_compiler
 
         void test_errors_dot_is_disallowed_as_the_end_of_name()
         {
-            primitive::simulator sim;
-            bool ok = bstyle::with_default_functions().compile(bstyle_test_data::errors_dot_is_disallowed_as_the_end_of_name, sim);
-            utt_assert.is_false(ok);
+            run_error(bstyle_test_data::errors_dot_is_disallowed_as_the_end_of_name,
+                      {
+                          "[syntaxer]",
+                          automata::syntaxer::debug_str("x", "raw-name"),
+                          automata::syntaxer::debug_str(".", "dot")
+                      });
         }
 
         bool run() override
         {
             test_nlp_parsable();
-            test_case1();
-            test_case2();
-            test_global_variable();
-            test_overload_function();
-            test_single_level_struct();
-            test_nested_struct();
-            test_function_struct();
-            test_return_struct();
-            test_call_struct_on_heap();
-            test_for_loop();
-            test_empty_struct_overloads();
-            test_delegate();
-            test_statement();
+            run_bstyle_cases();
             test_real__file__();
             test_predefined_def();
             test_func_name_with_dot();

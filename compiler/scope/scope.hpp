@@ -40,6 +40,7 @@ namespace osi
             T* parent{nullptr};
             T* child{nullptr};
             std::vector<std::function<void()>> ds;
+            bool end_scope_error_{false};
 
             explicit scope_base(T* parent_ptr)
                 : parent(parent_ptr)
@@ -58,6 +59,16 @@ namespace osi
             }
 
         public:
+            void mark_end_scope_error()
+            {
+                end_scope_error_ = true;
+            }
+
+            bool has_end_scope_error() const
+            {
+                return end_scope_error_;
+            }
+
             void run_end_scope()
             {
                 while (!ds.empty())
@@ -363,6 +374,11 @@ namespace osi
 
             bool variables_redefine(const std::string& type, const std::string& name)
             {
+                if (variable_t::is_heap_name(name))
+                {
+                    raise_error("Redefine works for heap name without index, but got ", name, " (new type ", type, ")");
+                    return false;
+                }
                 Derived* s = static_cast<Derived*>(this);
                 while (s != nullptr)
                 {
@@ -370,11 +386,17 @@ namespace osi
                     if (v != nullptr && v->redefine(type, name)) return true;
                     s = s->get_parent();
                 }
+                raise_error("Variable ", name, " (new type ", type, ") has not been defined yet.");
                 return false;
             }
 
             bool variables_undefine(const std::string& name)
             {
+                if (variable_t::is_heap_name(name))
+                {
+                    raise_error("Undefine works for heap name without index, but got ", name);
+                    return false;
+                }
                 Derived* s = static_cast<Derived*>(this);
                 while (s != nullptr)
                 {
@@ -382,6 +404,7 @@ namespace osi
                     if (v != nullptr && v->undefine(name)) return true;
                     s = s->get_parent();
                 }
+                raise_error("Variable ", name, " has not been defined yet.");
                 return false;
             }
 

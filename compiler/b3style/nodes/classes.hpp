@@ -61,6 +61,7 @@ namespace osi
                                 name + "." + scope::class_def::destruct, o))
                         {
                             raise_error(failed_to_build_destructor_message(name));
+                            scope::current()->mark_end_scope_error();
                         }
                     });
                     scope::current()->call_hierarchy().to(
@@ -72,13 +73,8 @@ namespace osi
                     assert(n != nullptr && (n->child_count() == 4 || n->child_count() == 5));
                     if (!struct_node::define_in_stack(n->child(0), n->child(1), o))
                     {
-                        std::string type = scope::normalized_type::of(n->child(0));
-                        std::string name = scope::variable_name::of(n->child(1));
-                        if (!value_declaration::declare_primitive_type(type, name, o))
-                        {
-                            raise_error(failed_to_build_constructor_message(n->child(0)->input(), n->child(1)->input()));
-                            return false;
-                        }
+                        raise_error(failed_to_build_constructor_message(n->child(0)->input(), n->child(1)->input()));
+                        return false;
                     }
                     if (n->child_count() == 4)
                     {

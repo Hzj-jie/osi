@@ -2,10 +2,6 @@
 #error "DIALECT must be defined before including raw_value.inc"
 #endif
 
-#ifndef TYPE_NAME_PREFIX
-#define TYPE_NAME_PREFIX ""
-#endif
-
 namespace osi
 {
     namespace compiler
@@ -30,7 +26,8 @@ namespace osi
                                   logic_writer& o)
                 {
                     assert(!code_type.empty());
-                    auto target = scope::current()->value_target().with_temp_target(code_type, o).front();
+                    auto target = scope::current()->value_target().with_temp_target(
+                        namespace_t::fully_qualified_name(code_type), o).front();
                     return builders::of_copy_const(target, i).to(o);
                 }
 
@@ -52,7 +49,7 @@ namespace osi
             class bool_node : public raw_value
             {
             public:
-                inline static const std::string type_name = TYPE_NAME_PREFIX "Boolean";
+                inline static const std::string type_name = "Boolean";
 
                 static const char* node_name() { return "bool"; }
 
@@ -85,7 +82,7 @@ namespace osi
             class integer_node : public raw_value
             {
             public:
-                inline static const std::string type_name = TYPE_NAME_PREFIX "Integer";
+                inline static const std::string type_name = "Integer";
 
                 static const char* node_name() { return "integer"; }
 
@@ -116,7 +113,7 @@ namespace osi
             class biguint_node : public raw_value
             {
             public:
-                inline static const std::string type_name = TYPE_NAME_PREFIX "BigUnsignedInteger";
+                inline static const std::string type_name = "BigUnsignedInteger";
 
                 static const char* node_name() { return "biguint"; }
 
@@ -145,7 +142,7 @@ namespace osi
             class ufloat_node : public raw_value
             {
             public:
-                inline static const std::string type_name = TYPE_NAME_PREFIX "BigUnsignedFloat";
+                inline static const std::string type_name = "BigUnsignedFloat";
 
                 static const char* node_name() { return "ufloat"; }
 
@@ -193,7 +190,7 @@ namespace osi
             class string_node : public raw_value
             {
             public:
-                inline static const std::string type_name = TYPE_NAME_PREFIX "String";
+                inline static const std::string type_name = "String";
 
                 static const char* node_name() { return "string"; }
 

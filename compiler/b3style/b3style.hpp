@@ -131,3 +131,49 @@ namespace osi
     using class_initializer = class_initializer_node; \
     static auto disable_namespace() { return b3style_compiler::disable_namespace(); }
 #include "../bstyle/driver.inc"
+
+#include "../b2style/b2style.hpp"
+
+namespace osi
+{
+    namespace compiler
+    {
+        namespace b2style_compiler
+        {
+            class compile_wrapper_b3style
+            {
+            private:
+                std::shared_ptr<primitive::interrupts> functions_;
+
+            public:
+                explicit compile_wrapper_b3style(std::shared_ptr<primitive::interrupts> functions)
+                    : functions_(std::move(functions))
+                {
+                    assert(functions_ != nullptr);
+                }
+
+                explicit compile_wrapper_b3style(primitive::interrupts functions)
+                    : compile_wrapper_b3style(std::make_shared<primitive::interrupts>(std::move(functions)))
+                {
+                }
+
+                static current_file_guard with_current_file(const std::string& filename)
+                {
+                    return b2style::compile_wrapper::with_current_file(filename);
+                }
+
+                bool compile(const std::string& input, primitive::simulator& sim)
+                {
+                    rewriter::typed_node_writer o;
+                    if (!b2style::with_functions(functions_).build(input, o))
+                    {
+                        return false;
+                    }
+                    auto guard = b3style_compiler::b3style::disable_namespace();
+                    return b3style_compiler::b3style::with_functions(functions_).compile(o.dump(), sim);
+                }
+            };
+        }
+    }
+}
+

@@ -18,7 +18,5 @@
 #include "../bstyle_forward.hpp"
 
 #define DIALECT bstyle_compiler
-#define TYPE_NAME_PREFIX ""
 #include "raw_value.inc"
-#undef TYPE_NAME_PREFIX
 #undef DIALECT

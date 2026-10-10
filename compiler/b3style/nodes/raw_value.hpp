@@ -18,7 +18,5 @@
 #include "../b3style_forward.hpp"
 
 #define DIALECT b3style_compiler
-#define TYPE_NAME_PREFIX "::"
 #include "../../bstyle/nodes/raw_value.inc"
-#undef TYPE_NAME_PREFIX
 #undef DIALECT

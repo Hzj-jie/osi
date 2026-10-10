@@ -67,6 +67,11 @@ namespace osi
                 }
 
             public:
+                static std::string debug_str(const std::string& input, const std::string& type_name)
+                {
+                    return debug_str_token(input, type_name);
+                }
+
                 syntaxer(syntax_collection collection,
                          std::unordered_set<uint32_t> ignore_types,
                          std::vector<uint32_t> root_types)

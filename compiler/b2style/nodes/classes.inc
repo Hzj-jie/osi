@@ -36,7 +36,7 @@ namespace osi
                         {
                             auto vd = child->child(0);
                             std::string t = CLASS_VAR_TYPE_OF(vd->child(0));
-                            std::string v = vd->child(1)->input_without_ignored();
+                            std::string v = scope::variable_name::of(vd->child(1));
                             while (v.rfind(current_namespace_t::namespace_separator, 0) == 0)
                             {
                                 v = v.substr(current_namespace_t::namespace_separator.length());
@@ -71,12 +71,7 @@ namespace osi
                                 return false;
                             }
                             cd.inherit_from(bcd);
-                            std::string clean_base_type = base_type;
-                            while (clean_base_type.rfind(current_namespace_t::namespace_separator, 0) == 0)
-                            {
-                                clean_base_type = clean_base_type.substr(current_namespace_t::namespace_separator.length());
-                            }
-                            cd.with_var(parameter::non_ref(base_type + "__struct__type__id__type", clean_base_type + "__struct__type__id"));
+                            cd.with_var(struct_t::create_type_id(base_type));
                         }
                     }
 
