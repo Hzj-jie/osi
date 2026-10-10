@@ -168,49 +168,39 @@ namespace osi::compiler::b3style_compiler
             // Case 1
             {
                 std::shared_ptr<osi::automata::typed_node> n;
-                utt_assert.is_true(b3style_nlp()->parse(b2style_test_data::template_template_case1, n));
+                utt_assert.is_true(b2style_compiler::b2style::nlp()->parse(b2style_test_data::template_template_case1, n));
                 utt_assert.is_true(n != nullptr);
-                auto tmpl_node = n->child(0)->child(0);
-                auto head = tmpl_node->child(0);
-                auto body = tmpl_node->child(1)->child(0);
-                auto type_param_list = head->child(2);
-                std::vector<std::string> type_params;
-                for (uint32_t i = 0; i < type_param_list->child_count(); ++i)
-                {
-                    auto p = type_param_list->child(i);
-                    if (p->type_name == "type-param-with-comma") p = p->child(0);
-                    type_params.push_back(p->input_without_ignored());
-                }
-                auto name_node = body->child(1);
-                auto tmpl = std::make_shared<template_template>(body, name_node, type_params);
+                b2style_compiler::scope root_scope;
+                std::string name;
+                std::shared_ptr<template_template> tmpl;
+                utt_assert.is_true(template_t::of(n->child(0)->child(0), name, tmpl));
                 std::string impl;
                 utt_assert.is_true(tmpl->apply({"int"}, impl));
                 utt_assert.equal(impl, std::string("class C__int { int x ; void f ( int y ) { } } ;"));
             }
             // Disallow duplicated template type parameters
             {
-                primitive::simulator sim;
-                bool ok = b3style::with_default_functions().compile(b2style_test_data::errors_duplicate_template_type_parameters, sim);
-                utt_assert.is_false(ok);
+                std::shared_ptr<osi::automata::typed_node> n;
+                utt_assert.is_true(b2style_compiler::b2style::nlp()->parse(
+                    b2style_test_data::errors_duplicate_template_type_parameters, n));
+                utt_assert.is_true(n != nullptr);
+                std::string err = error_handle::capture_log([&]() {
+                    b2style_compiler::scope root_scope;
+                    std::string name;
+                    std::shared_ptr<template_template> tmpl;
+                    utt_assert.is_false(template_t::of(n->child(0)->child(0), name, tmpl));
+                });
+                utt_assert.is_true(err.find("T, T") != std::string::npos);
             }
             // Two template parameters
             {
                 std::shared_ptr<osi::automata::typed_node> n;
-                utt_assert.is_true(b3style_nlp()->parse(b2style_test_data::two_template_type_parameters, n));
+                utt_assert.is_true(b2style_compiler::b2style::nlp()->parse(b2style_test_data::two_template_type_parameters, n));
                 utt_assert.is_true(n != nullptr);
-                auto tmpl_node = n->child(0)->child(0);
-                auto head = tmpl_node->child(0);
-                auto body = tmpl_node->child(1)->child(0);
-                auto type_param_list = head->child(2);
-                std::vector<std::string> type_params;
-                for (uint32_t i = 0; i < type_param_list->child_count(); ++i)
-                {
-                    auto p = type_param_list->child(i);
-                    if (p->type_name == "type-param-with-comma") p = p->child(0);
-                    type_params.push_back(p->input_without_ignored());
-                }
-                auto name_node = body->child(1);
-                auto tmpl = std::make_shared<template_template>(body, name_node, type_params);
+                b2style_compiler::scope root_scope;
+                std::string name;
+                std::shared_ptr<template_template> tmpl;
+                utt_assert.is_true(template_t::of(n->child(0)->child(0), name, tmpl));
                 std::string impl;
                 utt_assert.is_true(tmpl->apply({"int", "string"}, impl));
                 utt_assert.equal(impl, std::string("class C__int__string { int x ; string y ; void p ( int x , string y ) { } } ;"));

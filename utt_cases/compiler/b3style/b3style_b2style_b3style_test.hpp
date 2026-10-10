@@ -17,6 +17,12 @@ namespace osi::compiler::b3style_compiler
             return b2style_compiler::compile_wrapper_b3style(primitive::interrupts(io.io())).compile(content, sim);
         }
 
+        bool parse_error_case(const std::string& content) override
+        {
+            primitive::simulator sim;
+            return b2style_compiler::compile_wrapper_b3style(primitive::interrupts()).compile(content, sim);
+        }
+
     public:
         void test_nlp_parsable()
         {
@@ -31,6 +37,7 @@ namespace osi::compiler::b3style_compiler
         bool run() override
         {
             test_nlp_parsable();
+            run_common_compile_errors();
             run_b2style_cases();
             return true;
         }
