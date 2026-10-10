@@ -14,96 +14,20 @@
 #include "../../../app_info/error_handle.hpp"
 #include "../../bstyle/bstyle_lib.hpp"
 
+
+
+#define DIALECT b2style_compiler
+#define WRITER rewriter::typed_node_writer
+#include "../../bstyle/nodes/preprocessor.inc"
+#undef WRITER
+#undef DIALECT
+
 namespace osi
 {
     namespace compiler
     {
         namespace b2style_compiler
         {
-            class if_wrapped : public code_gen<rewriter::typed_node_writer>
-            {
-            private:
-                std::function<bool(const std::string&)> bypass_;
-
-            public:
-                explicit if_wrapped(std::function<bool(const std::string&)> bypass)
-                    : bypass_(std::move(bypass))
-                {
-                    assert(bypass_ != nullptr);
-                }
-
-                static std::shared_ptr<if_wrapped> ifdef_wrapped()
-                {
-                    return std::make_shared<if_wrapped>([](const std::string& s) {
-                        return !scope::current()->defines().is_defined(s);
-                    });
-                }
-
-                static std::shared_ptr<if_wrapped> ifndef_wrapped()
-                {
-                    return std::make_shared<if_wrapped>([](const std::string& s) {
-                        return scope::current()->defines().is_defined(s);
-                    });
-                }
-
-                bool build(const std::shared_ptr<automata::typed_node>& n, rewriter::typed_node_writer& o) override
-                {
-                    assert(n != nullptr);
-                    assert(n->child_count() >= 3);
-                    auto defines_node = n->child(1);
-                    for (uint32_t i = 0; i < defines_node->child_count(); ++i)
-                    {
-                        std::string s;
-                        if (i == defines_node->child_count() - 1)
-                        {
-                            s = defines_node->last_child()->word().str();
-                        }
-                        else
-                        {
-                            s = defines_node->child(i)->child(0)->word().str();
-                        }
-                        if (!bypass_(s))
-                        {
-                            for (uint32_t j = 2; j <= n->child_count() - 3; ++j)
-                            {
-                                if (!code_gen_of(n->child(j)).build(o))
-                                {
-                                    return false;
-                                }
-                            }
-                            auto second_last = n->child(n->child_count() - 2);
-                            return (second_last->type_name == "delse-wrapped") ||
-                                   code_gen_of(second_last).build(o);
-                        }
-                    }
-                    auto second_last = n->child(n->child_count() - 2);
-                    if (second_last->type_name == "delse-wrapped")
-                    {
-                        for (uint32_t j = 1; j < second_last->child_count(); ++j)
-                        {
-                            if (!code_gen_of(second_last->child(j)).build(o))
-                            {
-                                return false;
-                            }
-                        }
-                        return true;
-                    }
-                    return true;
-                }
-            };
-
-            class define_node : public code_gen<rewriter::typed_node_writer>
-            {
-            public:
-                static const char* node_name() { return "define"; }
-
-                bool build(const std::shared_ptr<automata::typed_node>& n, rewriter::typed_node_writer&) override
-                {
-                    assert(n != nullptr && n->child_count() == 2);
-                    scope::current()->defines().define(n->child(1)->word().str());
-                    return true;
-                }
-            };
 
             inline const std::string& b2style_inc_folder()
             {
