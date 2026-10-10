@@ -54,13 +54,6 @@ namespace osi
                 }
             };
 
-            struct b3style_should_include
-            {
-                bool operator()(const std::string& s) const
-                {
-                    return scope::current()->includes().should_include(s);
-                }
-            };
         }
     }
 }
@@ -68,9 +61,7 @@ namespace osi
 #define DIALECT b3style_compiler
 #define WRITER logic_writer
 #define PREPROCESSOR_FOLDERS b3style_folders
-#define PREPROCESSOR_SHOULD_INCLUDE b3style_should_include
 #include "../../bstyle/nodes/preprocessor.inc"
-#undef PREPROCESSOR_SHOULD_INCLUDE
 #undef PREPROCESSOR_FOLDERS
 #undef WRITER
 #undef DIALECT

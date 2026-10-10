@@ -97,7 +97,15 @@ namespace osi
                 }
             };
 
-#if defined(PREPROCESSOR_FOLDERS) && defined(PREPROCESSOR_SHOULD_INCLUDE)
+#ifdef PREPROCESSOR_FOLDERS
+            struct should_include
+            {
+                bool operator()(const std::string& s) const
+                {
+                    return scope::current()->includes().should_include(s);
+                }
+            };
+
             inline bool parse_include_file(const std::string& file, WRITER& o)
             {
                 if (file.empty())
@@ -115,7 +123,7 @@ namespace osi
                 return build_code(content, o);
             }
 
-            class include_with_string_node : public include_with_string<WRITER, PREPROCESSOR_SHOULD_INCLUDE, PREPROCESSOR_FOLDERS>
+            class include_with_string_node : public include_with_string<WRITER, should_include, PREPROCESSOR_FOLDERS>
             {
             public:
                 static const char* node_name() { return "include-with-string"; }
@@ -127,7 +135,7 @@ namespace osi
                 }
             };
 
-            class include_with_file_node : public include_with_file<WRITER, PREPROCESSOR_SHOULD_INCLUDE, PREPROCESSOR_FOLDERS>
+            class include_with_file_node : public include_with_file<WRITER, should_include, PREPROCESSOR_FOLDERS>
             {
             public:
                 static const char* node_name() { return "include-with-file"; }
