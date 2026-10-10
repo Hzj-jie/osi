@@ -3,6 +3,7 @@
 #include <string>
 #include "../scope.hpp"
 #include "../b2style_forward.hpp"
+#include "../../function_signature.hpp"
 #include "../../rewriter/typed_node_writer.hpp"
 #include "../../code_gen/code_gen.hpp"
 #include "../../../automata/typed_node.hpp"
@@ -49,18 +50,6 @@ namespace osi
             {
             public:
                 static const char* node_name() { return "function-call"; }
-
-                static bool split_struct_function(const std::string& name, std::string& obj, std::string& func)
-                {
-                    size_t dot_pos = name.rfind('.');
-                    if (dot_pos == std::string::npos || dot_pos == 0 || dot_pos + 1 >= name.length())
-                    {
-                        return false;
-                    }
-                    obj = name.substr(0, dot_pos);
-                    func = name.substr(dot_pos + 1);
-                    return true;
-                }
 
                 static bool build(const std::string& name,
                                   const std::shared_ptr<automata::typed_node>& n,

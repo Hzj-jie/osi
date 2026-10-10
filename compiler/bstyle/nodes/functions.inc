@@ -170,19 +170,6 @@
             class function_call_impl : public code_gen<logic_writer>
             {
             private:
-#ifdef FUNCTION_CALL_SUPPORT_STRUCT_FUNC
-                static bool split_struct_function(const std::string& name, std::string& obj, std::string& func)
-                {
-                    size_t dot_pos = name.rfind('.');
-                    if (dot_pos == std::string::npos || dot_pos == 0 || dot_pos + 1 >= name.length())
-                    {
-                        return false;
-                    }
-                    obj = name.substr(0, dot_pos);
-                    func = name.substr(dot_pos + 1);
-                    return true;
-                }
-#endif
 
                 static bool build_function_caller(
                     const std::string& function_name,

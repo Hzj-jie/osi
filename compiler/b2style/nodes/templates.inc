@@ -98,18 +98,6 @@ namespace osi
             public:
                 static const char* node_name() { return "function-call-with-template"; }
 
-                static bool split_struct_function(const std::string& name, std::string& obj, std::string& func)
-                {
-                    size_t dot_pos = name.rfind('.');
-                    if (dot_pos == std::string::npos || dot_pos == 0 || dot_pos + 1 >= name.length())
-                    {
-                        return false;
-                    }
-                    obj = name.substr(0, dot_pos);
-                    func = name.substr(dot_pos + 1);
-                    return true;
-                }
-
                 static bool build(
                     const std::shared_ptr<automata::typed_node>& n,
                     WRITER& o,

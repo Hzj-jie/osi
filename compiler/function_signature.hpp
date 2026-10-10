@@ -183,5 +183,17 @@ namespace osi
                 return res;
             }
         };
+
+        inline bool split_struct_function(const std::string& name, std::string& obj, std::string& func)
+        {
+            size_t dot_pos = name.rfind('.');
+            if (dot_pos == std::string::npos || dot_pos == 0 || dot_pos + 1 >= name.length())
+            {
+                return false;
+            }
+            obj = name.substr(0, dot_pos);
+            func = name.substr(dot_pos + 1);
+            return true;
+        }
     }
 }
