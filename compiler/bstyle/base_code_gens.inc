@@ -16,6 +16,11 @@ namespace osi
                  .with<ufloat_node>()
                  .with<function_node>()
                  .with<function_call_node>()
+                 .with_delegate("ignore-result-function-call",
+                     [](const std::shared_ptr<automata::typed_node>& n, logic_writer& o) {
+                         assert(n != nullptr);
+                         return function_call_node::without_return(n->child(0), o);
+                     })
                  .with<integer_node>()
                  .with<biguint_node>()
                  .with<logic_node>()

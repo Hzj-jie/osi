@@ -60,11 +60,6 @@ namespace osi
                      })
                      .with(code_gen_default::of_ignore_last_child<logic_writer>("b2style-sentence-with-semi-colon"))
                      .with(code_gen_default::of_only_descendant_str<logic_writer>("reference"))
-                     .with_delegate("ignore-result-function-call",
-                         [](const std::shared_ptr<automata::typed_node>& n, logic_writer& o) {
-                             assert(n != nullptr);
-                             return function_call_node::with_parameters::without_return(n->child(0), o);
-                         })
                      .with<heap_struct_function_call_node>()
                      .with_delegate("ignore-result-heap-struct-function-call",
                          [](const std::shared_ptr<automata::typed_node>& n, logic_writer& o) {

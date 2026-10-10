@@ -44,12 +44,7 @@ namespace osi
                     code_gens<logic_writer> c;
                     code_gens_registrar<logic_writer> r;
                     register_base_code_gens(r);
-                    r.with_delegate("ignore-result-function-call",
-                         [](const std::shared_ptr<automata::typed_node>& n, logic_writer& o) {
-                             assert(n != nullptr);
-                             return function_call_node::without_return(n->child(0), o);
-                         })
-                     .with_delegate("value-definition",
+                    r.with_delegate("value-definition",
                          [](const std::shared_ptr<automata::typed_node>& n, logic_writer& o) {
                              assert(n != nullptr && n->child_count() == 4);
                              return value_declaration::build(n->child(0), n->child(1), o) &&
