@@ -1,0 +1,6 @@
+#include <b2style.h>
+
+template<>
+class ThisTemplateHasNoTypeParameter {};
+
+void main() {}

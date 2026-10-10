@@ -1,0 +1,16 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+void main() {
+  ufloat s = 0.0;
+  for (int i = 0; i < 55; i += 1) {
+    ufloat c = b2style::ufloat::fraction(4, 1 + (8 * i));
+	c -= b2style::ufloat::fraction(2, 4 + (8 * i));
+	c -= b2style::ufloat::fraction(1, 5 + (8 * i));
+	c -= b2style::ufloat::fraction(1, 6 + (8 * i));
+	biguint b = 1;
+	c *= b2style::ufloat::fraction(1, b << (4 * i));
+	s += c;
+  }
+  b2style::std_out(s);
+}

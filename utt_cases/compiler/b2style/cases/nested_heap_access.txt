@@ -1,0 +1,19 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+void main() {
+  int a[10];
+  for (int i = 0; i < 10; i++) {
+    a[i] = i + 1;
+  }
+
+  b2style::std_out(a[a[0]]);
+  b2style::std_out(a[a[a[0]]]);
+  b2style::std_out(a[a[a[a[0]]]]);
+  // value syntaxer matching is quite costly.
+  /*
+  b2style::std_out(a[a[a[a[a[0]]]]]);
+  b2style::std_out(a[a[a[a[a[a[0]]]]]]);
+  b2style::std_out(a[a[a[a[a[a[a[0]]]]]]]);
+  */
+}

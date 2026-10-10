@@ -1,0 +1,11 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+void main() {
+  int x = 0;
+  for (int i = 0; i < 100; i += 1) {
+    x = x + i + 1;
+  }
+  b2style::std_out(x);
+  b2style::std_out("\n");
+}

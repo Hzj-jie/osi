@@ -1,0 +1,29 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+class C {
+  void print() {
+    b2style::std_out("C");
+  }
+};
+
+template <T>
+class D {
+  void print(T t) {
+    t.print();
+  }
+};
+
+template <T, T2>
+class E {
+  void print(T t, T2 t2) {
+    t.print(t2);
+  }
+};
+
+void main() {
+  C c;
+  D<C> d;
+  E<D<C>, C> e;
+  e.print(d, c);
+}

@@ -1,0 +1,9 @@
+#include <b2style.h>
+
+void f(int x) {}
+
+void main() {
+  int x;
+  reinterpret_cast(x, this_is_an_unknown_type);
+  f(x);
+}

@@ -1,0 +1,13 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+void main() {
+  ufloat x = 0.0;
+  ufloat i = 0.0;
+  while (i < 1.0) {
+    i += 0.01;
+	x += i;
+  }
+  b2style::std_out(x);
+  b2style::std_out("\n");
+}

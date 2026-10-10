@@ -1,0 +1,19 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+delegate int func(int);
+
+int f(int x) {
+  return x + 1;
+}
+
+int g(int x) {
+  return x - 1;
+}
+
+void main() {
+  func a = f;
+  b2style::std_out(a(2));
+  a = g;
+  b2style::std_out(a(2));
+}

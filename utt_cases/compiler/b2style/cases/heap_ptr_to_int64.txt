@@ -1,0 +1,27 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+biguint from_ptr(type_ptr x) {
+  return x;
+}
+
+void b2style::std_out(type_ptr x) {
+  b2style::std_out(from_ptr(x));
+}
+
+void main() {
+  int x[100];
+  x[0] = 100;
+  biguint y = x;
+  int l[100];
+  l[0] = 101;
+  int o[100];
+  o[0] = 102;
+  b2style::std_out(y);
+  b2style::std_out(" ");
+  reinterpret_cast(l, type_ptr);
+  b2style::std_out(from_ptr(l));
+  b2style::std_out(" ");
+  reinterpret_cast(o, type_ptr);
+  b2style::std_out(o);
+}

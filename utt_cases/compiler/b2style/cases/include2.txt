@@ -1,0 +1,17 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+#include "cstdio"
+
+int main() {
+  int x = getchar();
+  putchar(x);
+  x = getchar();
+  putchar(x);
+  x = getchar();
+  putchar(x);
+  x = getchar();
+  if (x == eof()) {
+    b2style::std_out("EoF");
+  }
+}

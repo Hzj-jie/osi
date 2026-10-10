@@ -1,0 +1,20 @@
+#include <bstyle.h>
+
+struct S {
+  string s;
+  string s2;
+};
+
+S f() {
+  S s;
+  s.s = "abc";
+  s.s2 = "def";
+  return s;
+}
+
+void main() {
+  S s = f();
+  string temp;
+  logic "interrupt stdout s.s temp";
+  logic "interrupt stdout s.s2 temp";
+}

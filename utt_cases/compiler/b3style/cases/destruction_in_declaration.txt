@@ -1,0 +1,17 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+class C {
+  void construct() {
+    b2style::std_out("construct");
+  }
+
+  void destruct() {
+    b2style::std_out("destruct");
+  }
+};
+
+void main() {
+  C c;
+  b2style::std_out("finish");
+}

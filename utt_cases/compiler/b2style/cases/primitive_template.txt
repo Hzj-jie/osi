@@ -1,0 +1,16 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+template <T>
+class Increaser {
+  T inc(T t) {
+    return ++t;
+  }
+};
+
+void main() {
+  Increaser<int> i1;
+  b2style::std_out(i1.inc(100));
+  Increaser<ufloat> i2;
+  b2style::std_out(i2.inc(100.11));
+}

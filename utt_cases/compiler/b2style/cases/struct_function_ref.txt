@@ -1,0 +1,19 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+struct S {
+  int x;
+  string y;
+};
+
+void f(S& s) {
+  s.x=100;
+  s.y="abc";
+}
+
+void main() {
+  S s;
+  f(s);
+  b2style::std_out(s.x);
+  b2style::std_out(s.y);
+}

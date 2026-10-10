@@ -1,0 +1,16 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+template <RT, T>
+delegate RT ref_function(T&);
+
+int func(int& x) {
+  return x++;
+}
+
+void main() {
+  int i = 100;
+  ref_function<int, int> f = func;
+  b2style::std_out(f(i));
+  b2style::std_out(i);
+}

@@ -1,0 +1,53 @@
+## define a type uint of 4 bytes
+type uint 4
+## define a type bool of 1 byte
+type bool 1
+
+callee copy-one-byte2 type* ( source type* target type* pos uint len uint ) {
+    define char type*
+    cut_len char source pos len
+    append target char
+    return copy-one-byte2 target
+}
+
+define source type*
+define target1 type*
+define target2 type*
+
+callee copy-one-byte1 type0 ( source type* pos uint len uint ) {
+    define char type*
+    cut_len char source pos len
+    append target1 char
+    return copy-one-byte1 *
+}
+
+## copy a const string to source
+copy_const source Ehello\x20world\n
+
+define 0 uint
+copy_const 0 i0
+define 1 uint
+copy_const 1 i1
+
+define length uint
+sizeof length source
+
+define i uint
+copy i length
+define not-finished bool
+more not-finished i 0
+while_then not-finished {
+    subtract i i 1
+    caller copy-one-byte1 ( source i 1 )
+    more not-finished i 0
+}
+
+copy i length
+more not-finished i 0
+while_then not-finished {
+    subtract i i 1
+    define result type*
+    caller copy-one-byte2 result ( source target2 i 1 )
+    move target2 result
+    more not-finished i 0
+}

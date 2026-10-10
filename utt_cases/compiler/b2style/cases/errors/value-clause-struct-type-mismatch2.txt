@@ -1,0 +1,23 @@
+#include <b2style.h>
+
+struct S1 {
+  int x;
+  string y;
+};
+
+struct S2 {
+  int v;
+  string w;
+};
+
+S1 f() {
+  S1 s;
+  s.x = 100;
+  s.y = "abc";
+  return s;
+}
+
+void main() {
+  S1 s1 = f();
+  S2 s2 = s1;
+}

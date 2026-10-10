@@ -1,0 +1,62 @@
+#include <bstyle.h>
+
+bool equal(int i, int j) {
+  bool result;
+  logic "equal result i j";
+  return result;
+}
+
+bool is_even(long i) {
+  int quotient;
+  int remainder;
+  int v = 2;
+  logic "divide quotient remainder i v";
+  return equal(remainder, 0);
+}
+
+void print(bool i) {
+  string temp;
+  string _true = "True";
+  string _false = "False";
+  if (i) {
+	logic "interrupt stdout _true temp";
+  } else {
+	logic "interrupt stdout _false temp";
+  }
+}
+
+long current_ms() {
+  long result;
+  int temp;
+  logic "interrupt current_ms temp result";
+  return result;
+}
+
+long self_decrease(long x) {
+  int temp = 1;
+  logic "subtract x x temp";
+  return x;
+}
+
+int self_increase(int x) {
+  int temp = 1;
+  logic "add x x temp";
+  return x;
+}
+
+bool less(int x, int y) {
+  bool result;
+  logic "less result x y";
+  return result;
+}
+
+void main() {
+  for (int i = 0; less(i, 100); i = self_increase(i)) {
+    long x;
+    x = current_ms();
+    if (is_even(x)) {
+      x = self_decrease(x);
+    }
+    print(is_even(x));
+  }
+}

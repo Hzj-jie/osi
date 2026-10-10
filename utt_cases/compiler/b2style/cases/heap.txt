@@ -1,0 +1,31 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+struct S {
+  string s;
+};
+
+void f(S s) {
+  b2style::std_out(s.s);
+}
+
+S new(string s) {
+  S r;
+  r.s = s;
+  return r;
+}
+
+void main() {
+  int x = 1;
+  int v[x++];
+  S v2[1 + ++x++];
+  v[0] = 100;
+  v2[0] = new("abc");
+  v2[1] = new("def");
+  f(v2[0]);
+  f(v2[1]);
+  v2[2].s = "ghi";
+  f(v2[2]);
+  // TODO: Make v2[2].  s = "ghi" work.
+  b2style::std_out(v[0]);
+}

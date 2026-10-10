@@ -1,0 +1,8 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+void main() {
+  b2style::std_out(-1);
+  b2style::std_out(-2);
+  b2style::std_out(-3);
+}

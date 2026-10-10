@@ -1,0 +1,22 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+struct S {
+  string s;
+};
+
+void f(S s) {
+  b2style::std_out(s.s);
+}
+
+S new(string s) {
+  S r;
+  r.s = s;
+  return r;
+}
+
+void main() {
+  int x = 0;
+  int v[++x];
+  S v2[++x];
+}

@@ -1,0 +1,19 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+namespace N {
+
+::void f() {
+  ::b2style::std_out("f");
+}
+
+::void ::f() {
+  ::b2style::std_out("::f");
+}
+
+}  // namespace N
+
+void main() {
+  N::f();
+  f();
+}

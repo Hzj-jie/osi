@@ -1,0 +1,17 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+void main() {
+  ufloat dx = 0.1;
+  ufloat x = 0.0;
+  ufloat s = 0.0;
+  while (x < 1.0) {
+    ufloat c = 1.0 - (x ^ 2.0);
+	c ^= 0.5;
+	c *= dx;
+	s += c;
+	x += dx;
+  }
+
+  b2style::std_out(s * 4.0);
+}

@@ -1,0 +1,27 @@
+type uint 4
+define 1 uint
+copy_const 1 i1
+
+callee m type0 ( n uint& ) {
+  add n n 1
+  return m *
+}
+
+callee m2 type0 ( n uint& ) {
+  subtract n n 1
+  return m2 *
+}
+
+callee_ref delegate uint ( uint& )
+define f delegate
+define n uint
+define temp_string type*
+copy_const n i1
+
+address_of f m
+caller_ref f ( n ) 
+interrupt stdout n temp_string
+
+address_of f m2
+caller_ref f ( n )
+interrupt stdout n temp_string

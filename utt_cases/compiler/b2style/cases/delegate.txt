@@ -1,0 +1,8 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+delegate int func(int, int&);
+
+void main() {
+  b2style::std_out("abc");
+}

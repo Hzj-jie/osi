@@ -1,0 +1,10 @@
+define temp_string type*
+
+callee main type0 ( ) {
+  define result type*
+  copy_const result Ehello\x20world
+  interrupt stdout result temp_string
+  interrupt stderr result temp_string
+}
+
+caller main ( )

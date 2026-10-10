@@ -1,0 +1,9 @@
+#include <b2style.h>
+#include <std/vector>
+
+void main() {
+  std::vector<int> v();
+  for (int i = 0; i < 10; i++) {
+    v.push_back(i + 1);
+  }
+}

@@ -1,0 +1,11 @@
+#include <b2style.h>
+
+namespace CYCLE_TYPEDEF {
+  typedef A B;
+  typedef B C;
+  typedef C A;
+}  // namespace CYCLE_TYPEDEF
+
+void main() {
+  CYCLE_TYPEDEF::A a;
+}

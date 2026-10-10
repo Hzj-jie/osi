@@ -1,0 +1,22 @@
+type uint 4
+define 1 uint
+copy_const 1 i1
+
+callee m type0 ( ) {
+  define temp_string type*
+  interrupt stdout 1 temp_string
+}
+
+callee_ref delegate type0 ( )
+
+callee m2 type0 ( f delegate ) {
+  caller_ref f ( )
+}
+
+callee_ref delegate2 type0 ( delegate )
+
+define f delegate2
+address_of f m2
+define g delegate
+address_of g m
+caller_ref f ( g )

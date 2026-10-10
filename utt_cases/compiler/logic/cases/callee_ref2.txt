@@ -1,0 +1,41 @@
+type Integer 4
+
+callee b2style__int_std_out&Integer type0 ( x Integer ) {
+  define temp type*
+  interrupt putchar x temp
+}
+
+callee b2style__add&Integer&Integer Integer ( b2style__i Integer b2style__j Integer ) {
+  add b2style__i b2style__i b2style__j
+  return b2style__add&Integer&Integer b2style__i
+}
+
+callee self_increment&Integer Integer ( x Integer& ) {
+  define temp_value_@1@34417-34418 Integer
+  copy_const temp_value_@1@34417-34418 a01000000
+  define temp_value_@1@34398-34420 Integer
+  caller b2style__add&Integer&Integer temp_value_@1@34398-34420 ( x temp_value_@1@34417-34418 )
+  move x temp_value_@1@34398-34420
+  return self_increment&Integer x
+}
+
+callee main type0 ( ) {
+  define x Integer
+  define temp_value_@1@34460-34461 Integer
+  copy_const temp_value_@1@34460-34461 a00000000
+  move x temp_value_@1@34460-34461
+  define temp_value_@1@34487-34507 Integer
+  caller self_increment&Integer temp_value_@1@34487-34507 ( x )
+  caller b2style__int_std_out&Integer ( temp_value_@1@34487-34507 )
+  define temp_value_@1@34535-34555 Integer
+  caller self_increment&Integer temp_value_@1@34535-34555 ( x )
+  caller b2style__int_std_out&Integer ( temp_value_@1@34535-34555 )
+  define temp_value_@1@34583-34603 Integer
+  caller self_increment&Integer temp_value_@1@34583-34603 ( x )
+  caller b2style__int_std_out&Integer ( temp_value_@1@34583-34603 )
+  define temp_value_@1@34631-34651 Integer
+  caller self_increment&Integer temp_value_@1@34631-34651 ( x )
+  caller b2style__int_std_out&Integer ( temp_value_@1@34631-34651 )
+}
+
+caller main ( )

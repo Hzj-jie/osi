@@ -1,0 +1,5 @@
+#include <b2style.h>
+
+void main() {
+  reinterpret_cast(this_is_an_unknown_variable, int);
+}

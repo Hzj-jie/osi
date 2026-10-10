@@ -1,0 +1,27 @@
+#include <bstyle.h>
+#include <stdio.h>
+
+struct S1 {
+  int x;
+};
+
+struct S2 {
+  S1 x;
+  int y;
+};
+
+void print(S1 s) {
+  putchar(s.x);
+}
+
+void print(S2 s) {
+  print(s.x);
+  putchar(s.y);
+}
+
+void main() {
+  S2 s;
+  s.x.x = 100;
+  s.y = 100;
+  print(s);
+}

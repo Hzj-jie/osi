@@ -1,0 +1,33 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+class B {
+  int x;
+
+  overridable int f() {
+    return this.x;
+  }
+
+  void f2() {
+    b2style::std_out("f2");
+  }
+};
+
+class C : B {
+  int y;
+
+  override int f() {
+    return this.x + this.y;
+  }
+};
+
+void main() {
+  C c;
+  c.x=1;
+  c.y=2;
+  b2style::std_out(c.f());
+  c.f2();
+  reinterpret_cast(c, B);
+  b2style::std_out(c.f());
+  c.f2();
+}

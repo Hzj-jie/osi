@@ -1,0 +1,33 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+int destructs = 0;
+
+class C {
+  int x;
+
+  void construct(int x) {
+    this.x = x;
+  }
+
+  void construct() {
+    this.construct(100);
+  }
+
+  void destruct() {
+    ::destructs++;
+  }
+};
+
+void main() {
+  {
+    C c();
+    b2style::std_out(c.x);
+  }
+  b2style::std_out(::destructs);
+  {
+    C c(200);
+	b2style::std_out(c.x);
+  }
+  b2style::std_out(::destructs);
+}

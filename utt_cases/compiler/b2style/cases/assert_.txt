@@ -1,0 +1,9 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+#include <assert.h>
+
+void main() {
+  assert(true, "This assertion should pass.");
+  assert(false, "This assertion should not pass.");
+  b2style::std_out("This line should not be executed.");
+}

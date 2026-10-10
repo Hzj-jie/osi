@@ -1,0 +1,23 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+class C {
+  void construct() {
+    b2style::std_out("construct");
+  }
+
+  void destruct() {
+    b2style::std_out("destruct");
+  }
+};
+
+C create() {
+  b2style::std_out("create");
+  C c;
+  return c;
+}
+
+void main() {
+  C c = create();
+  b2style::std_out("finish");
+}

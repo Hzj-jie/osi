@@ -1,0 +1,10 @@
+class C{
+  int x;
+
+  void print() {}
+};
+
+void main() {
+  C c;
+  c.();
+}

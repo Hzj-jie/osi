@@ -1,0 +1,11 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+void main() {
+  biguint i = 4294967296L;
+  biguint j = 4294967296l;
+  biguint k = 1L;
+  b2style::std_out(i);
+  b2style::std_out(j);
+  b2style::std_out(k);
+}

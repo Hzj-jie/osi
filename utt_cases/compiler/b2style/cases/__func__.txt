@@ -1,0 +1,30 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+class C {
+  void std_out() {
+    b2style::std_out(__func__);
+    b2style::std_out("\n");
+  }
+};
+
+namespace N {
+  ::void print() {
+    ::b2style::std_out(__func__);
+    ::b2style::std_out("\n");
+  }
+
+  ::void f2(::int x, ::string s) {
+    ::b2style::std_out(__func__);
+    ::b2style::std_out("\n");
+  }
+};
+
+void main() {
+  b2style::std_out(__func__);
+  b2style::std_out("\n");
+  C c;
+  c.std_out();
+  N::print();
+  N::f2(1, "");
+}

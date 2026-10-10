@@ -1,0 +1,28 @@
+#include <b2style.h>
+#include <testing.h>
+
+void f1() {
+  struct Point {
+    int x;
+    int y;
+  };
+  Point p;
+  p.x = 10;
+  p.y = 20;
+  b2style::testing::assert_equal<int>(p.x + p.y, 30);
+}
+
+void f2() {
+  struct Point {
+    string name;
+  };
+  Point p;
+  p.name = "osi";
+  b2style::testing::assert_equal<string>(p.name, "osi");
+}
+
+void main() {
+  f1();
+  f2();
+  b2style::testing::finished();
+}

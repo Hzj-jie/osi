@@ -1,0 +1,26 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+/*
+logic:
+  callee_ref func__2__int__int& int ( x int& )
+*/
+template <T, RT>
+delegate RT func(T);
+
+int f1(int& x) {
+  x++;
+  return x;
+}
+
+int f2(int& x) {
+  x--;
+  return x;
+}
+
+void main() {
+  func<int&, int> a = f1;
+  b2style::std_out(a(100));
+  a = f2;
+  b2style::std_out(a(100));
+}

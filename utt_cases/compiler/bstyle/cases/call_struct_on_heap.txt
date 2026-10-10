@@ -1,0 +1,23 @@
+struct S {
+  String s;
+};
+
+type0 f(S s) {
+  String temp;
+  logic "interrupt stdout s.s temp";
+}
+
+type0 f(Integer i) {
+  String temp;
+  logic "interrupt putchar i temp";
+}
+
+type0 main() {
+  S s[1];
+  // TODO: Make s[0].s work.
+  s.s[0] = "abc";
+  f(s[0]);
+  Integer v[1];
+  v[0] = 100;
+  f(v[0]);
+}

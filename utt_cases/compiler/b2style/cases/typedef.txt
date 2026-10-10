@@ -1,0 +1,13 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+namespace a {
+  typedef ::void void;
+  void f() {
+    ::b2style::std_out("abc");
+  }
+}  // namespace a
+
+void main() {
+  a::f();
+}

@@ -1,0 +1,97 @@
+## Use a stupid way to calculate n! from 1 to 100 and push the results into a
+## slice buffer.
+
+define n! type*
+
+type uint 4
+type bool 1
+
+define 0 uint
+copy_const 0 i0
+define 1 uint
+copy_const 1 i1
+define 2 uint
+copy_const 2 i2
+define 3 uint
+copy_const 3 i3
+
+callee method1 type0 ( n type* ) {
+  define result type*
+  copy_const result i1
+  define i type*
+  copy_const i i0
+  define not-continue bool
+  equal not-continue i n
+  do_until not-continue {
+    add i i 1
+    multiply result result i
+    equal not-continue i n
+  }
+  append_slice n! result
+}
+
+callee method2 type0 ( n type* ) {
+  define result type*
+  copy_const result i1
+  define i type*
+  copy_const i i0
+  define continue bool
+  less continue i n
+  do_while continue {
+    add i i 1
+    multiply result result i
+    less continue i n
+  }
+  append_slice n! result
+}
+
+callee method3-impl type* ( n type* ) {
+  define result type*
+  copy_const result i1
+  define i type*
+  copy_const i i2
+  define continue bool
+  less_or_equal continue i n
+  while_then continue {
+    multiply result result i
+    add i i 1
+    less_or_equal continue i n
+  }
+  return method3-impl result
+}
+
+callee method3 type0 ( n type* ) {
+  define result type*
+  caller method3-impl result ( n )
+  append_slice n! result 
+}
+
+define 100 uint
+copy_const 100 i100
+define i type*
+copy_const i i1
+define continue bool
+less_or_equal continue i 100
+while_then continue {
+  define rnd type*
+  interrupt current_ms 1 rnd
+  define result type*
+  divide result rnd rnd 3
+
+  define choose bool
+  equal choose rnd 0
+  if choose {
+    caller method1 ( i )
+  }
+  equal choose rnd 1
+  if choose {
+    caller method2 ( i )
+  }
+  equal choose rnd 2
+  if choose {
+    caller method3 ( i )
+  }
+
+  add i i 1
+  less_or_equal continue i 100
+}

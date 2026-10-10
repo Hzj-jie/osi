@@ -1,0 +1,27 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+class C1 {
+  int x;
+
+  void print() {
+    b2style::std_out(this.x);
+  }
+};
+
+class C2 {
+  int x;
+  C1 y;
+
+  void print() {
+    b2style::std_out(this.x);
+	this.y.print();
+  }
+};
+
+void main() {
+  C2 c;
+  c.x=100;
+  c.y.x=200;
+  c.print();
+}

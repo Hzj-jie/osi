@@ -1,0 +1,32 @@
+typedef "type*" string;
+typedef "type0" void;
+typedef "type0" b2style__void;
+typedef "type*" b2style__string;
+logic "define @@prefixes@temps@string type*";
+
+b2style__void b2style__std_out ( b2style__string b2style__i ) { logic "interrupt stdout b2style__i @@prefixes@temps@string" ;
+}
+
+ struct D { }
+;
+ struct E { }
+;
+ string to_string ( D & this ) { return "D" ;
+ }
+ string to_string ( E & this ) { return "E" ;
+ }
+struct C__D { }
+;
+ string to_string ( C__D & this ,  D t ) { return to_string ( t ) ;
+ }
+ struct C__E { }
+;
+ string to_string ( C__E & this ,  E t ) { return to_string ( t ) ;
+ }
+ void main ( ) { C__D c ;
+ D d ;
+ b2style__std_out ( to_string ( c ,  d ) ) ;
+ C__E c2 ;
+ E e ;
+ b2style__std_out ( to_string ( c2 ,  e ) ) ;
+ }

@@ -1,0 +1,6 @@
+template<T, T2>
+class C {
+  T x;
+  T2 y;
+  void p(T x, T2 y) {}
+};

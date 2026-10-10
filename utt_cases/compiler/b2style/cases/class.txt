@@ -1,0 +1,25 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+class C {
+  int x;
+
+  void add_x(int y) {
+    this.x += y;
+  }
+
+  int with_x(int y) {
+    return this.x + y;
+  }
+
+  int return_x() {
+    return this.x;
+  }
+};
+
+void main() {
+  C c;
+  c.add_x(100);
+  b2style::std_out(c.with_x(100));
+  b2style::std_out(c.return_x());
+}

@@ -1,0 +1,16 @@
+#include <b2style.h>
+
+void f1() {
+  struct LocalSecret {
+    int secret;
+  };
+}
+
+void f2() {
+  LocalSecret s;
+}
+
+void main() {
+  f1();
+  f2();
+}

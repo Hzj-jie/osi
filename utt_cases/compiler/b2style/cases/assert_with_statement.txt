@@ -1,0 +1,8 @@
+#include <b2style.h>
+#include <assert.h>
+
+void main() {
+  int i = 100;
+  assert(__STATEMENT__, i >= 100, "line 7");
+  assert(__STATEMENT__, i < 100, "line 8");
+}

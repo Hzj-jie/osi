@@ -1,0 +1,24 @@
+typedef Integer int;
+typedef Boolean bool;
+typedef type0 void;
+typedef String string;
+
+void f(int& x) {
+  int y = 1;
+  logic "add x x y";
+}
+
+bool less(int x, int y) {
+  bool result;
+  logic "less result x y";
+  return result;
+}
+ 
+void main() {
+  int r;
+  for (int i = 0; less(i, 5); f(i)) {
+    logic "add r r i";
+  }
+  string temp;
+  logic "interrupt putchar r temp";
+}

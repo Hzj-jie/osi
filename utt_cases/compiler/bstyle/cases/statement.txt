@@ -1,0 +1,12 @@
+#include <bstyle.h>
+
+void std_out(string i) {
+  string tmp;
+  logic "interrupt stdout i tmp";
+}
+
+void main() {
+  std_out(__STATEMENT__);
+  string s = __STATEMENT__;
+  std_out(s);
+}

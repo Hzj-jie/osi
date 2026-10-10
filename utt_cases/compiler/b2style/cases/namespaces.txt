@@ -1,0 +1,39 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+namespace a {
+  namespace b {
+    ::void f2() {
+      ::b2style::std_out("a::b::f2\n");
+    }
+  }
+
+  ::void f3() {
+    ::b2style::std_out("a::f3\n");
+  }
+
+  namespace b {
+    ::void f1() {
+      ::b2style::std_out("a::b::f1\n");
+    }
+  }
+
+  ::void f2() {
+    ::b2style::std_out("a::f2\n");
+  }
+
+  namespace c {
+    ::void f4() {
+      ::b2style::std_out("a::c::f4\n");
+    }
+  }
+}
+
+::void main() {
+  a::b::f1();
+  a::f2();
+
+  ::a::b::f2();
+  ::a::f3();
+  ::a::c::f4();
+}

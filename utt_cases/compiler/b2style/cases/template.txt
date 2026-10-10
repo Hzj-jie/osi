@@ -1,0 +1,32 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+class D {
+  string to_string() {
+    return "D";
+  }
+};
+
+class E {
+  string to_string() {
+    return "E";
+  }
+};
+
+template <T>
+class C {
+  string to_string(T t) {
+    return t.to_string();
+  }
+};
+
+// TODO: Allow class D and class E to be defined after template<T> C.
+
+void main() {
+  C<D> c;
+  D d;
+  b2style::std_out(c.to_string(d));
+  C<E> c2;
+  E e;
+  b2style::std_out(c2.to_string(e));
+}

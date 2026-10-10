@@ -1,0 +1,30 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+void self_increment(int& x) {
+  x++;
+}
+
+void self_increment2(int& x) {
+  ++x;
+}
+
+void main() {
+  int r = 0;
+  for (int i = 0; i < 100; i++) {
+    r += i;
+  }
+  b2style::std_out(r);
+  for (int i = 0; i < 100; ++i) {
+    r += i;
+  }
+  b2style::std_out(r);
+  for (int i = 0; i < 100; self_increment(i)) {
+    r += i;
+  }
+  b2style::std_out(r);
+  for (int i = 0; i < 100; self_increment2(i)) {
+    r += i;
+  }
+  b2style::std_out(r);
+}

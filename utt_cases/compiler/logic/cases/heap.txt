@@ -1,0 +1,22 @@
+type uint 4
+type bool 1
+
+define true bool
+copy_const true b1
+
+## Always use a new scope to ensure the heap allocation can be freed.
+if true {
+
+    define uint_100 uint
+    copy_const uint_100 i100
+    define_heap h uint uint_100
+    define uint_99 uint
+    copy_const uint_99 i99
+    copy h[uint_99] uint_99
+    define out uint
+    copy out h[uint_99]
+
+    define temp_string type*
+    interrupt putchar out temp_string
+
+}

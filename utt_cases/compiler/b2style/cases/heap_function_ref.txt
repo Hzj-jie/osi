@@ -1,0 +1,19 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+void f(int& x) {
+  x++;
+}
+
+void main() {
+  int s[100];
+  for (int i = 0; i < 100; i++) {
+    s[i] = i;
+	f(s[i]);
+  }
+
+  for (int i = 0; i < 100; i++) {
+    b2style::std_out(s[i]);
+	b2style::std_out("\n");
+  }
+}

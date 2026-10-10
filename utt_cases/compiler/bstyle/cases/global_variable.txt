@@ -1,0 +1,18 @@
+#include <bstyle.h>
+
+string _true = "True";
+string _false = "False";
+
+void print(bool i) {
+  string temp;
+  if (i) {
+	logic "interrupt stdout _true temp";
+  } else {
+	logic "interrupt stdout _false temp";
+  }
+}
+
+void main() {
+  print(true);
+  print(false);
+}

@@ -1,0 +1,24 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+struct S {};
+
+void f(S s) {
+  b2style::std_out("f");
+}
+
+void f2(S& s) {
+  b2style::std_out("f2");
+}
+
+S f3() {
+  b2style::std_out("f3");
+  S s;
+  return s;
+}
+
+void main() {
+  S s = f3();
+  f(s);
+  f2(s);
+}

@@ -1,0 +1,13 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+void main() {
+  b2style::std_out(true && true);
+  b2style::std_out(true && false);
+  b2style::std_out(false && true);
+  b2style::std_out(false && false);
+  b2style::std_out(true || true);
+  b2style::std_out(true || false);
+  b2style::std_out(false || true);
+  b2style::std_out(false || false);
+}

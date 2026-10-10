@@ -1,0 +1,38 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+class C {
+  int x;
+  string y;
+
+  void print() {
+    b2style::std_out(this.x);
+	b2style::std_out(" ");
+	b2style::std_out(this.y);
+  }
+};
+
+class C2 {
+  C x;
+  int y;
+
+  void print() {
+    this.x.print();
+	b2style::std_out(" ");
+	b2style::std_out(this.y);
+	b2style::std_out("\n");
+  }
+};
+
+void main() {
+  C2 cs[100];
+  for (int i = 0; i < 100; i++) {
+    cs[i].x.x = i;
+    cs[i].x.y = b2style::int_to_str(i);
+	cs[i].y = i;
+  }
+
+  for (int i = 0; i < 100; i++) {
+    cs[i].print();
+  }
+}

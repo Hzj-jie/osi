@@ -1,0 +1,26 @@
+#include <b2style.h>
+#include <bstyle/const.h>
+#include <b2style/stdio.h>
+
+long loaded_current_ms() {
+  load_method("current_ms");
+  long result;
+  logic "interrupt execute_loaded_method @@prefixes@temps@string result";
+  return result;
+}
+
+bool is_even(long i) {
+  long _2 = 2;
+  long _0 = 0;
+  return b2style::equal(b2style::mod(i, _2), _0);
+}
+
+void main() {
+  for (int i = 0; i < 100; i += 1) {
+    long x = loaded_current_ms();
+    if (is_even(x)) {
+	  x = --x;
+	}
+    b2style::std_out(is_even(x));
+  }
+} 

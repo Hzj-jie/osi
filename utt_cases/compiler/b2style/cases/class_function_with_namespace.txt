@@ -1,0 +1,18 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+class C {
+  int N::x;
+
+  void N::print() {
+    b2style::std_out(this.N::x);
+  }
+};
+
+void main() {
+  C c;
+  c.N::x = 100;
+  c.N::print();
+  c.::N::x = 200;
+  c.::N::print();
+}

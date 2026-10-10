@@ -1,0 +1,16 @@
+#include <b2style.h>
+#include <testing.h>
+
+typedef int Num;
+
+void main() {
+  Num a = 10;
+  {
+    typedef string Num;
+    Num b = "hello";
+    b2style::testing::assert_equal<string>(b, "hello");
+  }
+  Num c = 20;
+  b2style::testing::assert_equal<int>(a + c, 30);
+  b2style::testing::finished();
+}

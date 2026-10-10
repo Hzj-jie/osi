@@ -1,0 +1,25 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+template <T>
+class C {
+  T t;
+};
+
+template <T, T2>
+class C {
+  T t;
+  T2 t2;
+};
+
+void main() {
+  C<int> c;
+  C<int, string> c2;
+  c.t = 1;
+  c2.t = 2;
+  c2.t2 = "abc";
+
+  b2style::std_out(c.t);
+  b2style::std_out(c2.t);
+  b2style::std_out(c2.t2);
+}

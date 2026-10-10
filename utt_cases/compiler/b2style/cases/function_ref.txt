@@ -1,0 +1,40 @@
+#include <b2style.h>
+
+void self_increment(int& x) {
+  x = x + 1;
+}
+
+int self_increment2(int& x) {
+  x = x + 1;
+  return x;
+}
+
+int self_increment3(int& x) {
+  return self_increment2(x);
+}
+
+void self_increment4(int& x) {
+  self_increment3(x);
+}
+
+int self_increment5(int& x) {
+  int r = x;
+  x = x + 1;
+  return r;
+}
+
+void main() {
+  int x = 0;
+  self_increment(x);
+  b2style::std_out(x);
+  self_increment(x);
+  b2style::std_out(x);
+  b2style::std_out(self_increment2(x));
+  b2style::std_out(self_increment2(x));
+  b2style::std_out(self_increment3(x));
+  self_increment4(x);
+  b2style::std_out(x);
+  self_increment5(x);
+  b2style::std_out(x);
+  b2style::std_out(self_increment5(x));
+}

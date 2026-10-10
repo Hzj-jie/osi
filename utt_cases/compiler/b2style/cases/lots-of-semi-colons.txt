@@ -1,0 +1,21 @@
+#include <b2style.h>;;; ;;;
+#include <b2style/stdio.h>
+// This test;;;
+// tries to add unnecessary semi-colons ;;; to everywhere.
+
+class C {
+  ;
+  int x ;;
+
+  void print() {
+    b2style::std_out(this.x);;
+	;
+  };;
+};;;
+
+void main() { ;;;
+  C c;;
+  c.x = 100; ;;;
+  ;
+  c.print();;;
+};

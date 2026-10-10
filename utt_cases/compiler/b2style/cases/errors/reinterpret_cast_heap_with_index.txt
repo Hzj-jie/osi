@@ -1,0 +1,15 @@
+#include <b2style.h>
+
+struct S {
+  int x;
+};
+
+struct S2 {
+  int x;
+};
+
+void main() {
+  S s[1];
+  S2__struct__type__id__type s.S2__struct__type__id[1];
+  reinterpret_cast(s[0], S2);
+}

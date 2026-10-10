@@ -1,0 +1,27 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+void main() {
+  int i = 1;
+  i += i++;
+  b2style::std_out(i);
+  b2style::std_out("_");
+  i += ++i;
+  b2style::std_out(i);
+  b2style::std_out("_");
+  ++i;
+  i += i++;
+  b2style::std_out(i);
+  b2style::std_out("_");
+  ++i;
+  b2style::std_out(i);
+  b2style::std_out("_");
+  i++;
+  b2style::std_out(i);
+  b2style::std_out("_");
+
+  // This is not supported by c++ since the (++i) is a rvalue and (++i)++ does not take effect to the original i.
+  // But b2style does not detect rvalue reference now, so the expected result is to increase i by 1 rather than 2.
+  ++i++;
+  b2style::std_out(i);
+}

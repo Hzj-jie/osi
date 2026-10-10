@@ -1,0 +1,16 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+template <T>
+class Adder {
+  T add(T t, T t2) {
+    return t + t2;
+  }
+};
+
+void main() {
+  Adder<int> t;
+  Adder<int> t2;
+  b2style::std_out(t.add(1, 1));
+  b2style::std_out(t2.add(2, 2));
+}

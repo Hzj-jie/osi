@@ -1,0 +1,40 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+namespace N {
+
+class C {
+  ::int x;
+
+  ::void print() {
+    ::b2style::std_out(this.x);
+  }
+};
+
+C c;
+
+::void print() {
+  ::N::c.x = 2;
+  ::N::c.print();
+}
+
+}  // namespace N
+
+namespace M {
+
+::N::C c;
+
+::void print() {
+  ::M::c.x = 3;
+  ::M::c.print();
+}
+
+}  // namespace M
+
+void main() {
+  N::C c;
+  c.x = 1;
+  c.print();
+  N::print();
+  M::print();
+}

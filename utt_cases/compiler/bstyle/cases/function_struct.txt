@@ -1,0 +1,23 @@
+#include <bstyle.h>
+
+struct S {
+  string s;
+  string s2;
+};
+
+void f(S s) {
+  string temp;
+  logic "interrupt stdout s.s temp";
+  logic "interrupt stdout s.s2 temp";
+}
+
+void g(S s) {
+  f(s);
+}
+
+void main() {
+  S s;
+  s.s = "abc";
+  s.s2 = "def";
+  g(s);
+}

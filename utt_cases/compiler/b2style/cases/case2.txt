@@ -1,0 +1,19 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+#include <bstyle/time.h>
+
+bool is_even(long i) {
+  long _2 = 2;
+  long _0 = 0;
+  return b2style::equal(b2style::mod(i, _2), _0);
+}
+
+void main() {
+  for (int i = 0; i < 100; i += 1) {
+    long x = current_ms();
+    if (is_even(x)) {
+      x = --x;
+    }
+    b2style::std_out(is_even(x));
+  }
+}

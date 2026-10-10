@@ -1,0 +1,35 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+class S {
+  int x;
+  void print() {
+    b2style::std_out(this.x);
+  }
+};
+
+struct S2 {
+  int x;
+};
+
+// This function should not be used.
+void f(S& s) {
+  s.x = 0;
+}
+
+void f(S2& s) {
+  s.x = 100;
+}
+
+void main() {
+  S s;
+  s.x = -100;
+  s.print();
+  S2__struct__type__id__type s.S2__struct__type__id;
+  // Note: this is not a typical way of using reinterpret_cast, it's pretty much useless without the support of
+  // inheritance.
+  reinterpret_cast(s, S2);
+  f(s);
+  reinterpret_cast(s, S);
+  s.print();
+}

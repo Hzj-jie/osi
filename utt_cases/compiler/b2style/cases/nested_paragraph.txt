@@ -1,0 +1,17 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+void main() {
+  {
+    string x = "hello again again world";
+    {
+	  string x = "hello world\n";
+	  b2style::std_out(x);
+	}
+	{
+	  string x = "hello again world\n";
+	  b2style::std_out(x);
+	}
+	b2style::std_out(x);
+  }
+}

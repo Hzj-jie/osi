@@ -1,0 +1,18 @@
+#include <b2style.h>
+
+class S {
+  int x;
+};
+
+struct S2 {
+  int x;
+};
+
+void main() {
+  S s;
+  S2__struct__type__id__type s.S2__struct__type__id; 
+  reinterpret_cast(s, S2);
+  undefine(s.S__struct__type__id);
+  // On b3style, it will also complain the destruction of s as S2 cannot be generated.
+  // b2style would only complain the S2__struct__type__id hasn't been defined.
+}

@@ -1,0 +1,13 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+void main() {
+  int x = 0;
+  int i = 0;
+  while (i < 100) {
+    i += 1;
+	x += i;
+  }
+  b2style::std_out(x);
+  b2style::std_out("\n");
+}

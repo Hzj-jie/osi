@@ -1,0 +1,59 @@
+callee m type0 ( n type*& i type* ) {
+  append n i
+}
+
+callee m2 type0 ( n type*& ) {
+  define 1 type*
+  copy_const 1 i1
+  add n n 1
+}
+
+define n type*
+define i type*
+copy_const i sd
+
+caller m ( n i )
+caller m ( n i )
+caller m ( n i )
+caller m ( n i )
+
+define temp_string type*
+interrupt stdout n temp_string
+
+define v type*
+copy_const v i0
+
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+caller m2 ( v )
+
+interrupt putchar v temp_string

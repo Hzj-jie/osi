@@ -1,0 +1,55 @@
+define output type*
+
+type uint 4
+type bool 1
+
+define 0 uint
+copy_const 0 i0
+define 1 uint
+copy_const 1 i1
+define 2 uint
+copy_const 2 i2
+define 3 uint
+copy_const 3 i3
+
+callee method1 type0 ( n type* ) {
+  append_slice output n
+}
+
+callee method2 type0 ( n type* ) {
+  append_slice output n
+}
+
+callee method3 type0 ( n type* ) {
+  append_slice output n
+}
+
+define 100 uint
+copy_const 100 i100
+define i type*
+copy_const i i1
+define continue bool
+less_or_equal continue i 100
+while_then continue {
+  define rnd type*
+  interrupt current_ms 1 rnd
+  define result type*
+  divide result rnd rnd 3
+
+  define choose bool
+  equal choose rnd 0
+  if choose {
+    caller method1 ( i )
+  }
+  equal choose rnd 1
+  if choose {
+    caller method2 ( i )
+  }
+  equal choose rnd 2
+  if choose {
+    caller method3 ( i )
+  }
+
+  add i i 1
+  less_or_equal continue i 100
+}

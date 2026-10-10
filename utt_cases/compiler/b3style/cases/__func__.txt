@@ -1,0 +1,21 @@
+#include <b2style.h>
+#include <b2style/stdio.h>
+
+namespace N {
+  ::void print() {
+    ::b2style::std_out(__func__);
+    ::b2style::std_out("\n");
+  }
+
+  ::void f2(::int x, ::string s) {
+    ::b2style::std_out(__func__);
+    ::b2style::std_out("\n");
+  }
+}  // namespace N
+
+void main() {
+  b2style::std_out(__func__);
+  b2style::std_out("\n");
+  N::print();
+  N::f2(1, "");
+}
