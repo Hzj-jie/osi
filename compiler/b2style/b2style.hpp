@@ -33,17 +33,6 @@ namespace osi
     {
         namespace b2style_compiler
         {
-            inline std::shared_ptr<automata::nlp> b2style_nlp()
-            {
-                static std::shared_ptr<automata::nlp> parser = []() {
-                    std::shared_ptr<automata::nlp> p;
-                    bool ok = automata::nlp::of(b2style_lib::nlexer_rule(), b2style_lib::syntaxer_rule(), p);
-                    assert(ok && p != nullptr);
-                    return p;
-                }();
-                return parser;
-            }
-
             inline code_gens<rewriter::typed_node_writer>& get_b2style_code_gens()
             {
                 static code_gens<rewriter::typed_node_writer> cg = []() {
@@ -231,148 +220,13 @@ namespace osi
                 }();
                 return cg;
             }
-
-            inline bool build_code(const std::string& input, rewriter::typed_node_writer& o)
-            {
-                if (input.empty())
-                {
-                    return true;
-                }
-                const std::string* pinput = &input;
-                std::string stripped;
-                if (input.rfind("\xef\xbb\xbf", 0) == 0)
-                {
-                    stripped = input.substr(3);
-                    pinput = &stripped;
-                }
-                if (pinput->empty())
-                {
-                    return true;
-                }
-                std::shared_ptr<automata::typed_node> root;
-                if (!b2style_nlp()->parse(*pinput, root))
-                {
-                    return false;
-                }
-                assert(root != nullptr);
-                assert(root->type == automata::typed_node::root_type);
-                assert(root->type_name == automata::typed_node::root_type_name);
-                if (root->leaf())
-                {
-                    return false;
-                }
-                assert(root->child_count() > 0);
-                for (uint32_t i = 0; i < root->child_count(); ++i)
-                {
-                    if (!code_gen_of(root->child(i)).build(o))
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
-
-            inline bool build_full(const std::string& input, rewriter::typed_node_writer& o)
-            {
-                statements<rewriter::typed_node_writer> s;
-                call_hierarchy_t::calculator::register_statement(s);
-
-                scope root_scope;
-                root_scope.disable_end_scope();
-                if (!build_code(input, o))
-                {
-                    return false;
-                }
-                s.export_to(o);
-                return true;
-            }
-
-            class b2style
-            {
-            public:
-                static const std::string& nlexer_rule()
-                {
-                    return b2style_lib::nlexer_rule();
-                }
-
-                static const std::string& syntaxer_rule()
-                {
-                    return b2style_lib::syntaxer_rule();
-                }
-
-                static bool parse(const std::string& input, std::string& o)
-                {
-                    rewriter::typed_node_writer w;
-                    if (!build_full(input, w))
-                    {
-                        return false;
-                    }
-                    o = w.dump();
-                    return true;
-                }
-
-                class compile_wrapper
-                {
-                private:
-                    std::shared_ptr<primitive::interrupts> functions_;
-
-                public:
-                    explicit compile_wrapper(std::shared_ptr<primitive::interrupts> functions)
-                        : functions_(std::move(functions))
-                    {
-                        assert(functions_ != nullptr);
-                    }
-
-                    static bstyle_compiler::current_file_guard with_current_file(const std::string& filename)
-                    {
-                        return bstyle_compiler::current_file_guard(filename);
-                    }
-
-                    bool build(const std::string& input, rewriter::typed_node_writer& o)
-                    {
-                        return build_full(input, o);
-                    }
-
-                    bool compile(const std::string& input, primitive::simulator& sim)
-                    {
-                        rewriter::typed_node_writer o;
-                        if (!build(input, o))
-                        {
-                            return false;
-                        }
-                        std::string bstyle_code = o.dump();
-                        return bstyle_compiler::bstyle::with_functions(functions_).compile(bstyle_code, sim);
-                    }
-
-                    bool compile_file(const std::string& filename, primitive::simulator& sim)
-                    {
-                        std::ifstream ifs(filename);
-                        if (!ifs.is_open())
-                        {
-                            raise_error("Cannot read content from ", filename);
-                            return false;
-                        }
-                        std::string content((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
-                        bstyle_compiler::current_file_guard guard(filename);
-                        return compile(content, sim);
-                    }
-                };
-
-                static compile_wrapper with_functions(std::shared_ptr<primitive::interrupts> functions)
-                {
-                    return compile_wrapper(std::move(functions));
-                }
-
-                static compile_wrapper with_functions(primitive::interrupts functions)
-                {
-                    return compile_wrapper(std::make_shared<primitive::interrupts>(std::move(functions)));
-                }
-
-                static compile_wrapper with_default_functions()
-                {
-                    return with_functions(std::make_shared<primitive::interrupts>());
-                }
-            };
         }
     }
 }
+
+#define DIALECT b2style
+#define WRITER rewriter::typed_node_writer
+#define DRIVER_NO_LOGIC_STATEMENTS
+#define COMPILE_DUMPER(dumped, functions, sim) \
+    return bstyle_compiler::bstyle::with_functions(functions).compile(dumped, sim)
+#include "../bstyle/driver.inc"
