@@ -60,23 +60,8 @@ namespace osi
                 return !_disable_namespace;
             }
 
-            class template_t : public osi::compiler::template_t
-            {
-            public:
-                using osi::compiler::template_t::template_t;
-
-                static bool of(const std::shared_ptr<automata::typed_node>& n,
-                               std::string& name,
-                               std::shared_ptr<template_template>& t);
-
-                static bool resolve(const std::shared_ptr<automata::typed_node>& n,
-                                    std::string& extended_type_name);
-            };
-
             class scope : public compiler_scope<scope>
             {
-            public:
-                using template_t = b3style_compiler::template_t;
             private:
                 includes_t incs_;
                 call_hierarchy_t fc_;

@@ -241,6 +241,57 @@ namespace osi
                 assert(!head->child(2)->leaf());
                 return head->child(2)->child_count();
             }
+
+            static bool of(const std::shared_ptr<automata::typed_node>& n,
+                           std::string& name,
+                           std::shared_ptr<template_template>& t)
+            {
+                assert(n != nullptr && n->child_count() == 2);
+                auto head = n->child(0);
+                auto body_wrapper = n->child(1);
+                assert(body_wrapper->child_count() == 1);
+                auto body = body_wrapper->child(0);
+
+                auto type_param_list = head->child(2);
+                std::vector<std::string> type_params;
+                for (uint32_t i = 0; i < type_param_list->child_count(); ++i)
+                {
+                    auto p = type_param_list->child(i);
+                    if (p->type_name == "type-param-with-comma")
+                    {
+                        p = p->child(0);
+                    }
+                    assert(p->type_name == "type-param");
+                    type_params.push_back(p->input_without_ignored());
+                }
+
+                std::unordered_set<std::string> unique_types(type_params.begin(), type_params.end());
+                if (unique_types.size() != type_params.size())
+                {
+                    raise_error("Duplicate template type parameters in ", head->input());
+                    return false;
+                }
+
+                std::shared_ptr<automata::typed_node> name_node;
+                if (body->type_name == "class" || body->type_name == "function")
+                {
+                    name_node = body->child(1);
+                }
+                else if (body->type_name == "delegate-with-semi-colon")
+                {
+                    name_node = body->child(0)->child(2);
+                }
+                else
+                {
+                    raise_error("Unsupported template body: ", body->type_name);
+                    return false;
+                }
+
+                t = std::make_shared<template_template>(body, name_node, type_params);
+                name = name_of(name_node->input_without_ignored(),
+                               static_cast<uint32_t>(type_params.size()));
+                return true;
+            }
         };
     }
 }
