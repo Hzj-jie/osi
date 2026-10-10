@@ -1,0 +1,79 @@
+
+#ifndef B2STYLE_LIB_STD_VECTOR
+#define B2STYLE_LIB_STD_VECTOR
+
+#include <b2style.h>
+#include <assert.h>
+#include <b2style/heap_ptr.h>
+#include <std/types.h>
+
+namespace std {
+
+template <T>
+class vector {
+  ::b2style::heap_ptr<T> _a;
+  int _s;
+
+  int size() {
+    return this._s;
+  }
+
+  int capacity() {
+    return this._a.size();
+  }
+
+  T get(int index) {
+    ::assert(index >= 0, "get");
+    ::assert(index < this.size(), "get");
+    return this._a.get(index);
+  }
+
+  void set(int index, T v) {
+    ::assert(index >= 0, "set");
+    ::assert(index < this.size(), "set");
+    this._a.set(index, v);
+  }
+
+  void destruct() {
+    this._a.destruct();
+  }
+
+  void reserve(int size) {
+    ::b2style::heap_ptr<T> x(size);
+    for (int i = 0; i < this.size(); i++) {
+      x.set(i, this.get(i));
+    }
+	this.destruct();
+    this._a = x;
+	x.release();
+  }
+
+  void construct(int size) {
+    this.reserve(size);
+  }
+
+  void construct() {
+    this.construct(4);
+  }
+
+  void push_back(T v) {
+    if (this.size() == this.capacity()) {
+      this.reserve(this.capacity() << 1);
+    }
+    this._s++;
+    this.set(this.size() - 1, v);
+  }
+
+  void pop_back() {
+    ::assert(this.size() > 0, "pop_back");
+    this._s--;
+  }
+
+  void clear() {
+    this._s = 0;
+  }
+};
+
+}  // namespace std
+
+#endif  // B2STYLE_LIB_STD_VECTOR

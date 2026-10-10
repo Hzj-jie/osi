@@ -1,0 +1,56 @@
+
+kw-if if
+kw-else else
+kw-for for
+kw-while while
+kw-do do
+kw-loop loop
+kw-return return
+kw-break break
+kw-logic logic
+kw-include #include
+kw-ifdef #ifdef
+kw-delse #else
+kw-ifndef #ifndef
+kw-define #define
+kw-endif #endif
+kw-typedef typedef
+kw-struct struct
+kw-reinterpret-cast reinterpret_cast
+kw-delegate delegate
+kw-undefine undefine
+kw-dealloc dealloc
+kw-file __FILE__
+kw-func __func__
+kw-line __LINE__
+kw-statement __STATEMENT__
+kw-static-cast static_cast
+
+single-line-comment //[*|\n]*
+multi-line-comment /\*[*|\*/]*\*/
+
+blank [\b]+
+
+include-with-file #include[\b]+<[*|>]+>
+
+bool [true,false]
+integer [+,-]?[\d]+
+biguint [\d]+[l,L]
+ufloat [\d]*.[\d]+
+string "[\",*|"]*"
+
+comma \,
+colon :
+question-mark ?
+start-paragraph {
+end-paragraph }
+start-bracket (
+end-bracket )
+start-square-bracket \[
+end-square-bracket \]
+semi-colon ;
+assignment =
+or \|\|
+
+dot .
+

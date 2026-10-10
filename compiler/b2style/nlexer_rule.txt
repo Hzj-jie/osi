@@ -1,0 +1,52 @@
+
+INCLUDE ../shared/nlexer_rule.txt
+
+kw-namespace namespace
+kw-class class
+kw-template template
+kw-overridable overridable
+kw-override override
+
+# Comparison
+less-or-equal <=
+greater-or-equal >=
+equal ==
+not-equal !=
+less-than <
+greater-than >
+
+# Operator
+add \+
+minus -
+multiply \*
+divide /
+mod %
+power ^
+bit-and &
+bit-or \|
+and &&
+not !
+self-inc \+\+
+self-dec --
+left-shift <<
+# right-shift is conflict with template <T<T2>>
+# right-shift >>
+
+self-add \+=
+self-minus -=
+self-multiply \*=
+self-divide /=
+self-mod %=
+self-power ^=
+self-bit-and &=
+self-bit-or \|=
+self-and &&=
+self-or \|\|=
+self-left-shift <<=
+self-right-shift >>=
+
+double-colon ::
+# "void :: f" is not allowed, it should be "void ::f", otherwise it's conflict with "void::f".
+raw-name-with-double-colon [\w,_][\w,\d,_]*::
+
+INCLUDE ../shared/nlexer_rule2.txt

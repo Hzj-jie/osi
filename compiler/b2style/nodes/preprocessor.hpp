@@ -23,19 +23,7 @@ namespace osi
         {
             inline const std::string& b2style_inc_folder()
             {
-                static std::string folder = []() {
-                    std::string p = std::filesystem::temp_directory_path().string() + "/osi_b2style_inc";
-                    std::filesystem::create_directories(p);
-                    for (const auto& kv : b2style_lib::files())
-                    {
-                        std::filesystem::path fp = std::filesystem::path(p) / kv.first;
-                        std::filesystem::create_directories(fp.parent_path());
-                        std::ofstream ofs(fp);
-                        ofs << kv.second;
-                    }
-                    return p;
-                }();
-                return folder;
+                return b2style_lib::inc_folder();
             }
 
             struct b2style_folders

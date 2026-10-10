@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
-#include "../b2style/b2style_lib.hpp"
+#include <filesystem>
+#include "../bstyle/bstyle_lib.hpp"
 
 namespace osi
 {
@@ -10,15 +11,24 @@ namespace osi
         {
             class b3style_lib
             {
+            private:
+                static const std::filesystem::path& dir()
+                {
+                    static const std::filesystem::path d = resolve_compiler_subdir("b3style");
+                    return d;
+                }
+
             public:
                 static const std::string& nlexer_rule()
                 {
-                    return b2style_compiler::b2style_lib::nlexer_rule();
+                    static const std::string rule = (dir() / "nlexer_rule.txt").string();
+                    return rule;
                 }
 
                 static const std::string& syntaxer_rule()
                 {
-                    return b2style_compiler::b2style_lib::syntaxer_rule();
+                    static const std::string rule = (dir() / "syntaxer_rule.txt").string();
+                    return rule;
                 }
             };
         }

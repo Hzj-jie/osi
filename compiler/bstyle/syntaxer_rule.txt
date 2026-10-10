@@ -1,0 +1,13 @@
+
+INCLUDE ../shared/syntaxer_rule.txt
+
+root-type base-root-type
+
+raw-name-with-dot raw-name dot
+name [raw-name-with-dot]* raw-name
+type-name raw-name
+sentence-with-semi-colon base-sentence-with-semi-colon
+for-increase base-for-increase
+value-without-bracket base-value-without-bracket
+raw-variable-name name
+variable-name [heap-name, raw-variable-name]

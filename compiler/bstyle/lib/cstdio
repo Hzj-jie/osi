@@ -1,0 +1,9 @@
+
+#ifndef BSTYLE_LIB_CSTDIO
+#define BSTYLE_LIB_CSTDIO
+
+// TODO: Move to b2style once the include can be handled by b2style as well.
+
+#include <stdio.h>
+
+#endif  // BSTYLE_LIB_CSTDIO

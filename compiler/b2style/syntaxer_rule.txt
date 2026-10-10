@@ -1,0 +1,62 @@
+
+INCLUDE ../shared/syntaxer_rule.txt
+
+root-type [base-root-type, namespace, class, template]
+
+right-shift greater-than greater-than
+raw-name-with-dot raw-name dot
+# Support a.N::b function call and a.::N::b.
+# Otherwise it should be name [double-colon]? [raw-name-with-double-colon]* [raw-name-with-dot]* raw-name
+name [raw-name-with-dot]* [double-colon]? [raw-name-with-double-colon, raw-name-with-dot]* raw-name
+raw-type-name [double-colon]? [raw-name-with-double-colon]* raw-name
+
+type-name [template-type-name, raw-type-name]
+
+reference bit-and
+
+namespace kw-namespace name start-paragraph [root-type]* end-paragraph
+
+# Can easily share logic with existing code.
+function-name-with-template name less-than paramtypelist greater-than
+function-call-with-template function-name-with-template start-bracket [value-list]? end-bracket
+ignore-result-function-call-with-template function-call-with-template
+class-initializer type-name name start-bracket [value-list]? end-bracket
+b2style-sentence-with-semi-colon [ignore-result-heap-struct-function-call, ignore-result-function-call-with-template, self-value-clause, pre-operation-value, post-operation-value, class-initializer]? semi-colon
+sentence-with-semi-colon [b2style-sentence-with-semi-colon, base-sentence-with-semi-colon]
+
+self-value-clause variable-name [self-add, self-minus, self-multiply, self-divide, self-mod, self-power, self-bit-and, self-bit-or, self-and, self-or, self-left-shift, self-right-shift] value
+
+for-increase [self-value-clause, ignore-result-heap-struct-function-call, pre-operation-value, post-operation-value, base-for-increase]
+
+raw-value [heap-struct-function-call, function-call-with-template, base-value-without-bracket]
+value-without-bracket [value-with-operation, raw-value]
+value-with-operation [unary-operation-value, binary-operation-value]
+unary-operation-value [pre-operation-value, post-operation-value]
+pre-operation-value [not, self-inc, self-dec] value
+# Should support post-operation-value value [self-inc, self-dec]
+post-operation-value raw-value [self-inc, self-dec]
+# Should support binary-operation-value value [add, minus, multiply, divide, mod, power, bit-and, bit-or, and, or, less-than, greater-than, less-or-equal, greater-or-equal, equal, not-equal] value
+binary-operation-value [value-with-bracket, raw-value] [add, minus, multiply, divide, mod, power, bit-and, bit-or, and, or, left-shift, right-shift, less-than, greater-than, less-or-equal, greater-or-equal, equal, not-equal] value
+variable-name [heap-struct-name, heap-name, name]
+heap-struct-name heap-name dot name
+ignore-result-heap-struct-function-call heap-struct-function-call
+heap-struct-function-call heap-struct-name start-bracket [value-list]? end-bracket
+
+# TODO: Support static function
+type-name-with-comma type-name comma
+inherited-types [type-name-with-comma]* type-name
+class-inheritance colon inherited-types
+overridable-function kw-overridable function
+override-function kw-override function
+class-function [overridable-function, override-function, function]
+class-template-function template-head class-function
+class kw-class type-name [class-inheritance]? start-paragraph [struct-body, class-function, class-template-function]* end-paragraph semi-colon
+
+template-type-name raw-type-name less-than paramtypelist greater-than
+type-param-list [type-param-with-comma]* type-param
+type-param-with-comma type-param comma
+type-param raw-name
+delegate-with-semi-colon delegate semi-colon
+template-body [class, delegate-with-semi-colon, function]
+template-head kw-template less-than type-param-list greater-than
+template template-head template-body

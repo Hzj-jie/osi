@@ -39,9 +39,9 @@ namespace osi::compiler::b2style_compiler
 void test_nlp_parsable()
 {
     std::shared_ptr<osi::automata::nlp> parser;
-    bool ok = osi::automata::nlp::of(b2style::nlexer_rule(),
-                                     b2style::syntaxer_rule(),
-                                     parser);
+    bool ok = osi::automata::nlp::of_file(b2style::nlexer_rule(),
+                                          b2style::syntaxer_rule(),
+                                          parser);
     assert(ok);
     assert(parser != nullptr);
     std::cout << "[PASS] nlp_parsable\n";

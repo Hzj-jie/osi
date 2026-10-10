@@ -21,7 +21,7 @@ namespace osi
             {
                 static std::shared_ptr<automata::nlp> parser = []() {
                     std::shared_ptr<automata::nlp> p;
-                    bool ok = automata::nlp::of(DIALECT_LIB::nlexer_rule(), DIALECT_LIB::syntaxer_rule(), p);
+                    bool ok = automata::nlp::of_file(DIALECT_LIB::nlexer_rule(), DIALECT_LIB::syntaxer_rule(), p);
                     assert(ok && p != nullptr);
                     return p;
                 }();
