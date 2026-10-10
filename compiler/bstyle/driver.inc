@@ -30,23 +30,12 @@ namespace osi
 
             inline bool build_code(const std::string& input, WRITER& o)
             {
-                if (input.empty())
-                {
-                    return true;
-                }
-                const std::string* pinput = &input;
-                std::string stripped;
-                if (input.rfind("\xef\xbb\xbf", 0) == 0)
-                {
-                    stripped = input.substr(3);
-                    pinput = &stripped;
-                }
-                if (pinput->empty())
+                if (input.empty() || input == "\xef\xbb\xbf")
                 {
                     return true;
                 }
                 std::shared_ptr<automata::typed_node> root;
-                if (!DIALECT_NLP()->parse(*pinput, root))
+                if (!DIALECT_NLP()->parse(input, root))
                 {
                     return false;
                 }

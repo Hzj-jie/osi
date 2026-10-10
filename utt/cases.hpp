@@ -65,6 +65,7 @@
 #include "../utt_cases/compiler/b2style/b2style_test.hpp"
 #include "../utt_cases/compiler/b2style/b2style_self_test.hpp"
 #include "../utt_cases/compiler/b3style/b3style_test.hpp"
+#include "../utt_cases/compiler/b3style/b3style_nlp_test.hpp"
 #include "../utt_cases/compiler/b3style/b3style_bstyle_test.hpp"
 #include "../utt_cases/compiler/b3style/b3style_b2style_b3style_test.hpp"
 #include "../utt_cases/compiler/b3style/b3style_self_test.hpp"

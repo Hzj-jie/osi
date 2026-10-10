@@ -30,7 +30,14 @@ namespace osi
                        std::vector<typed_word>& words,
                        std::shared_ptr<typed_node>& root) override
             {
-                return n_->match(txt, words) && s_->match(words, root);
+                const std::string* p = &txt;
+                std::string stripped;
+                if (txt.rfind("\xef\xbb\xbf", 0) == 0)
+                {
+                    stripped = txt.substr(3);
+                    p = &stripped;
+                }
+                return n_->match(*p, words) && s_->match(words, root);
             }
 
             using lang_parser::parse;
