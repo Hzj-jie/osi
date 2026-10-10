@@ -7,6 +7,7 @@
 #include <utility>
 #include "name_with_namespace.hpp"
 #include "../logic/builders.hpp"
+#include "../../automata/typed_node.hpp"
 #include "../../app_info/assert.hpp"
 #include "../../app_info/error_handle.hpp"
 
@@ -87,6 +88,127 @@ namespace osi
             void with_var(const parameter& p)
             {
                 vars_.push_back(p);
+            }
+
+            static std::pair<std::shared_ptr<automata::typed_node>, function_def::type_t>
+            parse_class_function(const std::shared_ptr<automata::typed_node>& child)
+            {
+                assert(child != nullptr && child->child_count() >= 1);
+                auto fn_node = child->child(0);
+                function_def::type_t f_type = function_def::type_t::pure;
+                if (fn_node->type_name == "overridable-function")
+                {
+                    f_type = function_def::type_t::overridable;
+                    fn_node = fn_node->child(1);
+                }
+                else if (fn_node->type_name == "override-function")
+                {
+                    f_type = function_def::type_t::override;
+                    fn_node = fn_node->child(1);
+                }
+                return {fn_node, f_type};
+            }
+
+            function_def parse_function(const std::shared_ptr<automata::typed_node>& fn_node,
+                                        function_def::type_t f_type,
+                                        const std::unordered_set<std::string>& ignored_types = {}) const
+            {
+                assert(fn_node != nullptr);
+                std::string ret_type = fn_node->child(0)->input_without_ignored();
+                std::string fn_name = fn_node->child(1)->input_without_ignored();
+
+                std::vector<std::pair<std::string, std::string>> params;
+                std::vector<std::string> param_names;
+                if (fn_node->child_count() == 6)
+                {
+                    auto paramlist = fn_node->child(3);
+                    for (uint32_t p = 0; p < paramlist->child_count(); ++p)
+                    {
+                        auto pnode = paramlist->child(p);
+                        if (pnode->type_name == "param-with-comma")
+                        {
+                            pnode = pnode->child(0);
+                        }
+                        assert(pnode->type_name == "param");
+                        bool is_ref = (pnode->child_count() == 3);
+                        std::string pt = pnode->child(0)->input_without_ignored() + (is_ref ? "&" : "");
+                        std::string pn = pnode->last_child()->input_without_ignored();
+                        params.emplace_back(pt, pn);
+                        param_names.push_back(pn);
+                    }
+                }
+
+                function_def fdef;
+                fdef.return_type = ret_type;
+                fdef.name = fn_name;
+                fdef.params = std::move(params);
+                fdef.type = f_type;
+                fdef.content = fdef.declaration(name.fully_qualified_name(), param_names, ignored_types) +
+                               fn_node->last_child()->input();
+                return fdef;
+            }
+
+            void with_funcs(const std::shared_ptr<automata::typed_node>& n)
+            {
+                assert(n != nullptr && n->child_count() >= 5);
+                bool has_constructor = false;
+                bool has_destructor = false;
+                uint32_t body_start = (n->child(2)->type_name == "class-inheritance") ? 4 : 3;
+
+                for (uint32_t i = body_start; i + 2 < n->child_count(); ++i)
+                {
+                    auto child = n->child(i);
+                    if (child->type_name == "class-function")
+                    {
+                        auto [fn_node, f_type] = parse_class_function(child);
+                        function_def fdef = parse_function(fn_node, f_type);
+                        if (fdef.name == construct) has_constructor = true;
+                        if (fdef.name == destruct) has_destructor = true;
+                        funcs_.push_back(std::move(fdef));
+                    }
+                    else if (child->type_name == "class-template-function")
+                    {
+                        auto head = child->child(0);
+                        auto [fn_node, f_type] = parse_class_function(child->child(1));
+
+                        std::unordered_set<std::string> tmpl_type_names;
+                        auto tmpl_param_list = head->child(2);
+                        for (uint32_t tp = 0; tp < tmpl_param_list->child_count(); ++tp)
+                        {
+                            auto tpnode = tmpl_param_list->child(tp);
+                            if (tpnode->type_name == "type-param-with-comma")
+                            {
+                                tpnode = tpnode->child(0);
+                            }
+                            tmpl_type_names.insert(tpnode->input_without_ignored());
+                        }
+
+                        function_def fdef = parse_function(fn_node, f_type, tmpl_type_names);
+                        temps_.emplace_back(head->input(), std::move(fdef));
+                    }
+                }
+
+                std::string void_type = namespace_t::fully_qualified_name("void");
+                if (!has_constructor)
+                {
+                    function_def cdef;
+                    cdef.return_type = void_type;
+                    cdef.name = construct;
+                    cdef.type = function_def::type_t::pure;
+                    cdef.content = void_type + " " + namespace_t::fully_qualified_name(construct) + "(" +
+                                   name.fully_qualified_name() + "& this){}";
+                    funcs_.push_back(std::move(cdef));
+                }
+                if (!has_destructor)
+                {
+                    function_def ddef;
+                    ddef.return_type = void_type;
+                    ddef.name = destruct;
+                    ddef.type = function_def::type_t::pure;
+                    ddef.content = void_type + " " + namespace_t::fully_qualified_name(destruct) + "(" +
+                                   name.fully_qualified_name() + "& this){}";
+                    funcs_.push_back(std::move(ddef));
+                }
             }
 
             bool check() const
