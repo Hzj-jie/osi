@@ -7,6 +7,7 @@
 #include <memory>
 #include <functional>
 #include "../code_gen/statements.hpp"
+#include "compiler_scope_interface.hpp"
 #include "../../app_info/assert.hpp"
 
 namespace osi
@@ -51,6 +52,15 @@ namespace osi
                 {
                     std::string cur = current_func_name_fn_();
                     if (!cur.empty()) from = cur;
+                }
+                else
+                {
+                    auto* cur = compiler_scope_interface::current_or_null();
+                    if (cur)
+                    {
+                        std::string fn = cur->current_function_name();
+                        if (!fn.empty()) from = fn;
+                    }
                 }
                 if (name != from)
                 {

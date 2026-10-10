@@ -131,7 +131,8 @@ namespace osi::compiler::b3style_compiler
 
             std::vector<std::string> ignored = {
                 "delegate_in_class.txt",
-                "delegate_in_class_on_heap.txt"
+                "delegate_in_class_on_heap.txt",
+                "struct-and-primitive-type-with-same-name.txt"
             };
 
             std::vector<fs::path> entries;

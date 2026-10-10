@@ -11,6 +11,7 @@
 #include "../../app_info/assert.hpp"
 #include "../../app_info/error_handle.hpp"
 #include "../logic/logic_writer.hpp"
+#include "../rewriter/typed_node_writer.hpp"
 #include "name_with_namespace.hpp"
 #include "namespace.hpp"
 #include "root_type_injector.hpp"
@@ -65,27 +66,32 @@ namespace osi
             };
 
         private:
-            std::string template_str_;
+            rewriter::typed_node_writer w_;
             extended_type_name_t ext_name_;
-            std::vector<std::string> type_params_;
+            std::vector<std::shared_ptr<std::string>> type_refs_;
 
         public:
             template_template(const std::shared_ptr<automata::typed_node>& body,
                               const std::shared_ptr<automata::typed_node>& name_node,
                               const std::vector<std::string>& types)
-                : ext_name_(name_node->input_without_ignored()), type_params_(types)
+                : ext_name_(name_node->input_without_ignored())
             {
                 assert(body != nullptr);
                 assert(name_node != nullptr);
                 assert(!types.empty());
 
-                std::stringstream ss;
+                type_refs_.resize(types.size());
+                for (size_t i = 0; i < types.size(); ++i)
+                {
+                    type_refs_[i] = std::make_shared<std::string>();
+                }
+
                 body->dfs(
-                    [&ss, name_node, &types, this](const std::shared_ptr<automata::typed_node>& node,
-                                                  const std::function<void()>& stop_nav) {
+                    [this, name_node, types](const std::shared_ptr<automata::typed_node>& node,
+                                             const std::function<void()>& stop_nav) {
                         if (node == name_node)
                         {
-                            ss << "@@@NAME@@@ ";
+                            w_.append([this]() { return ext_name_.str(); });
                             stop_nav();
                             return;
                         }
@@ -96,17 +102,17 @@ namespace osi
                             {
                                 if (input_str == types[i])
                                 {
-                                    ss << "@@@PARAM_" << i << "@@@ ";
+                                    auto ref = type_refs_[i];
+                                    w_.append([ref]() { return *ref; });
                                     stop_nav();
                                     return;
                                 }
                             }
                         }
                     },
-                    [&ss](const std::shared_ptr<automata::typed_node>& leaf) {
-                        ss << leaf->word().str() << " ";
+                    [this](const std::shared_ptr<automata::typed_node>& leaf) {
+                        w_.append(leaf->word().str());
                     });
-                template_str_ = ss.str();
             }
 
             std::string extended_type_name(const std::vector<std::string>& types)
@@ -118,32 +124,17 @@ namespace osi
             bool apply(const std::vector<std::string>& types, std::string& impl)
             {
                 assert(!types.empty());
-                assert(types.size() == type_params_.size());
+                assert(types.size() == type_refs_.size());
                 ext_name_.apply(types);
-                std::string res = template_str_;
-                std::string name_marker = "@@@NAME@@@";
-                size_t pos = 0;
-                std::string ext_name_str = ext_name_.str();
-                while ((pos = res.find(name_marker, pos)) != std::string::npos)
-                {
-                    res.replace(pos, name_marker.length(), ext_name_str);
-                    pos += ext_name_str.length();
-                }
                 for (size_t i = 0; i < types.size(); ++i)
                 {
-                    std::string param_marker = "@@@PARAM_" + std::to_string(i) + "@@@";
-                    pos = 0;
-                    while ((pos = res.find(param_marker, pos)) != std::string::npos)
-                    {
-                        res.replace(pos, param_marker.length(), types[i]);
-                        pos += types[i].length();
-                    }
+                    *type_refs_[i] = types[i];
                 }
-                while (!res.empty() && res.back() == ' ')
+                impl = w_.str();
+                for (size_t i = 0; i < types.size(); ++i)
                 {
-                    res.pop_back();
+                    type_refs_[i]->clear();
                 }
-                impl = res;
                 return true;
             }
         };

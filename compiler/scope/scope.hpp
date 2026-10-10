@@ -323,6 +323,11 @@ namespace osi
                 return default_sig;
             }
 
+            std::string current_function_name() const override
+            {
+                return current_function_name_or("");
+            }
+
             std::string type_alias(std::string alias) const override
             {
                 assert(!parameter_type::is_ref_type(alias));
@@ -453,7 +458,7 @@ namespace osi
                 return true;
             }
 
-            bool structs_resolve(const std::string& type, const std::string& name, struct_def& o) const
+            bool structs_resolve(const std::string& type, const std::string& name, struct_def& o) const override
             {
                 const Derived* s = static_cast<const Derived*>(this);
                 while (s != nullptr)
@@ -465,7 +470,7 @@ namespace osi
                 return false;
             }
 
-            bool structs_is_type_defined(const std::string& type) const
+            bool structs_is_type_defined(const std::string& type) const override
             {
                 struct_def dummy;
                 return structs_resolve(type, "", dummy);

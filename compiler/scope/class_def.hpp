@@ -58,7 +58,7 @@ namespace osi
                         std::string base = has_ref ? t.substr(0, t.length() - 1) : t;
                         if (ignored_types.find(base) != ignored_types.end()) return t;
                         if (base.rfind(current_namespace_t::namespace_separator, 0) == 0) return t;
-                        return current_namespace_t::namespace_separator + base + (has_ref ? "&" : "");
+                        return current_namespace_t::of(base) + (has_ref ? "&" : "");
                     };
 
                     std::string d = get_type(return_type) + " " +

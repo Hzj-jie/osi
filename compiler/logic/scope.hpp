@@ -87,7 +87,11 @@ namespace osi
                         {
                             un_ns = un_ns.substr(2);
                         }
-                        if (sizes.find(un_ns) != sizes.end()) return false;
+                        auto it = sizes.find(un_ns);
+                        if (it != sizes.end())
+                        {
+                            return it->second == size;
+                        }
                         sizes[un_ns] = size;
                         sizes["::" + un_ns] = size;
                         return true;

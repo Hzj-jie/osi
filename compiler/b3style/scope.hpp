@@ -138,6 +138,32 @@ namespace osi
                 const accessor_t* get_accessor() const override { return &accessor_; }
                 const features_t* get_features() const override { return &features_; }
 
+                std::string resolve_type_node_impl(const std::shared_ptr<automata::typed_node>& type) const
+                {
+                    assert(type != nullptr);
+                    if (type->type_name == "template-type-name" ||
+                        (!type->leaf() && type->child_count() > 0 && type->child(0)->type_name == "template-type-name"))
+                    {
+                        auto target_node = (type->type_name == "template-type-name") ? type : type->child(0);
+                        std::string s;
+                        if (code_gen_of(target_node).dump(s))
+                        {
+                            while (!s.empty() && (s.back() == ' ' || s.back() == '\t' || s.back() == '\n' || s.back() == '\r')) s.pop_back();
+                            while (!s.empty() && (s.front() == ' ' || s.front() == '\t' || s.front() == '\n' || s.front() == '\r')) s.erase(s.begin());
+                            if (!s.empty())
+                            {
+                                return s;
+                            }
+                        }
+                    }
+                    return "";
+                }
+
+                std::string resolve_type_node(const std::shared_ptr<automata::typed_node>& type) const override
+                {
+                    return resolve_type_node_impl(type);
+                }
+
                 explicit scope(scope* parent = nullptr)
                     : compiler_scope<scope>(parent)
                 {

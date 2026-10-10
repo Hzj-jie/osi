@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include "namespace.hpp"
 #include "../function_signature.hpp"
 #include "../../app_info/assert.hpp"
 #include "../../app_info/error_handle.hpp"
@@ -16,8 +17,8 @@ namespace osi
             std::unordered_map<std::string, function_signature<parameter_type>> s_;
 
         public:
-            bool define(const std::string& return_type,
-                        const std::string& name,
+            bool define(const std::string& name,
+                        const std::string& return_type,
                         const std::vector<parameter_type>& params)
             {
                 assert(!name.empty());
@@ -37,6 +38,25 @@ namespace osi
                 {
                     o = it->second;
                     return true;
+                }
+                std::string fn = current_namespace_t::of(name);
+                if (fn != name)
+                {
+                    it = s_.find(fn);
+                    if (it != s_.end())
+                    {
+                        o = it->second;
+                        return true;
+                    }
+                }
+                if (name.rfind(current_namespace_t::namespace_separator, 0) == 0)
+                {
+                    it = s_.find(name.substr(current_namespace_t::namespace_separator.size()));
+                    if (it != s_.end())
+                    {
+                        o = it->second;
+                        return true;
+                    }
                 }
                 return false;
             }

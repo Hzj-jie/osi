@@ -4,10 +4,16 @@
 
 namespace osi
 {
+    namespace automata
+    {
+        class typed_node;
+    }
+
     namespace compiler
     {
         class accessor_t;
         class features_t;
+        class struct_def;
 
         class compiler_scope_interface
         {
@@ -19,6 +25,10 @@ namespace osi
             virtual const features_t& features() const = 0;
             virtual bool is_root() const = 0;
             virtual std::string type_alias(std::string alias) const = 0;
+            virtual bool structs_resolve(const std::string& type, const std::string& name, struct_def& o) const = 0;
+            virtual bool structs_is_type_defined(const std::string& type) const = 0;
+            virtual std::string resolve_type_node(const std::shared_ptr<automata::typed_node>& type) const { return ""; }
+            virtual std::string current_function_name() const { return ""; }
 
             static compiler_scope_interface* current_or_null();
             static compiler_scope_interface* current();

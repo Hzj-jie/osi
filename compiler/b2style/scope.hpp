@@ -185,7 +185,7 @@ namespace osi
 
                     includes_t* includes() const override { return &s_->get_root()->incs_; }
                     define_t* defines() const override { return &s_->get_root()->d_; }
-                    std::string current_function_name() const override { return s_->cur_func_; }
+                    std::string current_function_name() const override { return s_->current_function_name(); }
                     osi::compiler::call_hierarchy_t* call_hierarchy() const override { return &s_->get_root()->fc_; }
                     current_namespace_t* current_namespace() const override { return &s_->get_root()->cn_; }
                     variable_t* variables() const override { return &s_->v_; }

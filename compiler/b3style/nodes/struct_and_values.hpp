@@ -65,7 +65,10 @@ namespace osi
                     assert(n->child_count() >= 5);
                     std::string struct_name = scope::type_name::of(n->child(1));
                     auto members = parse_struct_body(n);
-                    return scope::current()->structs().define(
+                    auto target_scope = (n->parent != nullptr && n->parent->type_name == "base-root-type")
+                        ? scope::current()->get_root()
+                        : scope::current();
+                    return target_scope->structs().define(
                         struct_name,
                         std::move(members),
                         [&o](const std::string& type, uint32_t size) {

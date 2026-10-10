@@ -138,7 +138,7 @@ paramlist [param-with-comma]* param
 param-with-comma param comma
 
 paragraph [sentence, multi-sentence-paragraph]
-sentence [sentence-with-semi-colon, condition, while, for-loop]
+sentence [sentence-with-semi-colon, condition, while, for-loop, struct]
 
 multi-sentence-paragraph start-paragraph [paragraph, ifdef-wrapped, ifndef-wrapped]* end-paragraph
 

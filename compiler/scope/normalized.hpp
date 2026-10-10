@@ -66,6 +66,19 @@ namespace osi
                     type == "::type_ptr" ||
                     type == "::type0")
                 {
+                    auto* cur = compiler_scope_interface::current_or_null();
+                    if (cur != nullptr && cur->features().with_namespace())
+                    {
+                        if (type.rfind(current_namespace_t::namespace_separator, 0) == 0)
+                        {
+                            return type;
+                        }
+                        return current_namespace_t::namespace_separator + type;
+                    }
+                    if (type.rfind(current_namespace_t::namespace_separator, 0) == 0)
+                    {
+                        return type.substr(current_namespace_t::namespace_separator.size());
+                    }
                     return type;
                 }
                 auto* cur = compiler_scope_interface::current_or_null();
@@ -87,6 +100,15 @@ namespace osi
             static std::string of(const std::shared_ptr<automata::typed_node>& type)
             {
                 assert(type != nullptr);
+                auto* cur = compiler_scope_interface::current_or_null();
+                if (cur != nullptr)
+                {
+                    std::string s = cur->resolve_type_node(type);
+                    if (!s.empty())
+                    {
+                        return of(s);
+                    }
+                }
                 return of(type->input_without_ignored());
             }
 

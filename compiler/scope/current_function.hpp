@@ -46,9 +46,7 @@ namespace osi
             {
                 auto* cur = compiler_scope_interface::current_or_null();
                 if (!cur) return false;
-                auto* st = cur->myself().structs();
-                if (!st) return false;
-                return st->defined(return_type());
+                return cur->structs_is_type_defined(return_type());
             }
 
             std::string signature() const

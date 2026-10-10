@@ -276,7 +276,7 @@ namespace osi
                     {
                         param_type_strs.push_back(p.full_type());
                     }
-                    return scope::current()->delegates().define(return_type.full_type(), name.full_type(), ps) &&
+                    return scope::current()->delegates().define(name.full_type(), return_type.full_type(), ps) &&
                            builders::of_callee_ref(name.full_type(), return_type.full_type(), param_type_strs).to(o);
                 }
             };

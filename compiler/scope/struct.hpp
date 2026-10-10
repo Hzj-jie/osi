@@ -53,13 +53,13 @@ namespace osi
                 }
                 auto* cs = compiler_scope_interface::current_or_null();
                 struct_def sub_def;
-                if (cs != nullptr && cs->myself().structs() != nullptr && cs->myself().structs()->resolve(type, "", sub_def))
+                if (cs != nullptr && cs->structs_resolve(type, "", sub_def))
                 {
                     d.with_nested(full_type, name);
                     d.append(sub_def.append_prefix(name));
                     return true;
                 }
-                d.with_primitive(type, name);
+                d.with_primitive(full_type, name);
                 return true;
             }
 
@@ -71,7 +71,7 @@ namespace osi
                 std::string full_type = normalized_type::parameter_type_of(name).full_type();
                 assert(!parameter_type::is_ref_type(full_type));
 
-                parameter type_id = create_type_id(name);
+                parameter type_id = create_type_id(full_type);
                 define_type(normalized_type::of(type_id.unrefed_type()), 1);
                 members.push_back(type_id);
 

@@ -100,7 +100,7 @@ namespace osi
                 auto* cur = compiler_scope_interface::current();
                 auto define_primitive_type_temp_target = [&](const std::string& t_raw, const std::string& n) {
                     std::string t = normalized_type::parameter_type_of(t_raw).full_type();
-                    assert(!cur->myself().structs()->defined(t));
+                    assert(!cur->structs_is_type_defined(t));
                     assert(!cur->myself().variables()->defined(n));
                     assert(cur->myself().variables()->define(t, n));
                     assert(builders::of_define(n, t).to(o));
@@ -108,7 +108,7 @@ namespace osi
 
                 struct_def params;
                 std::string temp_var_name = cur->myself().temp_logic_name()->variable();
-                if (cur->myself().structs()->resolve(type, temp_var_name, params))
+                if (cur->structs_resolve(type, temp_var_name, params))
                 {
                     for (const auto& p : params.primitives())
                     {
