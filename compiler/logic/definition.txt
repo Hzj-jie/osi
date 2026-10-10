@@ -1,0 +1,258 @@
+
+# The following definitions are predefined.
+#  typed_parameters = ( string string * )
+#  parameters = ( string * )
+#  paragraph = { statement * }
+
+# No-op, start a new scope during the compilation.
+start_scope	paragraph
+
+# define a type:
+#  type uint 4
+#  type biguint 0
+# setting size >= max_int32 to define a variable-length type.
+type	string	uint
+
+# execute append_slice command against two variables:
+#  append_slice target source
+append_slice	string	string
+
+# execute append_slice command against two variables:
+#  cut_slice target index source
+cut_slice	string	string	string
+
+# execute cut command against two variables and store the result in the first variable:
+#  cut target source length
+cut	string	string	string
+
+# execute cutl command against three variables and store the result in the first variable:
+#  cut_len target source from length
+cut_len	string	string	string	string
+
+# execute clear command against the variable:
+#  clear target
+clear	string
+
+# execute add command against two variables and store the result in the first variable:
+#  add target source1 source2
+add	string	string	string
+
+# execute subtract command against two variables and store the result in the first variable:
+#  subtract target source1 source2
+subtract	string	string	string
+
+# execute multiply command against two variables and store the result in the first variable:
+#  multiply target source1 source2
+multiply	string	string	string
+
+# execute devide against two variables and store the result (quotient and remainder) in the first two variables:
+#  divide quotient remainder dividend divisor
+divide	string	string	string	string
+
+# execute extract against two varaibles and store the result (root and remainder) in the first two variables:
+#  extract root remainder radicand index
+extract	string	string	string	string
+
+# execute power command against two variables and store the result in the first variable:
+#  power target source1 source2
+power	string	string	string
+
+# execute and command against two variables and store the result in the first variable:
+#  and target source1 source2
+and	string	string	string
+
+# execute or command against two variables and store the result in the first variable:
+#  or target source1 source2
+or	string	string	string
+
+# define a callee / function with name, parameters and body:
+#  callee f int (a uint) { return f a; }
+#  a type suffixed by "&" indicates that it's a "reference".
+callee	string	string	typed_parameters	paragraph
+
+# execute a function with parameters and store its return value:
+#  caller f return-value (p1, p2)
+caller	string	string	parameters
+
+# execute a function with parameters and discard the return value:
+#  caller f (p1, p2)
+caller	string	parameters
+
+# define a callee / function reference with name, parameters:
+#  callee_ref f int ( a uint )
+#  a type suffixed by "&" indicates that it's a "reference".
+callee_ref	string	string	parameters
+
+# execute a function based on its address with parameters and store its return value:
+#  caller_ref f return-value (p1, p2)
+caller_ref	string	string	parameters
+
+# execute a function based on its address with parameters and discard the return value:
+#  caller_ref f (p1, p2)
+caller_ref	string	parameters
+
+# copy the position of a function:
+#  address_of target source
+address_of	string	string
+
+# execute less command against two variables and store the result in the first variable:
+#  less target source1 source2
+less	string	string	string
+
+# execute more command against two variables and store the result in the first variable:
+#  more target source1 source2
+more	string	string	string
+
+# execute equal command against two variables and store the result in the first variable:
+#  equal target source1 source2
+equal	string	string	string
+
+# execute less_or_equal command against two variables and store the result in the first variable:
+#  less_or_equal target source1 source2
+less_or_equal	string	string	string
+
+# execute more_or_equal command against two variables and store the result in the first variable:
+#  more_or_equal target source1 source2
+more_or_equal	string	string	string
+
+# if the variable is true (access_stack_as_bool()), execute the first paragraph, otherwise execute the second one:
+#  if a-bool-value { } else { }
+if	string	paragraph	else	paragraph
+
+# if the variable is true (access_stack_as_bool()), execute the paragraph:
+#  if a-bool-value { }
+if	string	paragraph
+
+# execute copy command:
+#  copy target source
+copy	string	string
+
+# execute copy_const command:
+#  copy target <data_block>
+copy_const	string	data_block
+
+# define a variable with type:
+#  define variable uint
+define	string	string
+
+# define a heap memory block with name, type and size
+#  define_heap my_heap_ptr uint my_size
+define_heap	string	string	string
+
+# redefine a variable into a different type:
+#  redefine variable uint
+# this command does not generate runtime instructions and works for both stack and heap variables.
+redefine	string	string
+
+# undefine a variable, it will not be accessible after this statement:
+#  undefine variable
+# this command does not generate runtime instructions and works for both stack and heap variables.
+undefine	string
+
+# deallocate the heap memory block.
+#  dealloc_heap my_heap_ptr
+dealloc_heap	string
+
+# execute the paragraph until the variable is true:
+#  do_until a-bool-value { }
+do_until	string	paragraph
+
+# execute the paragraph while the varaible is true:
+#  do_while a-bool-value { }
+# equals to do { } while (a_bool_value); in C.
+do_while	string	paragraph
+
+# execute an interrupt function with parameter and store the result in the third variable:
+#  interrupt function-name parameter result
+interrupt	string	string	string
+
+# execute move command:
+#  move target source
+move	string	string
+
+# exit a function without return value:
+# to avoid increasing the complexity in this level, the language contains no "syntax" concept, but only fixed rules. so
+# the "*" is used as a placeholder to make the parsing logic same as return string string.
+#  return f *
+return	string	*
+
+# exit a function with return value:
+#  return f result
+return	string	string
+
+# execute append command and store the result in the first variable:
+#  append target source
+append	string	string
+
+# execute not command and store the result in the first variable:
+#  not target source
+not	string	string
+
+# execute sizeof command and store the result in the first variable:
+#  sizeof target source
+sizeof	string	string
+
+# execute empty command and store the result in the first variable:
+#  empty target source
+empty	string	string
+
+# execute paragraph when the variable is true:
+#  while_then a-bool-value { }
+# equals to while(a_bool_value) { }; in C.
+while_then	string	paragraph
+
+# execute stop command:
+#  stop
+stop
+
+# execute add command against two variables and store the result in the first variable:
+#  float_add target source1 source2
+float_add	string	string	string
+
+# execute subtract command against two variables and store the result in the first variable:
+#  float_subtract target source1 source2
+float_subtract	string	string	string
+
+# execute multiply command against two variables and store the result in the first variable:
+#  float_multiply target source1 source2
+float_multiply	string	string	string
+
+# execute devide against two variables and store the result quotient in the first variable:
+#  float_divide quotient dividend divisor
+float_divide	string	string	string
+
+# execute extract against two varaibles and store the result root in the first variable:
+#  float_extract root radicand index
+float_extract	string	string	string
+
+# execute power command against two variables and store the result in the first variable:
+#  float_power target source1 source2
+float_power	string	string	string
+
+# execute less command against two variables and store the result in the first variable:
+#  float_less target source1 source2
+float_less	string	string	string
+
+# execute more command against two variables and store the result in the first variable:
+#  float_more target source1 source2
+float_more	string	string	string
+
+# execute equal command against two variables and store the result in the first variable:
+#  float_equal target source1 source2
+float_equal	string	string	string
+
+# execute less_or_equal command against two variables and store the result in the first variable:
+#  float_less_or_equal target source1 source2
+float_less_or_equal	string	string	string
+
+# execute more_or_equal command against two variables and store the result in the first variable:
+#  float_more_or_equal target source1 source2
+float_more_or_equal	string	string	string
+
+# execute left_shift command against two variables and store the result in the first variable:
+#  left_shift target source1 source2
+left_shift	string	string	string
+
+# execute right_shift command against two variables and store the result in the first variable:
+#  right_shift target source1 source2
+right_shift	string	string	string

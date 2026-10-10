@@ -259,6 +259,9 @@ namespace osi
                     assert(this->p != nullptr);
                 }
 
+                _callee(std::string name, std::string type, std::vector<parameter> parameters, std::shared_ptr<paragraph> p)
+                    : _callee(std::move(name), std::move(type), std::move(p), std::move(parameters)) {}
+
                 bool build(std::vector<std::string>& o) const override
                 {
                     uint32_t pos = static_cast<uint32_t>(o.size());
@@ -422,6 +425,14 @@ namespace osi
                     assert(!this->return_type.empty());
                 }
 
+                _callee_ref(std::string name, std::string return_type, const std::vector<std::string>& param_names)
+                    : name(std::move(name)), return_type(std::move(return_type))
+                {
+                    assert(!this->name.empty());
+                    assert(!this->return_type.empty());
+                    for (const auto& pn : param_names) parameters.emplace_back(pn);
+                }
+
                 bool build(std::vector<std::string>&) const override
                 {
                     return scope::current()->anchor_refs().decl(name, return_type, parameters);
@@ -514,6 +525,9 @@ namespace osi
                 {
                     assert(!this->name.empty());
                 }
+
+                _return(std::string name, place_holder)
+                    : _return(std::move(name), "") {}
 
                 bool build(std::vector<std::string>& o) const override
                 {

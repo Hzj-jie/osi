@@ -14,6 +14,8 @@ namespace osi
     {
         namespace logic
         {
+            struct place_holder {};
+
             class instruction_gen
             {
             public:

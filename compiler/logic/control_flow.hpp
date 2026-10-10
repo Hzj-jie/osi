@@ -75,6 +75,9 @@ namespace osi
                     assert(this->true_path != nullptr);
                 }
 
+                _if(std::string v, std::shared_ptr<paragraph> true_path, place_holder, std::shared_ptr<paragraph> false_path)
+                    : _if(std::move(v), std::move(true_path), std::move(false_path)) {}
+
                 bool build(std::vector<std::string>& o) const override
                 {
                     variable var;
