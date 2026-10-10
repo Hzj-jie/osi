@@ -82,9 +82,14 @@ namespace osi
                         assert(!type.empty());
                         if (size == variable_size && type != variable_type) return false;
                         if (size == zero_size && type != zero_type) return false;
-                        if (sizes.find(type) != sizes.end()) return false;
-                        sizes[type] = size;
-                        sizes["::" + type] = size;
+                        std::string un_ns = type;
+                        while (un_ns.rfind("::", 0) == 0)
+                        {
+                            un_ns = un_ns.substr(2);
+                        }
+                        if (sizes.find(un_ns) != sizes.end()) return false;
+                        sizes[un_ns] = size;
+                        sizes["::" + un_ns] = size;
                         return true;
                     }
 
@@ -111,6 +116,19 @@ namespace osi
                     bool retrieve(const std::string& type, uint32_t& size) const
                     {
                         auto it = sizes.find(type);
+                        if (it != sizes.end())
+                        {
+                            size = it->second;
+                            return true;
+                        }
+                        if (type.rfind("::", 0) != 0)
+                        {
+                            it = sizes.find("::" + type);
+                        }
+                        else
+                        {
+                            it = sizes.find(type.substr(2));
+                        }
                         if (it != sizes.end())
                         {
                             size = it->second;
