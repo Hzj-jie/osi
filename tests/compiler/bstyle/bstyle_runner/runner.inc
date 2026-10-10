@@ -1,0 +1,121 @@
+#ifndef DIALECT
+#error "DIALECT must be defined before including runner.inc"
+#endif
+#ifndef DIALECT_NAME
+#error "DIALECT_NAME must be defined before including runner.inc"
+#endif
+#ifndef RUNNER_IS_EXTENSION
+#error "RUNNER_IS_EXTENSION must be defined before including runner.inc"
+#endif
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <filesystem>
+#include <algorithm>
+#include "../../../../interpreter/primitive/simulator.hpp"
+#include "../../../../app_info/error_handle.hpp"
+
+namespace fs = std::filesystem;
+using namespace primitive;
+
+static bool read_stream(std::istream& is, std::string& out_str)
+{
+    out_str.assign(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>());
+    return !out_str.empty();
+}
+
+static bool run_code(const std::string& content, const std::string& source_name)
+{
+    simulator sim;
+    auto pw = DIALECT::with_default_functions();
+    if (!pw.compile(content, sim))
+    {
+        std::cerr << "Error: Failed to compile " << DIALECT_NAME << " code from " << source_name << std::endl;
+        return false;
+    }
+
+    bool ok = sim.run(SIZE_MAX);
+    if (!ok && !sim.reg().stop)
+    {
+        std::cerr << "Error: VM halted with error (ip=" << sim.reg().ip << ") in " << source_name << std::endl;
+        return false;
+    }
+    return true;
+}
+
+static bool run_file(const fs::path& p)
+{
+    simulator sim;
+    auto pw = DIALECT::with_default_functions();
+    if (!pw.compile_file(p.string(), sim))
+    {
+        std::cerr << "Error: Failed to compile " << DIALECT_NAME << " file: " << p << std::endl;
+        return false;
+    }
+
+    bool ok = sim.run(SIZE_MAX);
+    if (!ok && !sim.reg().stop)
+    {
+        std::cerr << "Error: VM halted with error (ip=" << sim.reg().ip << ") in " << p << std::endl;
+        return false;
+    }
+    return true;
+}
+
+static bool run_path(const fs::path& p)
+{
+    if (fs::is_directory(p))
+    {
+        std::vector<fs::path> files;
+        for (const auto& entry : fs::directory_iterator(p))
+        {
+            if (entry.is_regular_file() && RUNNER_IS_EXTENSION(entry.path().extension()))
+            {
+                files.push_back(entry.path());
+            }
+        }
+        std::sort(files.begin(), files.end());
+        bool all_ok = true;
+        for (const auto& file : files)
+        {
+            if (!run_file(file))
+            {
+                all_ok = false;
+            }
+        }
+        return all_ok;
+    }
+    return run_file(p);
+}
+
+int main(int argc, char* argv[])
+{
+    if (std::getenv("OSI_DEBUG"))
+    {
+        error_handle::add_writer(new error_handle::console_error_writer());
+    }
+    if (argc <= 1 || (argc == 2 && std::string(argv[1]) == "-"))
+    {
+        std::string content;
+        if (!read_stream(std::cin, content))
+        {
+            std::cerr << "Error: Standard input is empty." << std::endl;
+            return 1;
+        }
+        return run_code(content, "<stdin>") ? 0 : 2;
+    }
+
+    bool all_ok = true;
+    for (int i = 1; i < argc; ++i)
+    {
+        fs::path p(argv[i]);
+        if (!run_path(p))
+        {
+            all_ok = false;
+        }
+    }
+
+    return all_ok ? 0 : 3;
+}
