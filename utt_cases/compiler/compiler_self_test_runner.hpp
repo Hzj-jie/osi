@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include "test_data_loader.hpp"
 #include "../../interpreter/primitive/simulator.hpp"
 #include "../../interpreter/primitive/console_io.hpp"
 #include "../../utt/icase.hpp"
@@ -50,64 +51,7 @@ namespace osi::compiler
 
         static std::filesystem::path find_directory(const std::string& name)
         {
-            namespace fs = std::filesystem;
-            try
-            {
-                auto exe_path = fs::canonical("/proc/self/exe").parent_path();
-                if (fs::exists(exe_path / name))
-                {
-                    return exe_path / name;
-                }
-                if (fs::exists(exe_path / "utt_cases/compiler/b3style" / name))
-                {
-                    return exe_path / "utt_cases/compiler/b3style" / name;
-                }
-                if (fs::exists(exe_path / "../utt_cases/compiler/b3style" / name))
-                {
-                    return exe_path / "../utt_cases/compiler/b3style" / name;
-                }
-                if (fs::exists(exe_path / "utt_cases/compiler/b2style" / name))
-                {
-                    return exe_path / "utt_cases/compiler/b2style" / name;
-                }
-                if (fs::exists(exe_path / "../utt_cases/compiler/b2style" / name))
-                {
-                    return exe_path / "../utt_cases/compiler/b2style" / name;
-                }
-            }
-            catch (...)
-            {
-            }
-
-            if (fs::exists(name))
-            {
-                return fs::path(name);
-            }
-            if (fs::exists("utt_cases/compiler/b3style/" + name))
-            {
-                return fs::path("utt_cases/compiler/b3style/" + name);
-            }
-            if (fs::exists("../utt_cases/compiler/b3style/" + name))
-            {
-                return fs::path("../utt_cases/compiler/b3style/" + name);
-            }
-            if (fs::exists("utt_cases/compiler/b2style/" + name))
-            {
-                return fs::path("utt_cases/compiler/b2style/" + name);
-            }
-            if (fs::exists("../utt_cases/compiler/b2style/" + name))
-            {
-                return fs::path("../utt_cases/compiler/b2style/" + name);
-            }
-            if (fs::exists("tests/compiler/b3style/" + name))
-            {
-                return fs::path("tests/compiler/b3style/" + name);
-            }
-            if (fs::exists("tests/compiler/b2style/" + name))
-            {
-                return fs::path("tests/compiler/b2style/" + name);
-            }
-            return fs::path();
+            return test_data::utt_cases_dir() / "b2style" / name;
         }
 
         virtual bool compile_with_io(primitive::console_io::test_wrapper& io,

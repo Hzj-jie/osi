@@ -48,41 +48,7 @@ namespace osi::compiler::b3style_compiler
 
         static std::filesystem::path find_runnable_dir()
         {
-            namespace fs = std::filesystem;
-            try
-            {
-                auto exe_path = fs::canonical("/proc/self/exe").parent_path();
-                if (fs::exists(exe_path / "runnable"))
-                {
-                    return exe_path / "runnable";
-                }
-                if (fs::exists(exe_path / "utt_cases/compiler/b3style/runnable"))
-                {
-                    return exe_path / "utt_cases/compiler/b3style/runnable";
-                }
-                if (fs::exists(exe_path / "../utt_cases/compiler/b3style/runnable"))
-                {
-                    return exe_path / "../utt_cases/compiler/b3style/runnable";
-                }
-            }
-            catch (...) {}
-            if (fs::exists("utt_cases/compiler/b3style/runnable"))
-            {
-                return fs::canonical("utt_cases/compiler/b3style/runnable");
-            }
-            if (fs::exists("../utt_cases/compiler/b3style/runnable"))
-            {
-                return fs::canonical("../utt_cases/compiler/b3style/runnable");
-            }
-            if (fs::exists("tests/compiler/b3style/runnable"))
-            {
-                return fs::canonical("tests/compiler/b3style/runnable");
-            }
-            if (fs::exists("runnable"))
-            {
-                return fs::canonical("runnable");
-            }
-            return "";
+            return test_data::utt_cases_dir() / "b3style" / "runnable";
         }
 
         void test_func_kw()
