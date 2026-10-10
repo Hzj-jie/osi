@@ -8,33 +8,16 @@
 #include "../../../automata/typed_node.hpp"
 #include "../../../app_info/assert.hpp"
 
+#define DIALECT b2style_compiler
+#define WRITER rewriter::typed_node_writer
+#include "namespaces.inc"
+
 namespace osi
 {
     namespace compiler
     {
         namespace b2style_compiler
         {
-            class namespace_node : public code_gen<rewriter::typed_node_writer>
-            {
-            public:
-                static const char* node_name() { return "namespace"; }
-
-                bool build(const std::shared_ptr<automata::typed_node>& n, rewriter::typed_node_writer& o) override
-                {
-                    assert(n != nullptr);
-                    assert(n->child_count() >= 4);
-                    std::string ns_name = n->child(1)->input_without_ignored();
-                    auto guard = scope::current()->current_namespace().define(current_namespace_t::of(ns_name));
-                    for (uint32_t i = 3; i + 1 < n->child_count(); ++i)
-                    {
-                        if (!code_gen_of(n->child(i)).build(o))
-                        {
-                            return false;
-                        }
-                    }
-                    return true;
-                }
-            };
 
             class name_node : public code_gen<rewriter::typed_node_writer>
             {
