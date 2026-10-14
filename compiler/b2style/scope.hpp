@@ -28,8 +28,6 @@ namespace osi
             // Forward declaration of build_code for recursive code builds (templates, classes, etc.)
             bool build_code(const std::string& input, rewriter::typed_node_writer& o);
 
-            using current_file_guard = bstyle_compiler::current_file_guard;
-
             namespace _namespace
             {
                 class bstyle_format

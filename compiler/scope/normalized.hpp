@@ -3,7 +3,6 @@
 #include <memory>
 #include "../../automata/typed_node.hpp"
 #include "../logic/builders.hpp"
-#include "../logic/scope.hpp"
 #include "namespace.hpp"
 #include "compiler_scope_interface.hpp"
 #include "features.hpp"

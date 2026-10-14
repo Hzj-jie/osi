@@ -14,6 +14,8 @@
 #include "../rewriter/typed_node_writer.hpp"
 #include "name_with_namespace.hpp"
 #include "namespace.hpp"
+#include "normalized.hpp"
+#include "compiler_scope_interface.hpp"
 #include "root_type_injector.hpp"
 #include "accessor.hpp"
 

@@ -5,6 +5,7 @@
 #include <sstream>
 #include <cctype>
 #include "statements.hpp"
+#include "importer.definition.hpp"
 #include "../../interpreter/primitive/simulator.hpp"
 #include "../../interpreter/primitive/parser.hpp"
 #include "../../interpreter/primitive/data_block.hpp"
@@ -15,7 +16,7 @@ namespace osi
     {
         namespace logic
         {
-            class importer
+            class importer : private importer_definition
             {
             private:
                 std::shared_ptr<primitive::interrupts> functions;
@@ -72,87 +73,6 @@ namespace osi
                     }
                     return tokens;
                 }
-
-                static bool parse_typed_parameters(std::vector<parameter>& o, const std::vector<std::string>& v, size_t& p)
-                {
-                    assert(v.size() > p);
-                    if (v[p] != "(") return false;
-                    p++;
-                    while (p < v.size())
-                    {
-                        if (v[p] == ")")
-                        {
-                            p++;
-                            return true;
-                        }
-                        if (p + 1 >= v.size()) return false;
-                        std::string param_name = v[p];
-                        std::string param_type = v[p + 1];
-                        o.emplace_back(param_type, param_name);
-                        p += 2;
-                    }
-                    errors::typed_parameters_is_not_closed();
-                    return false;
-                }
-
-                static bool parse_parameters(std::vector<std::string>& o, const std::vector<std::string>& v, size_t& p)
-                {
-                    assert(v.size() > p);
-                    if (v[p] != "(") return false;
-                    p++;
-                    while (p < v.size())
-                    {
-                        if (v[p] == ")")
-                        {
-                            p++;
-                            return true;
-                        }
-                        o.push_back(v[p]);
-                        p++;
-                    }
-                    errors::parameters_is_not_closed();
-                    return false;
-                }
-
-                bool parse_paragraph(std::shared_ptr<paragraph>& o, const std::vector<std::string>& v, size_t& p)
-                {
-                    assert(v.size() > p);
-                    if (v[p] != "{") return false;
-                    o = std::make_shared<paragraph>();
-                    p++;
-                    while (p < v.size())
-                    {
-                        if (v[p] == "}")
-                        {
-                            p++;
-                            return true;
-                        }
-                        std::shared_ptr<instruction_gen> e;
-                        if (!parse(v, p, e)) return false;
-                        o->push(std::move(e));
-                    }
-                    errors::paragraph_is_not_closed();
-                    return false;
-                }
-
-                static bool parse_uint(const std::string& s, uint32_t& o)
-                {
-                    if (s.empty()) return false;
-                    try
-                    {
-                        size_t idx = 0;
-                        unsigned long val = std::stoul(s, &idx);
-                        if (idx != s.size()) return false;
-                        o = static_cast<uint32_t>(val);
-                        return true;
-                    }
-                    catch (...)
-                    {
-                        return false;
-                    }
-                }
-
-#include "importer.definition.hpp"
 
             public:
                 explicit importer(std::shared_ptr<primitive::interrupts> functions = nullptr)

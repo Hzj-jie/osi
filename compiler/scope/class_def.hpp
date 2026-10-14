@@ -6,6 +6,9 @@
 #include <memory>
 #include <utility>
 #include "name_with_namespace.hpp"
+#include "compiler_scope_interface.hpp"
+#include "accessor.hpp"
+#include "call_hierarchy.hpp"
 #include "../logic/builders.hpp"
 #include "../../automata/typed_node.hpp"
 #include "../../app_info/assert.hpp"

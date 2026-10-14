@@ -6,28 +6,6 @@
 #include <cassert>
 #include "../../app_info/assert.hpp"
 #include "../../app_info/error_handle.hpp"
-#include "../code_gen/code_gen.hpp"
-#include "compiler_scope_interface.hpp"
-#include "features.hpp"
-#include "accessor.hpp"
-#include "normalized.hpp"
-#include "includes.hpp"
-#include "define.hpp"
-#include "type_alias.hpp"
-#include "struct.hpp"
-#include "variable.hpp"
-#include "function.hpp"
-#include "value_target.hpp"
-#include "params.hpp"
-#include "current_function.hpp"
-#include "delegate.hpp"
-#include "temp_logic_name.hpp"
-#include "call_hierarchy.hpp"
-#include "namespace.hpp"
-#include "name_with_namespace.hpp"
-#include "class_def.hpp"
-#include "template.hpp"
-#include "root_type_injector.hpp"
 
 namespace osi
 {
@@ -164,7 +142,36 @@ namespace osi
                 return getter(get_root());
             }
         };
+    }
+}
 
+#include "../code_gen/code_gen.hpp"
+#include "compiler_scope_interface.hpp"
+#include "features.hpp"
+#include "accessor.hpp"
+#include "normalized.hpp"
+#include "includes.hpp"
+#include "define.hpp"
+#include "type_alias.hpp"
+#include "struct.hpp"
+#include "variable.hpp"
+#include "function.hpp"
+#include "value_target.hpp"
+#include "params.hpp"
+#include "current_function.hpp"
+#include "delegate.hpp"
+#include "temp_logic_name.hpp"
+#include "call_hierarchy.hpp"
+#include "namespace.hpp"
+#include "name_with_namespace.hpp"
+#include "class_def.hpp"
+#include "template.hpp"
+#include "root_type_injector.hpp"
+
+namespace osi
+{
+    namespace compiler
+    {
         template <typename Derived, typename Writer>
         class compiler_scope : public scope_base<Derived>, public compiler_scope_interface
         {

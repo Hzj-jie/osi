@@ -21,6 +21,8 @@ namespace osi
     {
         namespace b2style_compiler
         {
+            using current_file_guard = bstyle_compiler::current_file_guard;
+
             inline const std::string& b2style_inc_folder()
             {
                 return b2style_lib::inc_folder();

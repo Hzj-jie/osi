@@ -7,7 +7,9 @@
 #include <memory>
 #include <functional>
 #include "../code_gen/statements.hpp"
+#include "../logic/logic_writer.hpp"
 #include "compiler_scope_interface.hpp"
+#include "accessor.hpp"
 #include "../../app_info/assert.hpp"
 
 namespace osi

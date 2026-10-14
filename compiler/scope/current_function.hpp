@@ -6,7 +6,6 @@
 #include "struct.hpp"
 #include "../function_signature.hpp"
 #include "../logic/builders.hpp"
-#include "../logic/scope.hpp"
 
 namespace osi
 {
