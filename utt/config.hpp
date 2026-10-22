@@ -5,6 +5,7 @@
 #include <vector>
 #include <set>
 #include <string>
+#include "../envs/preenv.hpp"
 #include "../utils/str_pattern_matcher.hpp"
 #include "../utils/strcmp.hpp"
 #include "icase.hpp"
@@ -40,7 +41,9 @@ public:
     }
 
     config_t(const int argc, const char* const* const argv) :
-        thread_count(std::thread::hardware_concurrency())
+        thread_count(preenv.utt_concurrency > 0 ?
+                     preenv.utt_concurrency :
+                     (std::thread::hardware_concurrency() == 0 ? 1 : std::thread::hardware_concurrency()))
     {
         for(int i = 1; i < argc; i++)
         {

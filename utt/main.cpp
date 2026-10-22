@@ -31,7 +31,7 @@ static void run(int id)
             if(config.selected(c))
             {
                 uint32_t current_using_processors = using_processors.fetch_add(c.preserved_processor_count()) + c.preserved_processor_count();
-                bool should_run = (current_using_processors <= processor.count ||
+                bool should_run = (current_using_processors <= config.thread_count ||
                                    current_using_processors == c.preserved_processor_count());
                 if(should_run)
                 {
