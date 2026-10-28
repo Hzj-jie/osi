@@ -1,12 +1,12 @@
 # OSI (Operating System Infrastructure)
 
-A modern, high-performance C++17 utility and infrastructure library providing cross-platform system abstractions, thread management, async procedure combination, and built-in unit testing.
+A modern, high-performance C++20 utility and infrastructure library providing cross-platform system abstractions, thread management, async procedure combination, and built-in unit testing.
 
 ---
 
 ## 🌟 Key Features
 
-* **Modern C++17**: Standard compliance (`-std=c++17`) with **zero external Boost dependencies**.
+* **Modern C++20**: Standard compliance (`-std=c++20`) with **zero external Boost dependencies**.
 * **Cross-Platform OS Abstractions**: Operating system env vars, system time/clocks, process path/deploy management (`envs/`).
 * **Concurrency & Thread Pools**: Task queue runners, asynchronous timers (`stopwatch`), and thread-safe data queues (`threadpool/`, `formation/concurrent/`).
 * **Async Flow Composition**: Stateful asynchronous event combination (`procedure/event_comb.hpp`).

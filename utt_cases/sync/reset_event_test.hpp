@@ -4,6 +4,7 @@
 #include "../../utt/icase.hpp"
 #include "../../sync/reset_event.hpp"
 #include "../../sync/yield.hpp"
+#include <atomic>
 #include <stdint.h>
 #include <vector>
 #include <thread>
@@ -15,23 +16,23 @@ private:
 
     template <typename T>
     static void run_waiter(const std::reference_wrapper<T>& re,
-                           const std::reference_wrapper<int64_t>& v,
-                           const std::reference_wrapper<bool>& r,
-                           const std::reference_wrapper<uint32_t>& finished)
+                           const std::reference_wrapper<std::atomic<int64_t>>& v,
+                           const std::reference_wrapper<std::atomic<bool>>& r,
+                           const std::reference_wrapper<std::atomic<uint32_t>>& finished)
     {
-        while(r)
+        while(r.get().load(std::memory_order_acquire))
         {
             re.get().wait();
-            v++;
+            v.get().fetch_add(1, std::memory_order_acq_rel);
         }
-        finished++;
+        finished.get().fetch_add(1, std::memory_order_acq_rel);
     }
 
     template <typename T>
     static std::vector<std::thread> start_waiters(T& re,
-                                                  int64_t& v,
-                                                  bool& r,
-                                                  uint32_t& finished)
+                                                  std::atomic<int64_t>& v,
+                                                  std::atomic<bool>& r,
+                                                  std::atomic<uint32_t>& finished)
     {
         using namespace std;
         vector<thread> vs;
@@ -43,11 +44,11 @@ private:
     template <typename T>
     static void wait_for_waiters(T&& re,
                                  std::vector<std::thread>& v,
-                                 bool& r,
-                                 uint32_t& finished)
+                                 std::atomic<bool>& r,
+                                 std::atomic<uint32_t>& finished)
     {
-        r = false;
-        while(finished < v.size())
+        r.store(false, std::memory_order_release);
+        while(finished.load(std::memory_order_acquire) < v.size())
         {
             re.set();
             std::this_thread::interval();
@@ -66,19 +67,20 @@ private:
         using namespace std;
         auto_reset_event are;
         utt_assert.is_true(are.reset());
-        int64_t v = 0;
-        bool running = true;
-        uint32_t finished = 0;
+        atomic<int64_t> v(0);
+        atomic<bool> running(true);
+        atomic<uint32_t> finished(0);
         vector<thread>&& vs = start_waiters(are, v, running, finished);
         for(int i = 0; i < 1000; i++)
         {
-            utt_assert.equal(v, i);
+            utt_assert.equal(v.load(memory_order_acquire), i);
             utt_assert.is_true(are.set());
+            while(v.load(memory_order_acquire) < i + 1) std::this_thread::yield();
             for(int j = 0; j < 2; j++)
             {
-                pending();
+                std::this_thread::yield();
                 utt_assert.is_false(are);
-                utt_assert.equal(v, i + 1);
+                utt_assert.equal(v.load(memory_order_acquire), i + 1);
             }
         }
         wait_for_waiters(are, vs, running, finished);
@@ -90,29 +92,29 @@ private:
         using namespace std;
         manual_reset_event mre;
         utt_assert.is_true(mre.reset());
-        int64_t v = 0;
-        bool running = true;
-        uint32_t finished = 0;
+        atomic<int64_t> v(0);
+        atomic<bool> running(true);
+        atomic<uint32_t> finished(0);
         vector<thread>&& vs = start_waiters(mre, v, running, finished);
         for(int i = 0; i < 200; i++)
         {
-            int64_t c = v;
+            int64_t c = v.load(memory_order_acquire);
             utt_assert.is_true(mre.set());
             for(int j = 0; j < 2; j++)
             {
-                c = v;
-                pending();
+                c = v.load(memory_order_acquire);
+                while(v.load(memory_order_acquire) <= c) std::this_thread::yield();
                 utt_assert.is_true(mre);
-                utt_assert.more(v, c);
+                utt_assert.more(v.load(memory_order_acquire), c);
             }
             utt_assert.is_true(mre.reset());
             pending();
-            c = v;
+            c = v.load(memory_order_acquire);
             for(int j = 0; j < 2; j++)
             {
                 pending();
                 utt_assert.is_false(mre);
-                utt_assert.equal(v, c);
+                utt_assert.equal(v.load(memory_order_acquire), c);
             }
         }
         wait_for_waiters(mre, vs, running, finished);
