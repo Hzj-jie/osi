@@ -1,8 +1,7 @@
 
 #pragma once
-#include <semaphore>
+#include <thread>
 #include <atomic>
-#include <chrono>
 #include "../app_info/assert.hpp"
 #include <stdint.h>
 #include "../envs/nowadays.hpp"
@@ -14,40 +13,27 @@ namespace __reset_event_private
 }
 
 template <bool auto_reset>
-class reset_event;
-
-template <>
-class reset_event<true>
+class reset_event
 {
 private:
-    std::binary_semaphore sem;
-    std::atomic<bool> signaled;
-
+    const int PASS = 0;
+    const int BLOCK = 1;
+    std::atomic<int> s;
 public:
     reset_event(bool init_pass) :
-        sem(init_pass ? 1 : 0),
-        signaled(init_pass) { }
+        s(init_pass ? PASS : BLOCK) { }
 
     reset_event() :
         reset_event(true) { }
 
     bool set()
     {
-        bool expected = false;
-        if(signaled.compare_exchange_strong(expected, true, std::memory_order_acq_rel))
+        int v = BLOCK;
+        if(s.compare_exchange_strong(v, PASS, std::memory_order_acq_rel))
         {
-            assert(!expected);
-            sem.release();
-            return true;
-        }
-        return false;
-    }
-
-    bool try_wait()
-    {
-        if(sem.try_acquire())
-        {
-            signaled.store(false, std::memory_order_release);
+            assert(v == BLOCK);
+            if constexpr (auto_reset) s.notify_one();
+            else s.notify_all();
             return true;
         }
         return false;
@@ -55,89 +41,28 @@ public:
 
     bool reset()
     {
-        return try_wait();
+        int v = PASS;
+        return s.compare_exchange_strong(v, BLOCK, std::memory_order_acq_rel) &&
+               assert(v == PASS);
     }
 
     operator bool() const
     {
-        return signaled.load(std::memory_order_acquire);
-    }
-
-    template <typename Rep, typename Period>
-    bool wait(const std::chrono::duration<Rep, Period>& timeout)
-    {
-        if(sem.try_acquire_for(timeout))
-        {
-            signaled.store(false, std::memory_order_release);
-            return true;
-        }
-        return false;
-    }
-
-    template <typename T>
-    bool wait(T&& ms_timer, uint32_t timeout_ms)
-    {
-        return std::this_thread::wait_when(
-                        ms_timer,
-                        [&]()
-                        {
-                            return !try_wait();
-                        },
-                        timeout_ms);
-    }
-
-    inline bool wait(uint32_t timeout_ms)
-    {
-        return wait(std::chrono::milliseconds(timeout_ms));
-    }
-
-    void wait()
-    {
-        sem.acquire();
-        signaled.store(false, std::memory_order_release);
-    }
-};
-
-template <>
-class reset_event<false>
-{
-private:
-    std::atomic<bool> signaled;
-
-public:
-    reset_event(bool init_pass) :
-        signaled(init_pass) { }
-
-    reset_event() :
-        reset_event(true) { }
-
-    bool set()
-    {
-        bool expected = false;
-        if(signaled.compare_exchange_strong(expected, true, std::memory_order_acq_rel))
-        {
-            assert(!expected);
-            signaled.notify_all();
-            return true;
-        }
-        return false;
-    }
-
-    bool reset()
-    {
-        bool expected = true;
-        return signaled.compare_exchange_strong(expected, false, std::memory_order_acq_rel) &&
-               assert(expected);
-    }
-
-    operator bool() const
-    {
-        return signaled.load(std::memory_order_acquire);
+        return (s.load(std::memory_order_acquire) == PASS);
     }
 
     bool try_wait()
     {
-        return signaled.load(std::memory_order_acquire);
+        if constexpr (auto_reset)
+        {
+            int v = PASS;
+            return s.compare_exchange_strong(v, BLOCK, std::memory_order_acq_rel) &&
+                   assert(v == PASS);
+        }
+        else
+        {
+            return s.load(std::memory_order_acquire) == PASS;
+        }
     }
 
     template <typename T>
@@ -159,9 +84,9 @@ public:
 
     void wait()
     {
-        while(!signaled.load(std::memory_order_acquire))
+        while(!try_wait())
         {
-            signaled.wait(false, std::memory_order_acquire);
+            s.wait(BLOCK, std::memory_order_acquire);
         }
     }
 };
